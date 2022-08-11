@@ -1,0 +1,51 @@
+.workerscontainer h3 {
+  margin-top: 0;
+}
+
+.workersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1vw;
+  padding: 25px 0;
+}
+
+.workerCard {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 2vh 1vw;
+  word-wrap: break-word;
+  cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-radius: 15px;
+}
+
+.workerCard .cardInfos {
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+  row-gap: 15px;
+}
+
+.workerCard .cardInfos .cardtitle {
+  font-weight: bold;
+}
+
+.seemore {
+  font-style: italic;
+  text-align: right;
+  grid-column: 1 / span 2;
+  margin-top: 10px;
+}
+
+.workerCard:hover .seemore {
+  color: var(--orange-color);
+}
+
+.modal {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}

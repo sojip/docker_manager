@@ -1,0 +1,38 @@
+.homeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: max(1vw, 1vh);
+  grid-auto-rows: 150px;
+  transition: all 300ms;
+}
+
+.homeItem {
+  /* border: solid 1px red; */
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  cursor: pointer;
+  border-left: solid 3px var(--orange-color);
+  border-radius: 15px;
+  background-color: white;
+}
+
+.homeLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: black;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  font-weight: bold;
+  transition: all 300ms;
+  background-color: white;
+  border-radius: 15px;
+}
+
+.homeLink:hover {
+  color: var(--orange-color);
+}
