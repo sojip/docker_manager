@@ -28,3 +28,24 @@ module.exports.getShiftDockers = function (req, res, next) {
       return res.json(dockers);
     });
 };
+
+// module.exports.getDockerInterruptions = function (req, res, next) {
+//   var id = req.params.id;
+//   ShiftInstance.find({ docker: mongoose.Types.ObjectId(id) })
+//     .populate("interruptions")
+//     .exec(function (err, interruptions) {
+//       if (err) return res.status(500).json({ err });
+//       return res.json(interruptions);
+//     });
+// };
+
+module.exports.getDockerShifts = function (req, res, next) {
+  var id = req.params.id;
+  ShiftInstance.find({ docker: mongoose.Types.ObjectId(id) })
+    .select("shift startedshift endedshift interruptions")
+    .populate("shift interruptions")
+    .exec(function (err, shifts) {
+      if (err) return res.status(500).json({ err });
+      return res.json(shifts);
+    });
+};

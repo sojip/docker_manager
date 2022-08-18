@@ -35,6 +35,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+app.get("/", function (req, res, next) {
+  res.render("index", { title: "Express" });
+});
 app.use("/api", apiRouter);
 app.use("/users", usersRouter);
 
