@@ -39,6 +39,11 @@
   flex: 1 0 calc(50% -7.5px);
 }
 
+#showworkerbox .workerstats {
+  /* border: solid 1px red; */
+  padding: 5px 0;
+}
+
 #showworkerbox .shiftsgrid {
   margin-top: 15px;
   display: grid;

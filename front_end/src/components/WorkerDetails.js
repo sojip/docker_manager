@@ -15,7 +15,6 @@ const WorkerDetails = (props) => {
   });
   const [shifts, setshifts] = useState([]);
   const [searchresults, setsearchresults] = useState([]);
-  const [search, setsearch] = useState({ from: "", to: "" });
 
   const { handleClose } = props;
   const { selected_id } = props;
@@ -32,11 +31,136 @@ const WorkerDetails = (props) => {
     return shifts;
   }
 
-  function handleSearch(e) {
-    let date = e.target.value;
-    let name = e.target.name;
-    console.log(DateTime.fromISO(date));
-    setsearch({ ...search, [name]: date });
+  function handleSearchFrom(e) {
+    let dateFrom = e.target.value;
+    let dateTo = document.querySelector("#searchshiftend").value;
+    if (dateFrom !== "") {
+      let searchShiftsIds = shifts
+        .map((shift) => {
+          return {
+            _id: shift._id,
+            shift: {
+              startdate: shift.shift.startdate.split("T")[0],
+              enddate: shift.shift.enddate.split("T")[0],
+            },
+          };
+        })
+        .filter((shift) => {
+          if (dateTo !== "") {
+            let interval = Interval.fromDateTimes(
+              DateTime.fromISO(dateFrom),
+              DateTime.fromISO(dateTo).plus({ days: 1 })
+            );
+            return (
+              interval.contains(DateTime.fromISO(shift.shift.startdate)) ||
+              interval.contains(DateTime.fromISO(shift.shift.enddate))
+            );
+          }
+          return (
+            DateTime.fromISO(shift.shift.startdate) >=
+              DateTime.fromISO(dateFrom) ||
+            DateTime.fromISO(shift.shift.enddate) >= DateTime.fromISO(dateFrom)
+          );
+        })
+        .map((shift) => shift._id);
+
+      return setsearchresults(
+        shifts.filter((shift) => {
+          return searchShiftsIds.includes(shift._id);
+        })
+      );
+    } else if (dateTo !== "") {
+      let searchShiftsIds = shifts
+        .map((shift) => {
+          return {
+            _id: shift._id,
+            shift: {
+              startdate: shift.shift.startdate.split("T")[0],
+              enddate: shift.shift.enddate.split("T")[0],
+            },
+          };
+        })
+        .filter((shift) => {
+          return (
+            DateTime.fromISO(shift.shift.startdate) <=
+              DateTime.fromISO(dateTo) ||
+            DateTime.fromISO(shift.shift.enddate) <= DateTime.fromISO(dateTo)
+          );
+        })
+        .map((shift) => shift._id);
+      return setsearchresults(
+        shifts.filter((shift) => {
+          return searchShiftsIds.includes(shift._id);
+        })
+      );
+    }
+    return setsearchresults(shifts);
+  }
+
+  function handleSearchTo(e) {
+    let dateTo = e.target.value;
+    let dateFrom = document.querySelector("#searchshiftstart").value;
+    if (dateTo !== "") {
+      let searchShiftsIds = shifts
+        .map((shift) => {
+          return {
+            _id: shift._id,
+            shift: {
+              startdate: shift.shift.startdate.split("T")[0],
+              enddate: shift.shift.enddate.split("T")[0],
+            },
+          };
+        })
+        .filter((shift) => {
+          if (dateFrom !== "") {
+            let interval = Interval.fromDateTimes(
+              DateTime.fromISO(dateFrom),
+              DateTime.fromISO(dateTo).plus({ days: 1 })
+            );
+            return (
+              interval.contains(DateTime.fromISO(shift.shift.startdate)) ||
+              interval.contains(DateTime.fromISO(shift.shift.enddate))
+            );
+          }
+          return (
+            DateTime.fromISO(shift.shift.startdate) <=
+              DateTime.fromISO(dateTo) ||
+            DateTime.fromISO(shift.shift.enddate) <= DateTime.fromISO(dateTo)
+          );
+        })
+        .map((shift) => shift._id);
+
+      return setsearchresults(
+        shifts.filter((shift) => {
+          return searchShiftsIds.includes(shift._id);
+        })
+      );
+    } else if (dateFrom !== "") {
+      let searchShiftsIds = shifts
+        .map((shift) => {
+          return {
+            _id: shift._id,
+            shift: {
+              startdate: shift.shift.startdate.split("T")[0],
+              enddate: shift.shift.enddate.split("T")[0],
+            },
+          };
+        })
+        .filter((shift) => {
+          return (
+            DateTime.fromISO(shift.shift.startdate) >=
+              DateTime.fromISO(dateFrom) ||
+            DateTime.fromISO(shift.shift.enddate) >= DateTime.fromISO(dateFrom)
+          );
+        })
+        .map((shift) => shift._id);
+      return setsearchresults(
+        shifts.filter((shift) => {
+          return searchShiftsIds.includes(shift._id);
+        })
+      );
+    }
+    return setsearchresults(shifts);
   }
 
   useEffect(() => {
@@ -49,10 +173,6 @@ const WorkerDetails = (props) => {
       }
     );
   }, []);
-
-  useEffect(() => {
-    console.log(search);
-  }, [search]);
 
   return (
     <Box
@@ -96,40 +216,40 @@ const WorkerDetails = (props) => {
         </div>
       </div>
       <h3>Shifts</h3>
-      {shifts.length > 0 ? (
+      <div className="findshifts">
         <div>
-          <div className="findshifts">
-            <div>
-              <div>From</div>
-              <TextField
-                type="date"
-                id="searchshiftstart"
-                helperText="Select A Date"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                name="from"
-                onChange={handleSearch}
-              />
-            </div>
-            <div>
-              <div>To</div>
-              <TextField
-                type="date"
-                id="searchshiftend"
-                helperText="Select A Date"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                name="to"
-                onChange={handleSearch}
-              />
-            </div>
-          </div>
-          <div>Total Shifts {shifts.length}</div>
-          <div>
+          <div>From</div>
+          <TextField
+            type="date"
+            id="searchshiftstart"
+            helperText="Select A Date"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            name="from"
+            onChange={handleSearchFrom}
+          />
+        </div>
+        <div>
+          <div>To</div>
+          <TextField
+            type="date"
+            id="searchshiftend"
+            helperText="Select A Date"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            name="to"
+            onChange={handleSearchTo}
+          />
+        </div>
+      </div>
+      {searchresults.length > 0 ? (
+        <div>
+          <div className="workerstats">Total Shifts {searchresults.length}</div>
+          <div className="workerstats">
             Total Time Worked{" "}
-            {shifts.reduce((total, shift) => {
+            {searchresults.reduce((total, shift) => {
               if (!shift.interruptions) return total + shift.shift.duration;
               return (
                 total +
@@ -140,10 +260,10 @@ const WorkerDetails = (props) => {
                 )
               );
             }, 0)}{" "}
-            Mins
+            mins
           </div>
           <div className="shiftsgrid">
-            {shifts.map((shift) => {
+            {searchresults.map((shift) => {
               return (
                 <div className="shiftItem" key={shift._id}>
                   <div>Shift {shift.shift.type}</div>
