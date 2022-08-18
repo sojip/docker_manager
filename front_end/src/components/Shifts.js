@@ -8,6 +8,15 @@ import StickyHeadTable from "./Table";
 const Shifts = () => {
   const [shifts, setshifts] = useState([]);
   const [searchShiftsResults, setsearchShiftsResults] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [addShift, setaddShift] = useState(false);
+  const [showShift, setshowShift] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setOpen(false);
+    setaddShift(false);
+    setshowShift(false);
+  };
 
   async function getShifts() {
     const res = await fetch("http://localhost:3000/api/shifts");
@@ -74,6 +83,7 @@ const Shifts = () => {
       ) : (
         <div className="noDatasInfos">No Shifts ...</div>
       )}
+      {open && <div className="modal">{/* TO DO  */}</div>}
     </div>
   );
 };

@@ -17,15 +17,10 @@
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   border-radius: 15px;
 }
-
-.workerCard .cardInfos {
-  display: grid;
-  grid-template-columns: repeat(2, 50%);
-  row-gap: 15px;
-}
-
-.workerCard .cardInfos .cardtitle {
-  font-weight: bold;
+.workerCard .profileContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .seemore {
@@ -48,4 +43,6 @@
   width: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
+  padding: 1vw;
+  overflow-y: auto;
 }

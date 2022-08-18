@@ -1,0 +1,75 @@
+#showworkerbox h3 {
+  text-transform: uppercase;
+}
+
+#showworkerbox h3:not(:first-of-type) {
+  margin-top: 25px;
+}
+
+#showworkerbox .workerGeneralInfos div {
+  text-transform: capitalize;
+}
+
+#showworkerbox .fingerprintcontainer {
+  border: solid 3px black;
+  width: 250px;
+  height: 250px;
+  float: right;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#showworkerbox .workerGeneralInfos {
+  min-height: 250px;
+  position: relative;
+}
+
+#showworkerbox .workerGeneralInfos div:not(:last-of-type) {
+  line-height: 2rem;
+}
+
+#showworkerbox .findshifts {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+#showworkerbox .findshifts div {
+  flex: 1 0 calc(50% -7.5px);
+}
+
+#showworkerbox .shiftsgrid {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  align-items: flex-start;
+  gap: 15px;
+}
+
+#showworkerbox .shiftsgrid .shiftItem {
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  padding: 20px 1vw 40px 1vw;
+  word-wrap: break-word;
+  line-height: 1.6rem;
+  position: relative;
+  border-radius: 10px;
+}
+
+#showworkerbox .shiftsgrid .shiftItem > div:first-of-type {
+  text-transform: capitalize;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#showworkerbox .shiftsgrid .shiftItem .timeworked {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 5px 0;
+  font-weight: bold;
+}

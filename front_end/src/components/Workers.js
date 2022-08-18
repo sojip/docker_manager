@@ -1,16 +1,42 @@
 import Icon from "@mdi/react";
 import { mdiAccountPlusOutline } from "@mdi/js";
+import { mdiAccountHardHatOutline } from "@mdi/js";
 import "../styles/Workers.css";
 import { useState, useEffect } from "react";
 import AddWorkerForm from "./AddWorkerForm";
+import WorkerDetails from "./WorkerDetails";
 import TextField from "@mui/material/TextField";
+import { DateTime } from "luxon";
 
 const Workers = () => {
   const [workers, setworkers] = useState([]);
+  const [selected_id, setselectedid] = useState("");
   const [searchWorkersResults, setsearchWorkersResults] = useState([]);
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [addWorker, setaddWorker] = useState(false);
+  const [showWorker, setshowWorker] = useState(false);
+  const handleOpen = () => {
+    setOpen(true);
+    document.querySelector("body").style.overflowY = "hidden";
+  };
+  const handleClose = () => {
+    setOpen(false);
+    setaddWorker(false);
+    setshowWorker(false);
+    document.querySelector("body").style.overflowY = "auto";
+    setselectedid("");
+  };
+
+  function handleAddWorkerClick() {
+    handleOpen();
+    setaddWorker(true);
+  }
+
+  function handleShowWorkerClick(e) {
+    handleOpen();
+    setshowWorker(true);
+    setselectedid(e.currentTarget.id);
+  }
 
   async function getWorkers() {
     const res = await fetch("http://localhost:3000/api/workers");
@@ -35,10 +61,6 @@ const Workers = () => {
     setsearchWorkersResults(workers);
   }
 
-  function handleSelection(e) {
-    console.log(e.currentTarget);
-  }
-
   useEffect(() => {
     getWorkers().then((workers) => {
       setworkers(workers);
@@ -49,7 +71,7 @@ const Workers = () => {
   return (
     <div className="workerscontainer">
       <h3>Workers</h3>
-      <div className="oulinedButtonWrapper" onClick={handleOpen}>
+      <div className="oulinedButtonWrapper" onClick={handleAddWorkerClick}>
         <Icon path={mdiAccountPlusOutline} size={1} />
         Add Worker
       </div>
@@ -74,18 +96,30 @@ const Workers = () => {
                   className="workerCard"
                   key={worker._id}
                   id={worker._id}
-                  onClick={handleSelection}
+                  onClick={handleShowWorkerClick}
                 >
-                  <div className="profileContainer"></div>
-                  <div className="cardInfos">
-                    <div className="cardtitle">First Name</div>
-                    <div>{worker.firstname}</div>
-                    <div className="cardtitle">Last Name</div>
-                    <div>{worker.lastname}</div>
-                    <div className="cardtitle">Finger Print</div>
-                    <div>{worker.fingerprint}</div>
-                    <div className="seemore">See More</div>
+                  <div className="profileContainer">
+                    <Icon
+                      id="workerIcon"
+                      path={mdiAccountHardHatOutline}
+                      size={2.5}
+                    />
+                    <div className="name">
+                      <div>{worker.firstname}</div>
+                      <div>{worker.lastname}</div>
+                    </div>
                   </div>
+                  <div>
+                    Born On{" "}
+                    {DateTime.fromISO(worker.dateofbirth)
+                      .setLocale("fr")
+                      .toLocaleString({
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                  </div>
+                  <div className="seemore">See More</div>
                 </div>
               );
             })}
@@ -96,7 +130,13 @@ const Workers = () => {
       )}
       {open && (
         <div className="modal">
-          <AddWorkerForm handleClose={handleClose} />
+          {addWorker && <AddWorkerForm handleClose={handleClose} />}
+          {showWorker && (
+            <WorkerDetails
+              handleClose={handleClose}
+              selected_id={selected_id}
+            />
+          )}
         </div>
       )}
     </div>
