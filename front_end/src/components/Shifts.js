@@ -4,6 +4,7 @@ import Icon from "@mdi/react";
 import { mdiPlusCircle } from "@mdi/js";
 import { useEffect, useState } from "react";
 import StickyHeadTable from "./Table";
+import AddShiftForm from "./AddShiftForm";
 
 const Shifts = () => {
   const [shifts, setshifts] = useState([]);
@@ -11,12 +12,21 @@ const Shifts = () => {
   const [open, setOpen] = useState(false);
   const [addShift, setaddShift] = useState(false);
   const [showShift, setshowShift] = useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {
+    setOpen(true);
+    document.querySelector("body").style.overflowY = "hidden";
+  };
   const handleClose = () => {
     setOpen(false);
     setaddShift(false);
     setshowShift(false);
+    document.querySelector("body").style.overflowY = "auto";
   };
+
+  function handleAddShiftClick(e) {
+    handleOpen();
+    setaddShift(true);
+  }
 
   async function getShifts() {
     const res = await fetch("http://localhost:3000/api/shifts");
@@ -61,7 +71,7 @@ const Shifts = () => {
   return (
     <div className="shiftsContainer">
       <h3>Shifts</h3>
-      <div className="oulinedButtonWrapper">
+      <div className="oulinedButtonWrapper" onClick={handleAddShiftClick}>
         <Icon path={mdiPlusCircle} size={1} />
         Start New Shift
       </div>
@@ -83,7 +93,11 @@ const Shifts = () => {
       ) : (
         <div className="noDatasInfos">No Shifts ...</div>
       )}
-      {open && <div className="modal">{/* TO DO  */}</div>}
+      {open && (
+        <div className="modal">
+          {addShift && <AddShiftForm handleClose={handleClose} />}
+        </div>
+      )}
     </div>
   );
 };
