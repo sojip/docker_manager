@@ -9,32 +9,35 @@ function addHours(numOfHours, date) {
   return dateCopy;
 }
 
-let shiftSchema = new Schema({
-  type: {
-    type: String,
-    enum: ["jour", "nuit"],
-    required: true,
-  },
-  startdate: {
-    type: Date,
-    required: true,
-  },
-  enddate: {
-    type: Date,
-    default: function () {
-      if (this.startdate === undefined) return undefined;
-      return addHours(12, this.startdate);
+let shiftSchema = new Schema(
+  {
+    type: {
+      type: String,
+      enum: ["jour", "nuit"],
+      required: true,
+    },
+    startdate: {
+      type: Date,
+      required: true,
+    },
+    enddate: {
+      type: Date,
+      default: function () {
+        if (this.startdate === undefined) return undefined;
+        return addHours(12, this.startdate);
+      },
+    },
+    duration: {
+      type: Number,
+      default: 720,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["En cours", "Terminé"],
     },
   },
-  duration: {
-    type: Number,
-    default: 720,
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ["En cours", "Terminé"],
-  },
-});
+  { timestamps: true }
+);
 
 module.exports = new Model("Shift", shiftSchema);

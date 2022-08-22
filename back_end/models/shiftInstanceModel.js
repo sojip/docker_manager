@@ -14,7 +14,7 @@ let shiftInstanceSchema = new Schema({
   },
   startedshift: {
     type: Boolean,
-    default: false,
+    default: true,
     required: true,
   },
   endedshift: {

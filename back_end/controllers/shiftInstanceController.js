@@ -4,7 +4,9 @@ const mongoose = require("mongoose");
 module.exports.createShiftInstance = function (req, res, next) {
   var shift = req.body.shiftId;
   var docker = req.body.dockerId;
-  var startedshift = req.body.startedshift;
+  var startedshift = req.body.startedshift || true;
+
+  console.log(shift);
 
   var shiftinstance = new ShiftInstance({
     shift: mongoose.Types.ObjectId(shift),
