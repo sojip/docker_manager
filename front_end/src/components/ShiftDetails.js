@@ -48,14 +48,33 @@ const ShiftsDetails = (props) => {
   }
 
   const handleAddInterruptionClick = () => {
+    let open = document.querySelector(".open");
+    if (open) open.classList.remove("open");
     let formWrapper = document.querySelector(".interruptionForm");
     formWrapper.classList.add("open");
   };
-  const handleEndShiftClick = () => {};
+  const handleEndShiftClick = () => {
+    let open = document.querySelector(".open");
+    if (open) open.classList.remove("open");
+    let formWrapper = document.querySelector(".endShiftFormWrapper");
+    formWrapper.classList.add("open");
+  };
 
   const handleCloseAddInterruptionForm = () => {
     let formWrapper = document.querySelector(".interruptionForm");
     let form = document.querySelector("#addInterruptionForm");
+    formWrapper.classList.remove("open");
+    form.reset();
+    setshiftinstances(
+      shiftinstances.map((instance) => {
+        return { ...instance, checked: false };
+      })
+    );
+  };
+
+  const handleCloseEndShiftForm = () => {
+    let formWrapper = document.querySelector(".endShiftFormWrapper");
+    let form = document.querySelector("#endShiftForm");
     formWrapper.classList.remove("open");
     form.reset();
     setshiftinstances(
@@ -127,6 +146,12 @@ const ShiftsDetails = (props) => {
 
       <AddInterruptionForm
         handleCloseAddInterruptionForm={handleCloseAddInterruptionForm}
+        shiftinstances={shiftinstances}
+        handleCheckboxChange={handleCheckboxChange}
+      />
+
+      <EndShiftForm
+        handleCloseEndShiftForm={handleCloseEndShiftForm}
         shiftinstances={shiftinstances}
         handleCheckboxChange={handleCheckboxChange}
       />
@@ -263,6 +288,43 @@ const AddInterruptionForm = (props) => {
             );
           })}
         </FormControl>
+        <input type="submit" value="Save" />
+      </Box>
+    </div>
+  );
+};
+
+const EndShiftForm = (props) => {
+  const { handleCloseEndShiftForm } = props;
+  const { shiftinstances } = props;
+  const { handleCheckboxChange } = props;
+  return (
+    <div className="endShiftFormWrapper">
+      <Box component="form" id="endShiftForm" novalidate autoComplete="off">
+        <div className="closeForm" onClick={handleCloseEndShiftForm}>
+          <Icon path={mdiCloseThick} size={1} />
+        </div>
+        <h2>End Shift</h2>
+        <FormControl component="fieldset" variant="standard">
+          <FormLabel component="legend">Select Workers</FormLabel>
+          {shiftinstances.map((instance) => {
+            return (
+              <FormGroup key={instance.docker._id}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id={instance.docker._id}
+                      onChange={handleCheckboxChange}
+                      checked={instance.checked}
+                    />
+                  }
+                  label={`${instance.docker.firstname} ${instance.docker.lastname}`}
+                />
+              </FormGroup>
+            );
+          })}
+        </FormControl>
+        <br />
         <input type="submit" value="Save" />
       </Box>
     </div>
