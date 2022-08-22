@@ -1,0 +1,96 @@
+#showshiftbox h3 {
+  text-transform: uppercase;
+}
+
+#showshiftbox .interruptionForm {
+  display: none;
+}
+
+#showshiftbox .interruptionForm.open {
+  display: block;
+}
+
+#showshiftbox .closeForm {
+  width: 24px;
+  float: right;
+  cursor: pointer;
+}
+
+#showshiftbox .closeForm:hover {
+  color: var(--orange-color);
+}
+
+#showshiftbox .callToActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+#showshiftbox .generalInfos {
+  /* border: solid 1px red; */
+  padding: 25px 0;
+  line-height: 2rem;
+}
+
+#showshiftbox #addInterruptionForm {
+  /* border: solid 1px black; */
+  border-radius: 25px;
+  padding: 25px 2vw;
+  margin-top: 15px;
+  box-shadow: 0 1rem 2rem hsl(0 0% 0% / 20%);
+}
+
+#addInterruptionForm input[type="submit"] {
+  padding: 6px 1vw;
+  background-color: transparent;
+  border: solid 2px black;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: capitalize;
+  width: 80%;
+  max-width: 200px;
+  display: block;
+  margin: auto;
+  margin-top: 10px;
+}
+
+#addInterruptionForm input[type="submit"]:hover {
+  color: var(--orange-color);
+  border: solid 2px var(--orange-color);
+}
+
+#showshiftbox .workersgrid,
+#showshiftbox .interruptionsgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 15px;
+  align-items: flex-start;
+}
+
+#showshiftbox .workersgrid .workerItem,
+#showshiftbox .interruptionsgrid .interruptionItem {
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  padding: 5px;
+}
+
+#showshiftbox .profileContainer {
+  display: flex;
+  align-items: center;
+}
+
+#showshiftbox .interruptionsgrid .interruptionItem {
+  line-height: 1.5rem;
+}
+
+#showshiftbox .interruptionsgrid .interruptionItem div:last-of-type {
+  /* border: solid 1px red; */
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+#showshiftbox h3:nth-of-type(3) {
+  /* border: solid 1px red; */
+  margin-top: 25px;
+}

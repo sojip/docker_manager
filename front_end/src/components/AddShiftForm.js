@@ -26,11 +26,16 @@ const AddShiftForm = (props) => {
   const handleChange = (event) => {
     let value = event.target.value;
     let name = event.target.name;
-    value === "jour" ? settime("07:00") : settime("19:00");
+    if (name === "type") value === "jour" ? settime("07:00") : settime("19:00");
     setdatas({ ...datas, [name]: value });
   };
   function handleCheckboxChange(e) {
-    console.log(e.target.id);
+    setworkers(
+      workers.map((worker) => {
+        if (worker._id === e.target.id) worker.checked = !worker.checked;
+        return worker;
+      })
+    );
   }
 
   async function getWorkers() {
@@ -41,9 +46,17 @@ const AddShiftForm = (props) => {
 
   useEffect(() => {
     getWorkers().then((workers) => {
-      setworkers(workers);
+      setworkers(
+        workers.map((worker) => {
+          return { ...worker, checked: false };
+        })
+      );
     });
   }, []);
+
+  useEffect(() => {
+    console.log(workers);
+  }, [workers]);
 
   return (
     <Box
@@ -54,10 +67,6 @@ const AddShiftForm = (props) => {
         maxWidth: "500px",
         padding: "2vh 1vw",
         "& > :not(style)": { width: "100%" },
-        // position: "absolute",
-        // top: "50%",
-        // left: "50%",
-        // transform: "translate(-50%, -50%)",
         bgcolor: "background.paper",
         boxShadow: 24,
         p: 4,
@@ -113,6 +122,7 @@ const AddShiftForm = (props) => {
         margin="normal"
         helperText="Select The Start Date"
         required
+        onChange={handleChange}
       />
       <FormControl component="fieldset" variant="standard">
         <FormLabel component="legend">Select Workers</FormLabel>

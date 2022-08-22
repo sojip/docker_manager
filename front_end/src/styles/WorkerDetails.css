@@ -32,6 +32,7 @@
 #showworkerbox .findshifts {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 15px;
 }
 
@@ -77,4 +78,19 @@
   text-align: center;
   padding: 5px 0;
   font-weight: bold;
+}
+
+@media screen and (max-width: 780px) {
+  #showworkerbox {
+    padding: 2vh 20px;
+  }
+  #showworkerbox .fingerprintcontainer {
+    float: none;
+  }
+  #showworkerbox .workerGeneralInfos {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 15px;
+    padding-bottom: 45px;
+  }
 }

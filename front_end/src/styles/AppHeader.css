@@ -73,3 +73,14 @@ header .profileImageContainer {
 header li {
   list-style-type: none;
 }
+
+@media screen and (max-width: 780px) {
+  header {
+    padding: 0 2vw;
+    gap: 4vw;
+  }
+  header ul {
+    right: 2vw;
+    padding: 0 2vw;
+  }
+}

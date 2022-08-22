@@ -5,6 +5,7 @@ import { mdiPlusCircle } from "@mdi/js";
 import { useEffect, useState } from "react";
 import StickyHeadTable from "./Table";
 import AddShiftForm from "./AddShiftForm";
+import ShiftDetails from "./ShiftDetails";
 
 const Shifts = () => {
   const [shifts, setshifts] = useState([]);
@@ -12,7 +13,8 @@ const Shifts = () => {
   const [open, setOpen] = useState(false);
   const [addShift, setaddShift] = useState(false);
   const [showShift, setshowShift] = useState(false);
-  const handleOpen = () => {
+  const [selected_id, setselectedid] = useState("");
+  let handleOpen = () => {
     setOpen(true);
     document.querySelector("body").style.overflowY = "hidden";
   };
@@ -88,7 +90,12 @@ const Shifts = () => {
       </div>
       {searchShiftsResults.length > 0 ? (
         <div className="table">
-          <StickyHeadTable shifts={searchShiftsResults} />
+          <StickyHeadTable
+            shifts={searchShiftsResults}
+            handleOpen={handleOpen}
+            setshowShift={setshowShift}
+            setselectedid={setselectedid}
+          />
         </div>
       ) : (
         <div className="noDatasInfos">No Shifts ...</div>
@@ -96,6 +103,9 @@ const Shifts = () => {
       {open && (
         <div className="modal">
           {addShift && <AddShiftForm handleClose={handleClose} />}
+          {showShift && (
+            <ShiftDetails handleClose={handleClose} selected_id={selected_id} />
+          )}
         </div>
       )}
     </div>

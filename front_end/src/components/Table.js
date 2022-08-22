@@ -61,6 +61,9 @@ export default function StickyHeadTable(props) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { shifts } = props;
+  const { handleOpen } = props;
+  const { setshowShift } = props;
+  const { setselectedid } = props;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -72,7 +75,10 @@ export default function StickyHeadTable(props) {
   };
 
   function handleClick(e) {
-    console.log(e.currentTarget);
+    console.log(e.currentTarget.id);
+    handleOpen();
+    setshowShift(true);
+    setselectedid(e.currentTarget.id);
   }
 
   return (

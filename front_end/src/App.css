@@ -33,7 +33,7 @@
 
 .searchWrapper {
   width: 100%;
-  max-width: 350px;
+  max-width: 450px;
   margin: auto;
 }
 
@@ -57,4 +57,11 @@
 .noDatasInfos {
   font-style: italic;
   margin-top: 20px;
+}
+
+@media screen and (max-width: 780px) {
+  .outlet-container {
+    padding-left: calc(24px + 6vw);
+    padding-right: 2vw;
+  }
 }

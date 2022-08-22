@@ -22,6 +22,7 @@ nav ul {
   padding: 0;
   list-style-type: none;
   text-align: center;
+  /* border: solid 1px red; */
 }
 
 nav ul li {
@@ -57,4 +58,19 @@ nav .navLink .navitemDesc.show {
 }
 
 nav .navIcon {
+  /* border: solid 1px red; */
+}
+
+@media screen and (max-width: 780px) {
+  nav {
+    width: calc(24px + 4vw);
+    /* padding: 0 2vw; */
+  }
+  nav .navLink {
+    padding: 1vh 2vw;
+  }
+
+  /* nav ul {
+    padding-left: 1vw;
+  } */
 }

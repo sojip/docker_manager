@@ -194,16 +194,21 @@ const WorkerDetails = (props) => {
       <h3>General</h3>
       <div className="workerGeneralInfos">
         <div className="fingerprintcontainer">FINGERPRINT</div>
-        <div>{worker.firstname}</div>
-        <div>{worker.lastname}</div>
         <div>
-          Born on{" "}
-          {DateTime.fromISO(worker.dateofbirth).setLocale("fr").toLocaleString({
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
+          <div>{worker.firstname}</div>
+          <div>{worker.lastname}</div>
+          <div>
+            Born on{" "}
+            {DateTime.fromISO(worker.dateofbirth)
+              .setLocale("fr")
+              .toLocaleString({
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+          </div>
         </div>
+
         <div style={{ fontStyle: "italic", position: "absolute", bottom: "0" }}>
           Created On{" "}
           {DateTime.fromISO(worker.createdOn).setLocale("fr").toLocaleString({

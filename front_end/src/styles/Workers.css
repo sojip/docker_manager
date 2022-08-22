@@ -2,14 +2,14 @@
   margin-top: 0;
 }
 
-.workersGrid {
+.workerscontainer .workersGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1vw;
   padding: 25px 0;
 }
 
-.workerCard {
+.workerscontainer .workerCard {
   background-color: rgba(255, 255, 255, 0.85);
   padding: 2vh 1vw;
   word-wrap: break-word;
@@ -17,20 +17,20 @@
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   border-radius: 15px;
 }
-.workerCard .profileContainer {
+.workerscontainer .workerCard .profileContainer {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.seemore {
+.workerscontainer .seemore {
   font-style: italic;
   text-align: right;
   grid-column: 1 / span 2;
   margin-top: 10px;
 }
 
-.workerCard:hover .seemore {
+.workerscontainer .workerCard:hover .seemore {
   color: var(--orange-color);
 }
 
