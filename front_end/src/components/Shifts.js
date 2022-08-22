@@ -102,7 +102,14 @@ const Shifts = () => {
       )}
       {open && (
         <div className="modal">
-          {addShift && <AddShiftForm handleClose={handleClose} />}
+          {addShift && (
+            <AddShiftForm
+              handleClose={handleClose}
+              setsearchShiftsResults={setsearchShiftsResults}
+              shifts={shifts}
+              setshifts={setshifts}
+            />
+          )}
           {showShift && (
             <ShiftDetails handleClose={handleClose} selected_id={selected_id} />
           )}

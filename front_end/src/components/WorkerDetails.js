@@ -208,7 +208,6 @@ const WorkerDetails = (props) => {
               })}
           </div>
         </div>
-
         <div style={{ fontStyle: "italic", position: "absolute", bottom: "0" }}>
           Created On{" "}
           {DateTime.fromISO(worker.createdOn).setLocale("fr").toLocaleString({
@@ -327,7 +326,8 @@ const WorkerDetails = (props) => {
                       Time Worked {shift.shift.duration} mins
                     </div>
                   )}
-                  {shift.interruptions ? (
+                  {shift.interruptions !== undefined &&
+                  shift.interruptions.length ? (
                     <>
                       <div>Interruptions / Incidents</div>
                       <ul>

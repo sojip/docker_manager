@@ -9,7 +9,7 @@ import TextField from "@mui/material/TextField";
 import { DateTime } from "luxon";
 
 const Workers = () => {
-  const [workers, setworkers] = useState([]);
+  let [workers, setworkers] = useState([]);
   const [selected_id, setselectedid] = useState("");
   const [searchWorkersResults, setsearchWorkersResults] = useState([]);
   const [open, setOpen] = useState(false);
@@ -130,7 +130,14 @@ const Workers = () => {
       )}
       {open && (
         <div className="modal">
-          {addWorker && <AddWorkerForm handleClose={handleClose} />}
+          {addWorker && (
+            <AddWorkerForm
+              handleClose={handleClose}
+              workers={workers}
+              setworkers={setworkers}
+              setsearchWorkersResults={setsearchWorkersResults}
+            />
+          )}
           {showWorker && (
             <WorkerDetails
               handleClose={handleClose}
