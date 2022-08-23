@@ -99,7 +99,6 @@ const AddShiftForm = (props) => {
             return { ...worker, checked: false };
           })
         );
-        console.log(e.target);
       })
       .catch((e) => alert(e));
   }
