@@ -6,8 +6,6 @@ module.exports.createShiftInstance = function (req, res, next) {
   var docker = req.body.dockerId;
   var startedshift = req.body.startedshift || true;
 
-  console.log(shift);
-
   var shiftinstance = new ShiftInstance({
     shift: mongoose.Types.ObjectId(shift),
     docker: mongoose.Types.ObjectId(docker),
@@ -50,4 +48,32 @@ module.exports.getDockerShifts = function (req, res, next) {
       if (err) return res.status(500).json({ err });
       return res.json(shifts);
     });
+};
+
+module.exports.addInterruption = function (req, res, next) {
+  var id = mongoose.Types.ObjectId(req.params.id);
+  var interruption = mongoose.Types.ObjectId(req.body.interruption);
+
+  ShiftInstance.findByIdAndUpdate(
+    id,
+    { $push: { interruptions: [interruption] } },
+    function (err, instance) {
+      if (err) return res.status(500).json({ err });
+      return res.json(instance);
+    }
+  );
+};
+
+module.exports.endShift = function (req, res, next) {
+  var id = mongoose.Types.ObjectId(req.params.id);
+  ShiftInstance.findByIdAndUpdate(
+    id,
+    {
+      endedshift: true,
+    },
+    function (err, instance) {
+      if (err) return res.status(500).json({ err });
+      return res.json(instance);
+    }
+  );
 };

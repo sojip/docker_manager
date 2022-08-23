@@ -34,6 +34,11 @@ router.get("/shifts/:id/workers", shiftInstanceController.getShiftDockers);
 router.post("/interruptions", interruptionController.createInterruption);
 router.get("/interruptions", interruptionController.getAllInterruptions);
 router.post("/shiftinstances", shiftInstanceController.createShiftInstance);
+router.put(
+  "/shiftinstances/:id/interruptions",
+  shiftInstanceController.addInterruption
+);
+router.put("/shiftinstances/:id/shift", shiftInstanceController.endShift);
 
 //authentication
 router.post("/login", async (req, res, next) => {
