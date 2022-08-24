@@ -4,11 +4,11 @@ import TextField from "@mui/material/TextField";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import { useState } from "react";
-import Alert from "@mui/material/Alert";
+import alertify from "alertifyjs";
+import "alertifyjs/build/css/alertify.css";
 
 const AddWorkerForm = (props) => {
   const [datas, setdatas] = useState({});
-  const [showsuccess, setshowsuccess] = useState(false);
   let { handleClose } = props;
   let { setworkers } = props;
   let { workers } = props;
@@ -35,26 +35,22 @@ const AddWorkerForm = (props) => {
     })
       .then((res) => res.json())
       .then((worker) => {
-        setshowsuccess(true);
+        // setshowsuccess(true);
+        alertify.set("notifier", "position", "top-center");
+        alertify.success("New Worker Created Successfully");
         setsearchWorkersResults([...workers, worker]);
         setworkers([...workers, worker]);
         e.target.reset();
       })
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        alertify.set("notifier", "position", "top-center");
+        alertify.error("An Error Occured");
+        console.log(e);
+      });
   };
 
   return (
     <>
-      {showsuccess && (
-        <Alert
-          style={{ width: "96%", maxWidth: "500px", margin: "auto" }}
-          onClose={() => {
-            setshowsuccess(false);
-          }}
-        >
-          New Worker Created Successfully
-        </Alert>
-      )}
       <Box
         component="form"
         id="addworkerform"

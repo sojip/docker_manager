@@ -38,8 +38,10 @@ const Workers = () => {
     setselectedid(e.currentTarget.id);
   }
 
-  async function getWorkers() {
-    const res = await fetch("http://localhost:3000/api/workers");
+  async function getWorkers(signal) {
+    const res = await fetch("http://localhost:3000/api/workers", {
+      signal: signal,
+    });
     const workers = await res.json();
     return workers;
   }
@@ -62,10 +64,17 @@ const Workers = () => {
   }
 
   useEffect(() => {
-    getWorkers().then((workers) => {
+    let controller = new AbortController();
+    let signal = controller.signal;
+
+    getWorkers(signal).then((workers) => {
       setworkers(workers);
       setsearchWorkersResults(workers);
     });
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   return (

@@ -30,8 +30,10 @@ const Shifts = () => {
     setaddShift(true);
   }
 
-  async function getShifts() {
-    const res = await fetch("http://localhost:3000/api/shifts");
+  async function getShifts(signal) {
+    const res = await fetch("http://localhost:3000/api/shifts", {
+      signal: signal,
+    });
     const datas = await res.json();
     return datas;
   }
@@ -65,10 +67,15 @@ const Shifts = () => {
   }
 
   useEffect(() => {
-    getShifts().then((shifts) => {
+    let controller = new AbortController();
+    let signal = controller.signal;
+    getShifts(signal).then((shifts) => {
       setshifts(shifts);
       setsearchShiftsResults(shifts);
     });
+    return () => {
+      controller.abort();
+    };
   }, []);
   return (
     <div className="shiftsContainer">

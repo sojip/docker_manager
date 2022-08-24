@@ -12,6 +12,11 @@
   font-weight: bold;
   text-transform: capitalize;
   margin-top: 15px;
+  transition: all 300ms;
+}
+
+#addshiftform input[type="submit"]:active {
+  transform: scale(1.1);
 }
 
 #addshiftform input[type="submit"]:hover {

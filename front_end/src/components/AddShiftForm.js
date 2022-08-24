@@ -12,7 +12,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { FormLabel } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import "../styles/AddShiftForm.css";
-import Alert from "@mui/material/Alert";
+import alertify from "alertifyjs";
+import "alertifyjs/build/css/alertify.css";
 
 const AddShiftForm = (props) => {
   let { handleClose } = props;
@@ -27,7 +28,6 @@ const AddShiftForm = (props) => {
   const [datas, setdatas] = useState({ type: "", startdate: "" });
   const [time, settime] = useState("");
   const [workers, setworkers] = useState([]);
-  const [showsuccess, setshowsuccess] = useState(false);
 
   const handleChange = (event) => {
     let value = event.target.value;
@@ -78,11 +78,9 @@ const AddShiftForm = (props) => {
       .then((shift) => {
         setsearchShiftsResults([...shifts, shift]);
         setshifts([...shifts, shift]);
-
         let selectedworkers = workers.filter(
           (worker) => worker.checked === true
         );
-        console.log(selectedworkers);
         return Promise.all(
           selectedworkers.map((worker) => {
             return createShiftInstance(shift, worker);
@@ -93,14 +91,19 @@ const AddShiftForm = (props) => {
         e.target.reset();
         setdatas({ type: "", startdate: "" });
         settime("");
-        setshowsuccess(true);
+        alertify.set("notifier", "position", "top-center");
+        alertify.success("New Shift Added Successfully");
         setworkers(
           workers.map((worker) => {
             return { ...worker, checked: false };
           })
         );
       })
-      .catch((e) => alert(e));
+      .catch((e) => {
+        alertify.set("notifier", "position", "top-center");
+        alertify.error("An Error Occured");
+        console.log(e);
+      });
   }
 
   useEffect(() => {
@@ -113,28 +116,8 @@ const AddShiftForm = (props) => {
     });
   }, []);
 
-  useEffect(() => {
-    console.log(workers);
-  }, [workers]);
-
   return (
     <>
-      {showsuccess && (
-        <Alert
-          style={{
-            width: "96%",
-            maxWidth: "500px",
-            marginBottom: "25px",
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-          onClose={() => {
-            setshowsuccess(false);
-          }}
-        >
-          New Shift Created Successfully
-        </Alert>
-      )}
       <Box
         component="form"
         id="addshiftform"
@@ -149,7 +132,6 @@ const AddShiftForm = (props) => {
           margin: "auto",
         }}
         onSubmit={handleSubmit}
-        //   noValidate
         autoComplete="off"
       >
         <div

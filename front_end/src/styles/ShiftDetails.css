@@ -59,6 +59,12 @@
   display: block;
   margin: auto;
   margin-top: 10px;
+  transition: all 300ms;
+}
+
+#addInterruptionForm input[type="submit"]:active,
+#endShiftForm input[type="submit"]:active {
+  transform: scale(1.1);
 }
 
 #addInterruptionForm input[type="submit"]:hover,

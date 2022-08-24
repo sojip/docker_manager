@@ -15,18 +15,21 @@ const WorkerDetails = (props) => {
   });
   const [shifts, setshifts] = useState([]);
   const [searchresults, setsearchresults] = useState([]);
-
   const { handleClose } = props;
   const { selected_id } = props;
 
-  async function getWorker(id) {
-    const res = await fetch(`http://localhost:3000/api/workers/${id}`);
+  async function getWorker(id, signal) {
+    const res = await fetch(`http://localhost:3000/api/workers/${id}`, {
+      signal: signal,
+    });
     const worker = await res.json();
     return worker;
   }
 
-  async function getshifts(id) {
-    const res = await fetch(`http://localhost:3000/api/workers/${id}/shifts`);
+  async function getshifts(id, signal) {
+    const res = await fetch(`http://localhost:3000/api/workers/${id}/shifts`, {
+      signal: signal,
+    });
     const shifts = await res.json();
     return shifts;
   }
@@ -164,14 +167,20 @@ const WorkerDetails = (props) => {
   }
 
   useEffect(() => {
-    Promise.all([getWorker(selected_id), getshifts(selected_id)]).then(
-      (datas) => {
-        console.log(datas[1]);
-        setworker(datas[0]);
-        setshifts(datas[1]);
-        setsearchresults(datas[1]);
-      }
-    );
+    let controller = new AbortController();
+    let signal = controller.signal;
+
+    Promise.all([
+      getWorker(selected_id, signal),
+      getshifts(selected_id, signal),
+    ]).then((datas) => {
+      setworker(datas[0]);
+      setshifts(datas[1]);
+      setsearchresults(datas[1]);
+    });
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   return (
