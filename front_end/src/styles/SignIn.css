@@ -1,0 +1,36 @@
+.ajs-message.ajs-custom {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #31708f;
+}
+
+.full-screen-container {
+  width: 100%;
+  height: 100vh;
+  background-color: #fff7ed;
+}
+
+#signinform h1 {
+  text-align: center;
+  /* color: var(--orange-color); */
+}
+
+#signinform input[type="submit"] {
+  padding: 6px 1vw;
+  background-color: transparent;
+  border: solid 2px black;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: capitalize;
+  margin-top: 15px;
+  transition: all 300ms;
+}
+
+#signinform input[type="submit"]:active {
+  transform: scale(1.1);
+}
+
+#signinform input[type="submit"]:hover {
+  color: var(--orange-color);
+  border: solid 2px var(--orange-color);
+}

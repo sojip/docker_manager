@@ -35,7 +35,6 @@ const AddWorkerForm = (props) => {
     })
       .then((res) => res.json())
       .then((worker) => {
-        // setshowsuccess(true);
         alertify.set("notifier", "position", "top-center");
         alertify.success("New Worker Created Successfully");
         setsearchWorkersResults([...workers, worker]);
@@ -67,7 +66,6 @@ const AddWorkerForm = (props) => {
           boxShadow: 24,
           p: 4,
         }}
-        //   noValidate
         autoComplete="off"
         onSubmit={handleSubmit}
       >

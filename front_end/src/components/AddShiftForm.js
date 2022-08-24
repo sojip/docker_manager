@@ -16,6 +16,10 @@ import alertify from "alertifyjs";
 import "alertifyjs/build/css/alertify.css";
 
 const AddShiftForm = (props) => {
+  const [datas, setdatas] = useState({ type: "", startdate: "" });
+  const [time, settime] = useState("");
+  const [workers, setworkers] = useState([]);
+
   let { handleClose } = props;
   let { setsearchShiftsResults } = props;
   let { shifts } = props;
@@ -25,16 +29,13 @@ const AddShiftForm = (props) => {
     marginBottom: "15px",
   };
 
-  const [datas, setdatas] = useState({ type: "", startdate: "" });
-  const [time, settime] = useState("");
-  const [workers, setworkers] = useState([]);
-
   const handleChange = (event) => {
     let value = event.target.value;
     let name = event.target.name;
     if (name === "type") value === "jour" ? settime("07:00") : settime("19:00");
     setdatas({ ...datas, [name]: value });
   };
+
   function handleCheckboxChange(e) {
     setworkers(
       workers.map((worker) => {
@@ -44,8 +45,10 @@ const AddShiftForm = (props) => {
     );
   }
 
-  async function getWorkers() {
-    const res = await fetch("http://localhost:3000/api/workers");
+  async function getWorkers(signal) {
+    const res = await fetch("http://localhost:3000/api/workers", {
+      signal: signal,
+    });
     const workers = await res.json();
     return workers;
   }
@@ -107,13 +110,20 @@ const AddShiftForm = (props) => {
   }
 
   useEffect(() => {
-    getWorkers().then((workers) => {
+    let controller = new AbortController();
+    let signal = controller.signal;
+
+    getWorkers(signal).then((workers) => {
       setworkers(
         workers.map((worker) => {
           return { ...worker, checked: false };
         })
       );
     });
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   return (

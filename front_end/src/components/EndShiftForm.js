@@ -69,7 +69,6 @@ const EndShiftForm = (props) => {
         component="form"
         id="endShiftForm"
         onSubmit={handleSubmit}
-        novalidate
         autoComplete="off"
       >
         <div className="closeForm" onClick={handleCloseEndShiftForm}>
@@ -96,7 +95,7 @@ const EndShiftForm = (props) => {
           })}
         </FormControl>
         <br />
-        <input type="submit" value="Save" />
+        <input type="submit" value="Submit" />
       </Box>
     </div>
   );

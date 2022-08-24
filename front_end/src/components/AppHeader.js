@@ -18,7 +18,7 @@ const AppHeader = () => {
     return () => {
       window.removeEventListener("click", closeprofileOptions);
     };
-  });
+  }, []);
 
   function ToggleProfileOptions() {
     let profileOptions = document.querySelector(".profileOptions");

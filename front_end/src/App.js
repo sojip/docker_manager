@@ -9,19 +9,7 @@ function App() {
     <div className="App">
       <AppHeader />
       <AppNav />
-      <div
-        className="outlet-container"
-        style={
-          {
-            // backgroundImage: `url(${Logo})`,
-            // backgroundSize: "contain",
-            // backgroundRepeat: "no-repeat",
-            // backgroundPosition: "center",
-            // backgroundBlendMode: "multiply",
-            // backgroundAttachment: "fixed",
-          }
-        }
-      >
+      <div className="outlet-container">
         <Outlet />
       </div>
     </div>

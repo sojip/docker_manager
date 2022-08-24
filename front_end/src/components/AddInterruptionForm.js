@@ -4,7 +4,6 @@ import "alertifyjs/build/css/alertify.css";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
-
 import {
   TextField,
   InputAdornment,

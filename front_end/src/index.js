@@ -9,6 +9,16 @@ import Shifts from "./components/Shifts";
 import Workers from "./components/Workers";
 import Stats from "./components/Stats";
 import AddWorkerForm from "./components/AddWorkerForm";
+import SignIn from "./components/SignIn";
+import { Navigate } from "react-router-dom";
+
+const ProtectedRoute = ({ isLoggedIn, children }) => {
+  if (!isLoggedIn) {
+    return <Navigate to="/signin" replace />;
+  }
+
+  return children;
+};
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -22,6 +32,7 @@ root.render(
           <Route path="/stats" element={<Stats />} />
           <Route path="/addworker" element={<AddWorkerForm />} />
         </Route>
+        <Route path="/signin" element={<SignIn />} />
       </Routes>
     </Router>
   </React.StrictMode>
