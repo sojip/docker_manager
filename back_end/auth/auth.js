@@ -6,8 +6,6 @@ const ExtractJWT = require("passport-jwt").ExtractJwt;
 var User = require("../models/userModel");
 require("dotenv").config();
 
-// ...
-
 passport.use(
   "login",
   new localStrategy(
@@ -36,8 +34,6 @@ passport.use(
     }
   )
 );
-
-// ...
 
 passport.use(
   new JWTstrategy(
