@@ -5,9 +5,9 @@
 }
 
 .full-screen-container {
+  background-color: #fff7ed;
   width: 100%;
   height: 100vh;
-  background-color: #fff7ed;
 }
 
 #signinform h1 {

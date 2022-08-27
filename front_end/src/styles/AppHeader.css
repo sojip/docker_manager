@@ -1,6 +1,7 @@
 header {
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
   height: 8vh;
   max-height: 70px;
@@ -12,7 +13,7 @@ header {
   align-items: center;
   background-color: var(--orange-color);
   color: white;
-  z-index: 2;
+  z-index: 3;
 }
 
 header h3,

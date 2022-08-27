@@ -10,6 +10,17 @@
 #showshiftbox .interruptionForm.open,
 #showshiftbox .endShiftFormWrapper.open {
   display: block;
+  animation: fadeIn 200ms;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 #showshiftbox .closeForm {
@@ -78,7 +89,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
   gap: 15px;
-  align-items: flex-start;
 }
 
 #showshiftbox .workersgrid .workerItem,
@@ -86,6 +96,9 @@
   box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
     rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
   padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 #showshiftbox .profileContainer {
@@ -99,12 +112,39 @@
 
 #showshiftbox .interruptionsgrid .interruptionItem div:last-of-type {
   /* border: solid 1px red; */
-  text-align: center;
+  text-align: right;
   margin-top: 10px;
   font-weight: bold;
 }
 
 #showshiftbox h3:nth-of-type(3) {
-  /* border: solid 1px red; */
   margin-top: 25px;
 }
+
+#endShiftForm .operationDetails {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  animation: fadeIn 300ms;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#endShiftForm .operationDetails #opsdescription {
+}
+
+/* #endShiftForm .operationDetails > :first-child {
+  border: solid 1px green;
+}
+
+#endShiftForm .operationDetails > :nth-child(2) {
+  border: solid 2px yellow;
+} */

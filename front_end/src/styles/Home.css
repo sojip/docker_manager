@@ -4,6 +4,7 @@
   gap: max(1vw, 1vh);
   grid-auto-rows: 150px;
   transition: all 300ms;
+  z-index: 99;
 }
 
 .homeItem {

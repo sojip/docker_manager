@@ -8,6 +8,50 @@
   color: var(--orange-color);
 }
 
+/* #addworkerform #photo {
+  display: none;
+} */
+
+#addworkerform #photo {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+/* #addworkerform #photo:is(:focus, :focus-within) label {
+  border: solid 8px red;
+} */
+
+#addworkerform #photolabel {
+  /* border: solid 1px red; */
+  display: block;
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin: 10px auto;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+#addworkerform #photolabel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 #addworkerform input[type="submit"] {
   padding: 6px 1vw;
   background-color: transparent;

@@ -11,6 +11,7 @@ nav {
   background-color: white;
   box-shadow: 5px 0 5px -7px rgba(0, 0, 0, 0.7),
     -5px 0 5px -5px rgba(0, 0, 0, 0.7);
+  z-index: 2;
 }
 
 nav.isfull {
@@ -64,13 +65,8 @@ nav .navIcon {
 @media screen and (max-width: 780px) {
   nav {
     width: calc(24px + 4vw);
-    /* padding: 0 2vw; */
   }
   nav .navLink {
     padding: 1vh 2vw;
   }
-
-  /* nav ul {
-    padding-left: 1vw;
-  } */
 }
