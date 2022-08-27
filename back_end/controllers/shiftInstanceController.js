@@ -13,7 +13,7 @@ module.exports.createShiftInstance = function (req, res, next) {
   });
 
   shiftinstance.save(function (err, shiftinstance_) {
-    if (err) return res.status(500).json({ err });
+    if (err) return next(err);
     return res.json(shiftinstance_);
   });
 };
@@ -24,7 +24,7 @@ module.exports.getShiftDockers = function (req, res, next) {
     .select("docker startedshift endedshift")
     .populate("docker")
     .exec(function (err, dockers) {
-      if (err) return res.status(500).json({ err });
+      if (err) return next(err);
       return res.json(dockers);
     });
 };
@@ -45,7 +45,7 @@ module.exports.getDockerShifts = function (req, res, next) {
     .select("shift startedshift endedshift interruptions")
     .populate("shift interruptions")
     .exec(function (err, shifts) {
-      if (err) return res.status(500).json({ err });
+      if (err) return next(err);
       return res.json(shifts);
     });
 };
@@ -58,7 +58,7 @@ module.exports.addInterruption = function (req, res, next) {
     id,
     { $push: { interruptions: [interruption] } },
     function (err, instance) {
-      if (err) return res.status(500).json({ err });
+      if (err) return next(err);
       return res.json(instance);
     }
   );
@@ -72,7 +72,7 @@ module.exports.endShift = function (req, res, next) {
       endedshift: true,
     },
     function (err, instance) {
-      if (err) return res.status(500).json({ err });
+      if (err) return next(err);
       return res.json(instance);
     }
   );

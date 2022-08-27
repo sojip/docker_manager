@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 
 module.exports.createInterruption = function (req, res, next) {
   var shift = mongoose.Types.ObjectId(req.body.shift);
-  var duration = req.body.duration;
+  var duration = Number(req.body.duration);
   var description = req.body.description;
 
   var interruption = new Interruption({
@@ -12,7 +12,7 @@ module.exports.createInterruption = function (req, res, next) {
     description: description,
   });
   interruption.save(function (err, interruption_) {
-    if (err) return res.status(500).json({ err });
+    if (err) return next(err);
     return res.json(interruption_);
   });
 };
@@ -21,7 +21,7 @@ module.exports.getAllInterruptions = function (req, res, next) {
   Interruption.find({})
     .populate("shift")
     .exec(function (err, interruptions) {
-      if (err) return res.status(500).json({ err });
+      if (err) return next(err);
       return res.json(interruptions);
     });
 };
@@ -31,7 +31,7 @@ module.exports.getShiftInterruptions = function (req, res, next) {
   Interruption.find(
     { shift: mongoose.Types.ObjectId(id) },
     function (err, interruptions) {
-      if (err) return res.status(500).json({ err });
+      if (err) return next(err);
       return res.json(interruptions);
     }
   );

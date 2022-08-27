@@ -15,11 +15,20 @@ let dockerSchema = new Schema(
       trim: true,
       required: true,
     },
+    position: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      required: true,
+    },
     photo: {
-      type: Buffer,
+      type: String,
       default: undefined,
     },
-
+    cni: {
+      type: String,
+      default: undefined,
+    },
     dateofbirth: {
       type: Date,
       required: true,

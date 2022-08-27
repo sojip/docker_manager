@@ -14,6 +14,8 @@ let interruptionSchema = new Schema(
     },
     description: {
       type: String,
+      trim: true,
+      lowercase: true,
       required: true,
     },
     createdOn: {

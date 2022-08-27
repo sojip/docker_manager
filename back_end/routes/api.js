@@ -7,14 +7,23 @@ var interruptionController = require("../controllers/interruptionController");
 var shiftInstanceController = require("../controllers/shiftInstanceController");
 var passport = require("passport");
 require("dotenv").config();
+const multer = require("multer");
+var storage = multer.diskStorage({
+  destination: "./public/uploads",
+  filename: function (req, file, cb) {
+    cb(null, `${file.originalname}`);
+  },
+});
+const upload = multer({ storage: storage });
 
-router.post("/workers", dockerController.createDocker);
+router.post("/workers", upload.single("photo"), dockerController.createDocker);
 router.get(
   "/workers",
   //   passport.authenticate("jwt", { session: false }),
   dockerController.getAllDockers
 );
 router.get("/workers/:id", dockerController.getDocker);
+router.get("/workers/:id/photo", dockerController.getPhoto);
 router.post("/shifts", shiftController.createShift);
 router.get("/shifts", shiftController.getAllShifts);
 router.get(

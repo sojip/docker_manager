@@ -22,6 +22,27 @@ let shiftInstanceSchema = new Schema({
     default: false,
     required: true,
   },
+  operation: {
+    type: {
+      type: String,
+      enum: ["navire", "yard", "magasin"],
+    },
+    position: {
+      type: String,
+      lowercase: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      lowercase: true,
+      trim: true,
+    },
+    vessel: {
+      type: String,
+      lowercase: true,
+      trim: true,
+    },
+  },
   interruptions: {
     type: [Schema.Types.ObjectId],
     default: undefined,
