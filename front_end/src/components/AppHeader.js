@@ -29,9 +29,9 @@ const AppHeader = () => {
   function ToggleNav() {
     let nav = document.querySelector("nav");
     let descriptions = document.querySelectorAll(".navitemDesc");
-    let outletcontainer = document.querySelector(".outlet-container");
+    let main = document.querySelector(".main");
     nav.classList.toggle("isfull");
-    outletcontainer.classList.toggle("shrink");
+    main.classList.toggle("shrink");
     descriptions.forEach((description) => {
       description.classList.toggle("show");
     });

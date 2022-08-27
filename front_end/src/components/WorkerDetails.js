@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import "../styles/WorkerDetails.css";
 import { DateTime, Interval } from "luxon";
 import TextField from "@mui/material/TextField";
+import alertify from "alertifyjs";
+import "alertifyjs/build/css/alertify.css";
 
 const WorkerDetails = (props) => {
   const [worker, setworker] = useState({
@@ -15,15 +17,26 @@ const WorkerDetails = (props) => {
   });
   const [shifts, setshifts] = useState([]);
   const [searchresults, setsearchresults] = useState([]);
+  const [photoUrl, setphotoUrl] = useState("");
   const { handleClose } = props;
   const { selected_id } = props;
+  const { setisLoading } = props;
 
   async function getWorker(id, signal) {
     const res = await fetch(`http://localhost:3000/api/workers/${id}`, {
       signal: signal,
     });
     const worker = await res.json();
+
     return worker;
+  }
+
+  async function getPhoto(id, signal) {
+    const res = await fetch(`http://localhost:3000/api/workers/${id}/photo`, {
+      signal: signal,
+    });
+    const data = await res.json();
+    return data;
   }
 
   async function getshifts(id, signal) {
@@ -167,17 +180,28 @@ const WorkerDetails = (props) => {
   }
 
   useEffect(() => {
+    setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
-
     Promise.all([
       getWorker(selected_id, signal),
       getshifts(selected_id, signal),
-    ]).then((datas) => {
-      setworker(datas[0]);
-      setshifts(datas[1]);
-      setsearchresults(datas[1]);
-    });
+      getPhoto(selected_id, signal),
+    ])
+      .then((datas) => {
+        setphotoUrl(datas[2]);
+        setworker(datas[0]);
+        setshifts(datas[1]);
+        setsearchresults(datas[1]);
+        setisLoading(false);
+      })
+      .catch((e) => {
+        if (e.name !== "AbortError") {
+          setisLoading(false);
+          alertify.error("An Error Occured");
+          console.log(e);
+        }
+      });
     return () => {
       controller.abort();
     };
@@ -201,22 +225,37 @@ const WorkerDetails = (props) => {
         <Icon path={mdiCloseThick} size={1} />
       </div>
       <h3>General</h3>
+
       <div className="workerGeneralInfos">
-        <div className="fingerprintcontainer">FINGERPRINT</div>
         <div>
-          <div>{worker.firstname}</div>
-          <div>{worker.lastname}</div>
+          {photoUrl !== "" && (
+            <div className="photoContainer">
+              <img src={photoUrl} alt="" />
+            </div>
+          )}
           <div>
-            Born on{" "}
-            {DateTime.fromISO(worker.dateofbirth)
-              .setLocale("fr")
-              .toLocaleString({
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+            <div>{worker.firstname}</div>
+            <div>{worker.lastname}</div>
+
+            <div>
+              Born on{" "}
+              {DateTime.fromISO(worker.dateofbirth)
+                .setLocale("fr")
+                .toLocaleString({
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+            </div>
+            {worker.cni && <div>CNI N° {worker.cni}</div>}
+
+            {worker.position && (
+              <div style={{ fontStyle: "italic" }}>{worker.position}</div>
+            )}
           </div>
         </div>
+        <div className="fingerprintcontainer">FINGERPRINT</div>
+
         <div style={{ fontStyle: "italic", position: "absolute", bottom: "0" }}>
           Created On{" "}
           {DateTime.fromISO(worker.createdOn).setLocale("fr").toLocaleString({
@@ -351,7 +390,10 @@ const WorkerDetails = (props) => {
                       </ul>
                     </>
                   ) : (
-                    <div className="noDatasInfos">
+                    <div
+                      className="noDatasInfos"
+                      style={{ textAlign: "right" }}
+                    >
                       No Interruptions / Incidents ...
                     </div>
                   )}

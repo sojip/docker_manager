@@ -6,8 +6,10 @@ import { useEffect, useState } from "react";
 import StickyHeadTable from "./Table";
 import AddShiftForm from "./AddShiftForm";
 import ShiftDetails from "./ShiftDetails";
+import alertify from "alertifyjs";
 
-const Shifts = () => {
+const Shifts = (props) => {
+  const { setisLoading } = props;
   const [shifts, setshifts] = useState([]);
   const [searchShiftsResults, setsearchShiftsResults] = useState([]);
   const [open, setOpen] = useState(false);
@@ -67,12 +69,21 @@ const Shifts = () => {
   }
 
   useEffect(() => {
+    setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
-    getShifts(signal).then((shifts) => {
-      setshifts(shifts);
-      setsearchShiftsResults(shifts);
-    });
+    getShifts(signal)
+      .then((shifts) => {
+        setshifts(shifts);
+        setsearchShiftsResults(shifts);
+        setisLoading(false);
+      })
+      .catch((e) => {
+        if (e.name !== "AbortError") {
+          setisLoading(false);
+          alertify.error("An Error Occured");
+        }
+      });
     return () => {
       controller.abort();
     };
@@ -115,10 +126,15 @@ const Shifts = () => {
               setsearchShiftsResults={setsearchShiftsResults}
               shifts={shifts}
               setshifts={setshifts}
+              setisLoading={setisLoading}
             />
           )}
           {showShift && (
-            <ShiftDetails handleClose={handleClose} selected_id={selected_id} />
+            <ShiftDetails
+              setisLoading={setisLoading}
+              handleClose={handleClose}
+              selected_id={selected_id}
+            />
           )}
         </div>
       )}

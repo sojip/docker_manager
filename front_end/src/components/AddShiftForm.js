@@ -24,6 +24,7 @@ const AddShiftForm = (props) => {
   let { setsearchShiftsResults } = props;
   let { shifts } = props;
   let { setshifts } = props;
+  let { setisLoading } = props;
 
   let style = {
     marginBottom: "15px",
@@ -110,16 +111,25 @@ const AddShiftForm = (props) => {
   }
 
   useEffect(() => {
+    setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
 
-    getWorkers(signal).then((workers) => {
-      setworkers(
-        workers.map((worker) => {
-          return { ...worker, checked: false };
-        })
-      );
-    });
+    getWorkers(signal)
+      .then((workers) => {
+        setworkers(
+          workers.map((worker) => {
+            return { ...worker, checked: false };
+          })
+        );
+        setisLoading(false);
+      })
+      .catch((e) => {
+        if (e.name !== "AbortError") {
+          setisLoading(false);
+          alertify.error("An Error Occured");
+        }
+      });
 
     return () => {
       controller.abort();

@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function SignIn(props) {
+  const { setisLoggedIn } = props;
   const [datas, setdatas] = useState({});
   let navigate = useNavigate();
 
@@ -37,6 +38,7 @@ export default function SignIn(props) {
           alertify.set("notifier", "position", "top-center");
           alertify.success("Logged In Successfully");
           localStorage.setItem("utoken", datas.token);
+          setisLoggedIn(true);
           navigate("/", { replace: true });
         }
       })

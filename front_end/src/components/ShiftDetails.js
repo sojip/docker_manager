@@ -8,10 +8,13 @@ import { mdiPauseOctagonOutline, mdiAccountHardHatOutline } from "@mdi/js";
 import { mdiCloseOctagonOutline } from "@mdi/js";
 import AddInterruptionForm from "./AddInterruptionForm";
 import EndShiftForm from "./EndShiftForm";
+import alertify from "alertifyjs";
+import "alertifyjs/build/css/alertify.css";
 
 const ShiftsDetails = (props) => {
   const { handleClose } = props;
   const { selected_id } = props;
+  const { setisLoading } = props;
   const [shift, setshift] = useState({});
   const [shiftinstances, setshiftinstances] = useState([]);
   const [interruptions, setinterruptions] = useState([]);
@@ -50,13 +53,27 @@ const ShiftsDetails = (props) => {
 
   const handleAddInterruptionClick = () => {
     let open = document.querySelector(".open");
-    if (open) open.classList.remove("open");
+    if (open) {
+      open.classList.remove("open");
+      setshiftinstances(
+        shiftinstances.map((instance) => {
+          return { ...instance, checked: false };
+        })
+      );
+    }
     let formWrapper = document.querySelector(".interruptionForm");
     formWrapper.classList.add("open");
   };
   const handleEndShiftClick = () => {
     let open = document.querySelector(".open");
-    if (open) open.classList.remove("open");
+    if (open) {
+      open.classList.remove("open");
+      setshiftinstances(
+        shiftinstances.map((instance) => {
+          return { ...instance, checked: false };
+        })
+      );
+    }
     let formWrapper = document.querySelector(".endShiftFormWrapper");
     formWrapper.classList.add("open");
   };
@@ -96,6 +113,7 @@ const ShiftsDetails = (props) => {
   };
 
   useEffect(() => {
+    setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
 
@@ -103,20 +121,32 @@ const ShiftsDetails = (props) => {
       getShift(signal),
       getShiftInstances(signal),
       getInterruptions(signal),
-    ]).then((datas) => {
-      setshift(datas[0]);
-      setshiftinstances(
-        datas[1].map((instance) => {
-          return { ...instance, checked: false };
-        })
-      );
-      setinterruptions(datas[2]);
-    });
+    ])
+      .then((datas) => {
+        setshift(datas[0]);
+        setshiftinstances(
+          datas[1].map((instance) => {
+            return { ...instance, checked: false };
+          })
+        );
+        setinterruptions(datas[2]);
+        setisLoading(false);
+      })
+      .catch((e) => {
+        if (e.name !== "AbortError") {
+          setisLoading(false);
+          alertify.error("An Error Occured");
+        }
+      });
 
     return () => {
       controller.abort();
     };
   }, []);
+
+  useEffect(() => {
+    console.log(shiftinstances);
+  }, [shiftinstances]);
 
   return (
     <Box

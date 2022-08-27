@@ -23,18 +23,7 @@ const ProtectedRoute = ({ isLoggedIn, children }) => {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Router>
-      <Routes>
-        <Route path="/" element={<App />}>
-          <Route index element={<Home />} />
-          <Route path="/workers" element={<Workers />} />
-          <Route path="/shifts" element={<Shifts />} />
-          <Route path="/stats" element={<Stats />} />
-          <Route path="/addworker" element={<AddWorkerForm />} />
-        </Route>
-        <Route path="/signin" element={<SignIn />} />
-      </Routes>
-    </Router>
+    <App />
   </React.StrictMode>
 );
 

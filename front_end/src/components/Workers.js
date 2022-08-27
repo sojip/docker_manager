@@ -7,8 +7,11 @@ import AddWorkerForm from "./AddWorkerForm";
 import WorkerDetails from "./WorkerDetails";
 import TextField from "@mui/material/TextField";
 import { DateTime } from "luxon";
+import alertify from "alertifyjs";
+import "alertifyjs/build/css/alertify.css";
 
-const Workers = () => {
+const Workers = (props) => {
+  const { setisLoading } = props;
   let [workers, setworkers] = useState([]);
   const [selected_id, setselectedid] = useState("");
   const [searchWorkersResults, setsearchWorkersResults] = useState([]);
@@ -48,7 +51,7 @@ const Workers = () => {
 
   let search = (arr, str) => {
     return arr.filter((x) =>
-      [x.firstname, x.lastname]
+      [x.firstname, x.lastname, x.cni]
         .join(" ")
         .toLowerCase()
         .includes(str.toLowerCase())
@@ -64,13 +67,22 @@ const Workers = () => {
   }
 
   useEffect(() => {
+    setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
 
-    getWorkers(signal).then((workers) => {
-      setworkers(workers);
-      setsearchWorkersResults(workers);
-    });
+    getWorkers(signal)
+      .then((workers) => {
+        setworkers(workers);
+        setsearchWorkersResults(workers);
+        setisLoading(false);
+      })
+      .catch((e) => {
+        if (e.name !== "AbortError") {
+          alertify.error("An Error Occured");
+          setisLoading(false);
+        }
+      });
 
     return () => {
       controller.abort();
@@ -128,6 +140,7 @@ const Workers = () => {
                         day: "numeric",
                       })}
                   </div>
+                  {worker.cni && <div>CNI N° {worker.cni}</div>}
                   <div className="seemore">See More</div>
                 </div>
               );
@@ -145,12 +158,14 @@ const Workers = () => {
               workers={workers}
               setworkers={setworkers}
               setsearchWorkersResults={setsearchWorkersResults}
+              setisLoading={setisLoading}
             />
           )}
           {showWorker && (
             <WorkerDetails
               handleClose={handleClose}
               selected_id={selected_id}
+              setisLoading={setisLoading}
             />
           )}
         </div>
