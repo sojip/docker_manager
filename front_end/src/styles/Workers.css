@@ -41,7 +41,8 @@
   margin-top: 10px;
 }
 
-.workerscontainer .workerCard:hover .seemore {
+.workerscontainer .workerCard:hover .seemore,
+.workerscontainer .workerCard:hover .profileContainer {
   color: var(--orange-color);
 }
 

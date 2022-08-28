@@ -18,6 +18,8 @@ const ShiftsDetails = (props) => {
   const [shift, setshift] = useState({});
   const [shiftinstances, setshiftinstances] = useState([]);
   const [interruptions, setinterruptions] = useState([]);
+  const [addInterruption, setaddInterruption] = useState(false);
+  const [endShift, setendShift] = useState(false);
 
   async function getShift(signal) {
     const res = await fetch(`http://localhost:3000/api/shifts/${selected_id}`, {
@@ -52,54 +54,45 @@ const ShiftsDetails = (props) => {
   }
 
   const handleAddInterruptionClick = () => {
-    let open = document.querySelector(".open");
-    if (open) {
-      open.classList.remove("open");
-      setshiftinstances(
-        shiftinstances.map((instance) => {
-          return { ...instance, checked: false };
-        })
-      );
-    }
-    let formWrapper = document.querySelector(".interruptionForm");
-    formWrapper.classList.add("open");
+    setendShift(false);
+    setaddInterruption(true);
+    setshiftinstances(
+      shiftinstances.map((instance) => {
+        return { ...instance, checked: false };
+      })
+    );
   };
+
   const handleEndShiftClick = () => {
-    let open = document.querySelector(".open");
-    if (open) {
-      open.classList.remove("open");
-      setshiftinstances(
-        shiftinstances.map((instance) => {
-          return { ...instance, checked: false };
-        })
-      );
-    }
-    let formWrapper = document.querySelector(".endShiftFormWrapper");
-    formWrapper.classList.add("open");
+    setendShift(true);
+    setaddInterruption(false);
+    setshiftinstances(
+      shiftinstances.map((instance) => {
+        return { ...instance, checked: false };
+      })
+    );
   };
 
   const handleCloseAddInterruptionForm = () => {
-    let formWrapper = document.querySelector(".interruptionForm");
     let form = document.querySelector("#addInterruptionForm");
-    formWrapper.classList.remove("open");
     form.reset();
     setshiftinstances(
       shiftinstances.map((instance) => {
         return { ...instance, checked: false };
       })
     );
+    setaddInterruption(false);
   };
 
   const handleCloseEndShiftForm = () => {
-    let formWrapper = document.querySelector(".endShiftFormWrapper");
     let form = document.querySelector("#endShiftForm");
-    formWrapper.classList.remove("open");
     form.reset();
     setshiftinstances(
       shiftinstances.map((instance) => {
         return { ...instance, checked: false };
       })
     );
+    setendShift(false);
   };
 
   const handleCheckboxChange = (e) => {
@@ -179,23 +172,25 @@ const ShiftsDetails = (props) => {
           Close Shift
         </div>
       </div>
-
-      <AddInterruptionForm
-        handleCloseAddInterruptionForm={handleCloseAddInterruptionForm}
-        shiftinstances={shiftinstances}
-        setshiftinstances={setshiftinstances}
-        handleCheckboxChange={handleCheckboxChange}
-        selected_id={selected_id}
-        interruptions={interruptions}
-        setinterruptions={setinterruptions}
-      />
-
-      <EndShiftForm
-        handleCloseEndShiftForm={handleCloseEndShiftForm}
-        shiftinstances={shiftinstances}
-        setshiftinstances={setshiftinstances}
-        handleCheckboxChange={handleCheckboxChange}
-      />
+      {addInterruption && (
+        <AddInterruptionForm
+          handleCloseAddInterruptionForm={handleCloseAddInterruptionForm}
+          shiftinstances={shiftinstances}
+          setshiftinstances={setshiftinstances}
+          handleCheckboxChange={handleCheckboxChange}
+          selected_id={selected_id}
+          interruptions={interruptions}
+          setinterruptions={setinterruptions}
+        />
+      )}
+      {endShift && (
+        <EndShiftForm
+          handleCloseEndShiftForm={handleCloseEndShiftForm}
+          shiftinstances={shiftinstances}
+          setshiftinstances={setshiftinstances}
+          handleCheckboxChange={handleCheckboxChange}
+        />
+      )}
 
       <div className="generalInfos">
         <div>Shift {shift.type}</div>

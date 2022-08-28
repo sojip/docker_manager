@@ -7,6 +7,7 @@ import { DateTime, Interval } from "luxon";
 import TextField from "@mui/material/TextField";
 import alertify from "alertifyjs";
 import "alertifyjs/build/css/alertify.css";
+import { mdiPauseOctagon } from "@mdi/js";
 
 const WorkerDetails = (props) => {
   const [worker, setworker] = useState({
@@ -319,45 +320,48 @@ const WorkerDetails = (props) => {
               return (
                 <div className="shiftItem" key={shift._id}>
                   <div>Shift {shift.shift.type}</div>
-                  <div>
-                    Started on{" "}
-                    {DateTime.fromISO(shift.shift.startdate)
-                      .setLocale("fr")
-                      .toLocaleString({
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                  </div>
-                  <div>
-                    Ended on{" "}
-                    {DateTime.fromISO(shift.shift.enddate)
-                      .setLocale("fr")
-                      .toLocaleString({
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                  </div>
-                  <div>
-                    Started shift{" "}
-                    <input
-                      type="checkbox"
-                      disabled
-                      checked={shift.startedshift}
-                    />
-                  </div>
-                  <div>
-                    Ended shift
-                    <input
-                      type="checkbox"
-                      disabled
-                      checked={shift.endedshift}
-                    />{" "}
+                  <div className="shiftItemgrid">
+                    <div>
+                      Started on{" "}
+                      {DateTime.fromISO(shift.shift.startdate)
+                        .setLocale("fr")
+                        .toLocaleString({
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                    </div>
+
+                    <div>
+                      Ended on{" "}
+                      {DateTime.fromISO(shift.shift.enddate)
+                        .setLocale("fr")
+                        .toLocaleString({
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                    </div>
+                    <div>
+                      Started shift{" "}
+                      <input
+                        type="checkbox"
+                        disabled
+                        checked={shift.startedshift}
+                      />
+                    </div>
+                    <div>
+                      Ended shift
+                      <input
+                        type="checkbox"
+                        disabled
+                        checked={shift.endedshift}
+                      />{" "}
+                    </div>
                   </div>
                   {shift.interruptions ? (
                     <div className="timeworked">
@@ -376,25 +380,32 @@ const WorkerDetails = (props) => {
                   )}
                   {shift.interruptions !== undefined &&
                   shift.interruptions.length ? (
-                    <>
-                      <div>Interruptions / Incidents</div>
-                      <ul>
+                    <div>
+                      <div style={{ marginTop: "5px", fontWeight: "bold" }}>
+                        INTERRUPTIONS - INCIDENTS
+                      </div>
+                      <ul className="shiftinterruptionsList">
                         {shift.interruptions.map((interruption) => {
                           return (
                             <li key={interruption._id}>
-                              <div>{interruption.description}</div>
-                              <div>Duration {interruption.duration} mins</div>
+                              <Icon path={mdiPauseOctagon} size={1} />
+                              <div>
+                                <div>{interruption.duration} mins</div>
+                                <div style={{ marginTop: "5px" }}>
+                                  {interruption.description}
+                                </div>
+                              </div>
                             </li>
                           );
                         })}
                       </ul>
-                    </>
+                    </div>
                   ) : (
                     <div
                       className="noDatasInfos"
                       style={{ textAlign: "right" }}
                     >
-                      No Interruptions / Incidents ...
+                      No Interruptions - Incidents ...
                     </div>
                   )}
                 </div>

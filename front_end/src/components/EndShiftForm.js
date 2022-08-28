@@ -10,17 +10,22 @@ import "alertifyjs/build/css/alertify.css";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { TextField } from "@mui/material";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import { useState, useEffect } from "react";
 
 const EndShiftForm = (props) => {
   const { handleCloseEndShiftForm } = props;
   const { shiftinstances } = props;
   const { handleCheckboxChange } = props;
   const { setshiftinstances } = props;
+  const [formdatas, setformdatas] = useState({});
 
+  useEffect(() => {
+    console.log(formdatas);
+  }, [formdatas]);
   async function endShift(instance) {
     const res = await fetch(
       `http://localhost:3000/api/shiftinstances/${instance._id}/shift`,
@@ -29,6 +34,7 @@ const EndShiftForm = (props) => {
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify(formdatas[instance._id]),
       }
     );
     const data = await res.json();
@@ -39,24 +45,24 @@ const EndShiftForm = (props) => {
     let name = e.target.name;
     let value = e.target.value;
     if (dataset !== undefined) {
-      return setshiftinstances(
-        shiftinstances.map((instance) => {
-          if (instance._id === dataset.instance)
-            instance.operation = {
-              ...instance.operation,
-              [name]: value,
-            };
-          return instance;
-        })
-      );
+      let selectedinstance = shiftinstances.find((instance) => {
+        return instance._id === dataset.instance;
+      });
+      return setformdatas({
+        ...formdatas,
+        [selectedinstance._id]: {
+          ...formdatas[selectedinstance._id],
+          [name]: value,
+        },
+      });
     }
-    setshiftinstances(
-      shiftinstances.map((instance) => {
-        if (instance._id === e.target.dataset.instance)
-          instance.operation = { ...instance.operation, [name]: value };
-        return instance;
-      })
-    );
+    return setformdatas({
+      ...formdatas,
+      [e.currentTarget.dataset.instance]: {
+        ...formdatas[e.currentTarget.dataset.instance],
+        [name]: value,
+      },
+    });
   };
 
   const handleSubmit = (e) => {
@@ -83,6 +89,7 @@ const EndShiftForm = (props) => {
           })
         );
         e.target.reset();
+        setformdatas({});
       })
       .catch((e) => {
         alertify.set("notifier", "position", "top-center");
@@ -130,35 +137,31 @@ const EndShiftForm = (props) => {
                     className="operationDetails"
                     data-instance={instance._id}
                   >
-                    <TextField
-                      id="opsposition"
-                      label="Position"
-                      variant="outlined"
-                      required
-                      name="opsposition"
-                      onChange={handleOpsDetailsChange}
-                      inputProps={{
-                        "data-instance": instance._id,
-                      }}
-                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="opsTypeLabel">Operation Type</InputLabel>
+                      <Select
+                        labelId="opsTypeLabel"
+                        id="opsTypeSelect"
+                        value={
+                          formdatas[instance._id] !== undefined &&
+                          formdatas[instance._id].opsType !== undefined
+                            ? formdatas[instance._id].opsType
+                            : ""
+                        }
+                        label="Operation Type"
+                        name="opsType"
+                        onChange={(e) => {
+                          handleOpsDetailsChange(e, { instance: instance._id });
+                        }}
+                      >
+                        <MenuItem value={"navire"}>Opération Navire</MenuItem>
+                        <MenuItem value={"yard"}>Opération Yard</MenuItem>
+                        <MenuItem value={"magasin"}>Opération Magasin</MenuItem>
+                      </Select>
+                    </FormControl>
 
-                    <TextField
-                      id="opsType"
-                      select
-                      label="Type"
-                      required
-                      onChange={(e) => {
-                        handleOpsDetailsChange(e, { instance: instance._id });
-                      }}
-                      name="opsType"
-                    >
-                      <MenuItem value={"navire"}>Opération Navire</MenuItem>
-                      <MenuItem value={"yard"}>Opération Yard</MenuItem>
-                      <MenuItem value={"magasin"}>Opération magasin</MenuItem>
-                    </TextField>
-
-                    {instance.operation !== undefined &&
-                    instance.operation.opsType === "navire" ? (
+                    {formdatas[instance._id] !== undefined &&
+                    formdatas[instance._id].opsType === "navire" ? (
                       <TextField
                         id="vesselname"
                         label="Vessel"
@@ -171,6 +174,17 @@ const EndShiftForm = (props) => {
                         required
                       />
                     ) : null}
+                    <TextField
+                      id="opsposition"
+                      label="Position"
+                      variant="outlined"
+                      required
+                      name="opsposition"
+                      onChange={handleOpsDetailsChange}
+                      inputProps={{
+                        "data-instance": instance._id,
+                      }}
+                    />
                     <TextField
                       id="opsdescription"
                       label="Description"

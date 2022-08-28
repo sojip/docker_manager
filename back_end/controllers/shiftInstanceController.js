@@ -66,11 +66,19 @@ module.exports.addInterruption = function (req, res, next) {
 
 module.exports.endShift = function (req, res, next) {
   var id = mongoose.Types.ObjectId(req.params.id);
+  var operation = {
+    type: req.body.opsType,
+    position: req.body.opsposition,
+    vessel: req.body.opsvessel || undefined,
+    description: req.body.opsdescription,
+  };
   ShiftInstance.findByIdAndUpdate(
     id,
     {
       endedshift: true,
+      operation: operation,
     },
+    { new: true },
     function (err, instance) {
       if (err) return next(err);
       return res.json(instance);

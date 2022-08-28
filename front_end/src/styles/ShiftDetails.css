@@ -4,13 +4,8 @@
 
 #showshiftbox .interruptionForm,
 #showshiftbox .endShiftFormWrapper {
-  display: none;
-}
-
-#showshiftbox .interruptionForm.open,
-#showshiftbox .endShiftFormWrapper.open {
   display: block;
-  animation: fadeIn 200ms;
+  animation: fadeIn 1000ms;
 }
 
 @keyframes fadeIn {
@@ -21,6 +16,10 @@
   to {
     opacity: 1;
   }
+}
+
+#showshiftbox #endShiftForm .operationDetails {
+  padding: 15px 0;
 }
 
 #showshiftbox .closeForm {
@@ -47,12 +46,9 @@
 
 #showshiftbox #addInterruptionForm,
 #showshiftbox #endShiftForm {
-  /* border: solid 1px black; */
   border-radius: 25px;
   padding: 25px 2vw;
   margin-top: 15px;
-  /* box-shadow: 0 1rem 2rem hsl(0 0% 0% / 20%); */
-  /* box-shadow: rgb(44, 62, 80) 0px 0px 15px 0px; */
   box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
     rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
 }
@@ -137,14 +133,3 @@
     opacity: 1;
   }
 }
-
-#endShiftForm .operationDetails #opsdescription {
-}
-
-/* #endShiftForm .operationDetails > :first-child {
-  border: solid 1px green;
-}
-
-#endShiftForm .operationDetails > :nth-child(2) {
-  border: solid 2px yellow;
-} */

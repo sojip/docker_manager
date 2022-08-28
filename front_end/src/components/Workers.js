@@ -121,7 +121,7 @@ const Workers = (props) => {
                 >
                   <div className="profileContainer">
                     <Icon
-                      id="workerIcon"
+                      className="workerIcon"
                       path={mdiAccountHardHatOutline}
                       size={2.5}
                     />

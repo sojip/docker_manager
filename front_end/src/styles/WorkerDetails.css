@@ -80,9 +80,11 @@
 
 #showworkerbox .shiftsgrid {
   margin-top: 15px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  /* display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-auto-flow: row dense;
+  grid-auto-flow: row dense; */
   gap: 15px;
 }
 
@@ -97,6 +99,30 @@
   animation: fadeIn 500ms;
 }
 
+#showworkerbox .shiftsgrid .shiftItem .shiftItemgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+#showworkerbox .shiftsgrid .shiftItem .shiftinterruptionsList {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  padding-top: 10px;
+  /* border: solid 1px red; */
+}
+#showworkerbox .shiftsgrid .shiftItem .shiftinterruptionsList li {
+  /* border: solid 1px red; */
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  gap: 5px;
+  align-items: flex-start;
+  line-height: normal;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -107,7 +133,7 @@
 }
 
 #showworkerbox .shiftsgrid .shiftItem > div:first-of-type {
-  text-transform: capitalize;
+  text-transform: uppercase;
   font-weight: bold;
   text-align: center;
   margin-bottom: 10px;
