@@ -40,6 +40,7 @@ app.use("/users", usersRouter);
 // app.use(express.static(path.join(__dirname, "./public")));
 //indicate react app folder
 app.use(express.static(path.join(__dirname, "./front_end/build")));
+app.use(express.static(path.join(__dirname, "./public")));
 
 // app.get("/", function (req, res, next) {
 //   res.render("index", { title: "Express" });

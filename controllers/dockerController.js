@@ -9,7 +9,7 @@ module.exports.createDocker = function (req, res, next) {
   var position = req.body.position;
   var cni = req.body.cni;
   var fingerprint = req.body.fingerprint || undefined;
-  var photo = req.file.path.replace("front_end/build/", "");
+  var photo = req.file.path.replace("public/", "");
   var docker = new Docker({
     firstname: firstname,
     lastname: lastname,
