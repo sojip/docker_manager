@@ -18,10 +18,12 @@ const Workers = (props) => {
   const [open, setOpen] = useState(false);
   const [addWorker, setaddWorker] = useState(false);
   const [showWorker, setshowWorker] = useState(false);
+
   const handleOpen = () => {
     setOpen(true);
     document.querySelector("body").style.overflowY = "hidden";
   };
+
   const handleClose = () => {
     setOpen(false);
     setaddWorker(false);
@@ -42,7 +44,7 @@ const Workers = (props) => {
   }
 
   async function getWorkers(signal) {
-    const res = await fetch("http://localhost:3000/api/workers", {
+    const res = await fetch("/api/workers", {
       signal: signal,
     });
     const workers = await res.json();
@@ -81,6 +83,7 @@ const Workers = (props) => {
         if (e.name !== "AbortError") {
           alertify.error("An Error Occured");
           setisLoading(false);
+          console.log(e);
         }
       });
 
@@ -91,7 +94,7 @@ const Workers = (props) => {
 
   return (
     <div className="workerscontainer">
-      <h3>Workers</h3>
+      <h3>Workers__</h3>
       <div className="oulinedButtonWrapper" onClick={handleAddWorkerClick}>
         <Icon path={mdiAccountPlusOutline} size={1} />
         Add Worker

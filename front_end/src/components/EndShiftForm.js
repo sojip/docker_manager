@@ -27,16 +27,13 @@ const EndShiftForm = (props) => {
     console.log(formdatas);
   }, [formdatas]);
   async function endShift(instance) {
-    const res = await fetch(
-      `http://localhost:3000/api/shiftinstances/${instance._id}/shift`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formdatas[instance._id]),
-      }
-    );
+    const res = await fetch(`/api/shiftinstances/${instance._id}/shift`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formdatas[instance._id]),
+    });
     const data = await res.json();
     return data;
   }

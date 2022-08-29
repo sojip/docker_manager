@@ -32,7 +32,7 @@ const AddInterruptionForm = (props) => {
 
   async function updateInstancesInterruptions(instance, interruption) {
     const res = await fetch(
-      `http://localhost:3000/api/shiftinstances/${instance._id}/interruptions`,
+      `/api/shiftinstances/${instance._id}/interruptions`,
       {
         method: "PUT",
         headers: {
@@ -50,7 +50,7 @@ const AddInterruptionForm = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("http://localhost:3000/api/interruptions", {
+    fetch("/api/interruptions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -10,6 +10,7 @@ import AddInterruptionForm from "./AddInterruptionForm";
 import EndShiftForm from "./EndShiftForm";
 import alertify from "alertifyjs";
 import "alertifyjs/build/css/alertify.css";
+import { mdiPauseOctagon } from "@mdi/js";
 
 const ShiftsDetails = (props) => {
   const { handleClose } = props;
@@ -22,7 +23,7 @@ const ShiftsDetails = (props) => {
   const [endShift, setendShift] = useState(false);
 
   async function getShift(signal) {
-    const res = await fetch(`http://localhost:3000/api/shifts/${selected_id}`, {
+    const res = await fetch(`/api/shifts/${selected_id}`, {
       signal: signal,
     });
     const datas = await res.json();
@@ -30,23 +31,17 @@ const ShiftsDetails = (props) => {
   }
 
   async function getShiftInstances(signal) {
-    const res = await fetch(
-      `http://localhost:3000/api/shifts/${selected_id}/workers`,
-      {
-        signal: signal,
-      }
-    );
+    const res = await fetch(`/api/shifts/${selected_id}/workers`, {
+      signal: signal,
+    });
     const datas = await res.json();
     return datas;
   }
 
   async function getInterruptions(signal) {
-    const res = await fetch(
-      `http://localhost:3000/api/shifts/${selected_id}/interruptions`,
-      {
-        signal: signal,
-      }
-    );
+    const res = await fetch(`/api/shifts/${selected_id}/interruptions`, {
+      signal: signal,
+    });
     const datas = await res.json();
     console.log("interruptions");
     console.log(datas);
@@ -251,8 +246,11 @@ const ShiftsDetails = (props) => {
           {interruptions.map((interruption) => {
             return (
               <div key={interruption._id} className="interruptionItem">
-                <div>{interruption.description}</div>
-                <div>Duration {interruption.duration} mins</div>
+                <Icon path={mdiPauseOctagon} size={1} />
+                <div>
+                  <div>{interruption.duration} mins</div>
+                  <div>{interruption.description}</div>
+                </div>
               </div>
             );
           })}

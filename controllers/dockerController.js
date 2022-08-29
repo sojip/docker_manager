@@ -9,9 +9,7 @@ module.exports.createDocker = function (req, res, next) {
   var position = req.body.position;
   var cni = req.body.cni;
   var fingerprint = req.body.fingerprint || undefined;
-  var photo = req.file.path.replace("public/", "");
-  console.log(photo);
-
+  var photo = req.file.path.replace("front_end/build/", "");
   var docker = new Docker({
     firstname: firstname,
     lastname: lastname,
@@ -51,7 +49,7 @@ module.exports.getPhoto = function (req, res, next) {
     .exec(function (err, docker) {
       if (err) return next(err);
       if (docker.photo !== undefined) {
-        return res.json(`http://localhost:3000/${docker.photo}`);
+        return res.json(docker.photo);
       }
       return res.json("");
     });

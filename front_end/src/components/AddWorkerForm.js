@@ -47,9 +47,8 @@ const AddWorkerForm = (props) => {
     keys.forEach((key) => {
       formData.append(key, datas[key]);
     });
-    fetch(`http://localhost:3000/api/workers`, {
+    fetch(`/api/workers`, {
       method: "POST",
-      headers: {},
       body: formData,
     })
       .then((res) => res.json())

@@ -21,7 +21,7 @@ export default function SignIn(props) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("http://localhost:3000/api/login", {
+    fetch("/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +42,11 @@ export default function SignIn(props) {
           navigate("/", { replace: true });
         }
       })
-      .catch((e) => alert(e));
+      .catch((e) => {
+        alertify.set("notifier", "position", "top-center");
+        alertify.error("An Error Occured");
+        console.log(e);
+      });
   };
 
   useEffect(() => {

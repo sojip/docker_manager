@@ -24,7 +24,7 @@ const WorkerDetails = (props) => {
   const { setisLoading } = props;
 
   async function getWorker(id, signal) {
-    const res = await fetch(`http://localhost:3000/api/workers/${id}`, {
+    const res = await fetch(`/api/workers/${id}`, {
       signal: signal,
     });
     const worker = await res.json();
@@ -33,7 +33,7 @@ const WorkerDetails = (props) => {
   }
 
   async function getPhoto(id, signal) {
-    const res = await fetch(`http://localhost:3000/api/workers/${id}/photo`, {
+    const res = await fetch(`/api/workers/${id}/photo`, {
       signal: signal,
     });
     const data = await res.json();
@@ -41,7 +41,7 @@ const WorkerDetails = (props) => {
   }
 
   async function getshifts(id, signal) {
-    const res = await fetch(`http://localhost:3000/api/workers/${id}/shifts`, {
+    const res = await fetch(`/api/workers/${id}/shifts`, {
       signal: signal,
     });
     const shifts = await res.json();
@@ -190,9 +190,9 @@ const WorkerDetails = (props) => {
       getPhoto(selected_id, signal),
     ])
       .then((datas) => {
-        setphotoUrl(datas[2]);
         setworker(datas[0]);
         setshifts(datas[1]);
+        setphotoUrl(datas[2]);
         setsearchresults(datas[1]);
         setisLoading(false);
       })

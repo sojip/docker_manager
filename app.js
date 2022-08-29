@@ -26,20 +26,24 @@ var app = express();
 app.use(cors());
 
 // view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "jade");
+// app.set("views", path.join(__dirname, "views"));
+// app.set("view engine", "jade");
 
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "./public")));
 
-app.get("/", function (req, res, next) {
-  res.render("index", { title: "Express" });
-});
 app.use("/api", apiRouter);
 app.use("/users", usersRouter);
+
+// app.use(express.static(path.join(__dirname, "./public")));
+//indicate react app folder
+app.use(express.static(path.join(__dirname, "./front_end/build")));
+
+// app.get("/", function (req, res, next) {
+//   res.render("index", { title: "Express" });
+// });
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -58,7 +62,9 @@ app.use(function (err, req, res, next) {
   res.send("error");
 });
 
-// app.get("*", function (req, res, next) {
-//   res.sendFile(path.join(__dirname, "./front_end/build", "index.html"));
-// });
+//serve react
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "front_end", "build", "index.html"));
+});
+
 module.exports = app;

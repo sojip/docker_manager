@@ -9,7 +9,7 @@ var passport = require("passport");
 require("dotenv").config();
 const multer = require("multer");
 var storage = multer.diskStorage({
-  destination: "./public/uploads",
+  destination: "./front_end/build/uploads",
   filename: function (req, file, cb) {
     cb(null, `${file.originalname}`);
   },

@@ -47,7 +47,7 @@ const AddShiftForm = (props) => {
   }
 
   async function getWorkers(signal) {
-    const res = await fetch("http://localhost:3000/api/workers", {
+    const res = await fetch("/api/workers", {
       signal: signal,
     });
     const workers = await res.json();
@@ -55,7 +55,7 @@ const AddShiftForm = (props) => {
   }
 
   async function createShiftInstance(shift, docker) {
-    const res = await fetch("http://localhost:3000/api/shiftinstances", {
+    const res = await fetch("/api/shiftinstances", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +71,7 @@ const AddShiftForm = (props) => {
 
   function handleSubmit(e) {
     e.preventDefault();
-    fetch("http://localhost:3000/api/shifts", {
+    fetch("/api/shifts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
