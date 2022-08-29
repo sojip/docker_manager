@@ -49,7 +49,7 @@ module.exports.getPhoto = function (req, res, next) {
     .exec(function (err, docker) {
       if (err) return next(err);
       if (docker.photo !== undefined) {
-        return res.json(docker.photo);
+        return res.json(`/${docker.photo}`);
       }
       return res.json("");
     });
