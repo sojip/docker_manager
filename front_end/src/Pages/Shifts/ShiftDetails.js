@@ -148,6 +148,8 @@ const ShiftsDetails = (props) => {
         margin: "auto",
         boxShadow: 24,
         p: 4,
+        // position: "absolute",
+        // bottom: 0,
       }}
     >
       <div className="closeModalWrapper" id="closeModal" onClick={handleClose}>

@@ -5,13 +5,19 @@
 }
 
 .full-screen-container {
-  background-color: #fff7ed;
+  /* background-color: #fff7ed; */
   width: 100%;
   height: 100vh;
+  background: linear-gradient(to bottom, var(--orange-color) 50%, white 50%);
+}
+
+#signinform {
+  border-radius: 10px;
 }
 
 #signinform h1 {
-  text-align: center;
+  /* text-align: center; */
+  /* border: solid 1px red; */
   /* color: var(--orange-color); */
 }
 

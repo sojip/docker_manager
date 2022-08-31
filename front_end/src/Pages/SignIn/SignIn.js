@@ -67,16 +67,17 @@ export default function SignIn(props) {
           left: "50%",
           transform: "translate(-50%, -50%)",
           bgcolor: "background.paper",
-          boxShadow: 24,
+          // boxShadow: 29,
           p: 4,
         }}
         autoComplete="off"
         onSubmit={handleSubmit}
       >
         <h1>Docker Manager</h1>
+        {/* <h2>Log In</h2> */}
         <TextField
           id="username"
-          label="username"
+          label="Username"
           name="username"
           variant="outlined"
           required
@@ -85,7 +86,7 @@ export default function SignIn(props) {
         />
         <TextField
           id="password"
-          label="password"
+          label="Password"
           variant="outlined"
           name="password"
           type="password"

@@ -72,6 +72,12 @@ const AddShiftForm = (props) => {
   function handleSubmit(e) {
     setisLoading(true);
     e.preventDefault();
+    let selectedworkers = workers.filter((worker) => worker.checked === true);
+    if (selectedworkers.length === 0) {
+      alertify.error("Select Workers Please");
+      setisLoading(false);
+      return;
+    }
     fetch("/api/shifts", {
       method: "POST",
       headers: {
@@ -89,9 +95,6 @@ const AddShiftForm = (props) => {
         }
         setsearchShiftsResults([...shifts, data]);
         setshifts([...shifts, data]);
-        let selectedworkers = workers.filter(
-          (worker) => worker.checked === true
-        );
         return Promise.all(
           selectedworkers.map((worker) => {
             return createShiftInstance(data, worker);
@@ -148,101 +151,95 @@ const AddShiftForm = (props) => {
   }, []);
 
   return (
-    <>
-      <Box
-        component="form"
-        id="addshiftform"
-        sx={{
-          width: "96%",
-          maxWidth: "500px",
-          padding: "2vh 1vw",
-          "& > :not(style)": { width: "100%" },
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          p: 4,
-          margin: "auto",
-        }}
-        onSubmit={handleSubmit}
-        autoComplete="off"
-      >
-        <div
-          className="closeModalWrapper"
-          id="closeModal"
-          onClick={handleClose}
-        >
-          <Icon path={mdiCloseThick} size={1} />
-        </div>
+    <Box
+      component="form"
+      id="addshiftform"
+      sx={{
+        width: "96%",
+        maxWidth: "500px",
+        padding: "2vh 1vw",
+        "& > :not(style)": { width: "100%" },
+        bgcolor: "background.paper",
+        boxShadow: 24,
+        p: 4,
+        margin: "auto",
+      }}
+      onSubmit={handleSubmit}
+      autoComplete="off"
+    >
+      <div className="closeModalWrapper" id="closeModal" onClick={handleClose}>
+        <Icon path={mdiCloseThick} size={1} />
+      </div>
 
-        <h3>Start A Shift</h3>
-        <div className="typeandtimeWrapper">
-          <FormControl>
-            <InputLabel id="typeLabel">Type</InputLabel>
-            <Select
-              labelId="typeLabel"
-              id="type"
-              value={datas.type}
-              label="type"
-              name="type"
-              onChange={handleChange}
-              required
-            >
-              <MenuItem value={"jour"}>jour</MenuItem>
-              <MenuItem value={"nuit"}>nuit</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            id="time"
-            label="time"
-            name="time"
-            variant="outlined"
-            style={style}
-            value={time}
+      <h3>Start A Shift</h3>
+      <div className="typeandtimeWrapper">
+        <FormControl>
+          <InputLabel id="typeLabel">Type</InputLabel>
+          <Select
+            labelId="typeLabel"
+            id="type"
+            value={datas.type}
+            label="type"
+            name="type"
+            onChange={handleChange}
             required
-            type="time"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            InputProps={{
-              readOnly: true,
-            }}
-          />
-        </div>
+          >
+            <MenuItem value={"jour"}>jour</MenuItem>
+            <MenuItem value={"nuit"}>nuit</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
-          id="startdate"
-          name="startdate"
+          id="time"
+          label="time"
+          name="time"
           variant="outlined"
           style={style}
-          type="date"
-          margin="normal"
-          helperText="Select The Start Date"
+          value={time}
           required
-          onChange={handleChange}
+          type="time"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          InputProps={{
+            readOnly: true,
+          }}
         />
-        <FormControl component="fieldset" variant="standard">
-          <FormLabel component="legend">Select Workers</FormLabel>
-          {workers.length > 0 &&
-            workers.map((worker) => {
-              return (
-                <FormGroup key={worker._id}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        id={worker._id}
-                        onChange={handleCheckboxChange}
-                        checked={worker.checked}
-                      />
-                    }
-                    label={`${worker.firstname} ${worker.lastname}`}
-                  />
-                </FormGroup>
-              );
-            })}
-        </FormControl>
+      </div>
+      <TextField
+        id="startdate"
+        name="startdate"
+        variant="outlined"
+        style={style}
+        type="date"
+        margin="normal"
+        helperText="Select The Start Date"
+        required
+        onChange={handleChange}
+      />
+      <FormControl component="fieldset" variant="standard">
+        <FormLabel component="legend">Select Workers</FormLabel>
+        {workers.length > 0 &&
+          workers.map((worker) => {
+            return (
+              <FormGroup key={worker._id}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id={worker._id}
+                      onChange={handleCheckboxChange}
+                      checked={worker.checked}
+                    />
+                  }
+                  label={`${worker.firstname} ${worker.lastname}`}
+                />
+              </FormGroup>
+            );
+          })}
+      </FormControl>
 
-        <input type="submit" value="save" />
-        <br />
-      </Box>
-    </>
+      <input type="submit" value="save" />
+      <br />
+    </Box>
   );
 };
 

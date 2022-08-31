@@ -48,6 +48,24 @@ const AddInterruptionForm = (props) => {
     return datas;
   }
 
+  const handleSelectAll = (e) => {
+    const checked = e.target.checked;
+    if (checked) {
+      return setshiftinstances(
+        shiftinstances.map((instance) => {
+          instance.checked = true;
+          return instance;
+        })
+      );
+    }
+    setshiftinstances(
+      shiftinstances.map((instance) => {
+        instance.checked = false;
+        return instance;
+      })
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     fetch("/api/interruptions", {
@@ -155,6 +173,12 @@ const AddInterruptionForm = (props) => {
         />
         <FormControl component="fieldset" variant="standard">
           <FormLabel component="legend">Select Workers</FormLabel>
+          <FormGroup>
+            <FormControlLabel
+              control={<Checkbox id={"selectall"} onChange={handleSelectAll} />}
+              label={`Everybody`}
+            />
+          </FormGroup>
           {shiftinstances.map((instance) => {
             return (
               <FormGroup key={instance.docker._id}>

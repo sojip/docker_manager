@@ -94,7 +94,7 @@ const Workers = (props) => {
 
   return (
     <div className="workerscontainer">
-      <h3>Workers__</h3>
+      <h3>Workers</h3>
       <div className="oulinedButtonWrapper" onClick={handleAddWorkerClick}>
         <Icon path={mdiAccountPlusOutline} size={1} />
         Add Worker

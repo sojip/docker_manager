@@ -37,6 +37,12 @@ const columns = [
         minute: "2-digit",
       }),
   },
+  {
+    id: "status",
+    label: "Status",
+    minWidth: 170,
+    align: "right",
+  },
   //   {
   //     id: "size",
   //     label: "Size\u00a0(km\u00b2)",
