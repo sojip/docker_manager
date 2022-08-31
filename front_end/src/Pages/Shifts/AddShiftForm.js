@@ -80,26 +80,26 @@ const AddShiftForm = (props) => {
       body: JSON.stringify(datas),
     })
       .then((res) => res.json())
-      .then((shift) => {
-        if (shift.message) {
+      .then((data) => {
+        if (data.message) {
           setisLoading(false);
           alertify.set("notifier", "position", "top-center");
-          alertify.error(shift.message);
-          return null;
+          alertify.error(data.message);
+          return;
         }
-        setsearchShiftsResults([...shifts, shift]);
-        setshifts([...shifts, shift]);
+        setsearchShiftsResults([...shifts, data]);
+        setshifts([...shifts, data]);
         let selectedworkers = workers.filter(
           (worker) => worker.checked === true
         );
         return Promise.all(
           selectedworkers.map((worker) => {
-            return createShiftInstance(shift, worker);
+            return createShiftInstance(data, worker);
           })
         );
       })
       .then((result) => {
-        if (result !== null) {
+        if (result !== null && result !== undefined) {
           e.target.reset();
           setdatas({ type: "", startdate: "" });
           settime("");

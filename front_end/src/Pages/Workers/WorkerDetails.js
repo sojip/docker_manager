@@ -210,6 +210,10 @@ const WorkerDetails = (props) => {
     };
   }, []);
 
+  useEffect(() => {
+    console.log(searchresults);
+  }, [searchresults]);
+
   return (
     <Box
       id="showworkerbox"
