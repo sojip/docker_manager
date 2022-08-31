@@ -26,6 +26,7 @@ const EndShiftForm = (props) => {
   useEffect(() => {
     console.log(formdatas);
   }, [formdatas]);
+
   async function endShift(instance) {
     const res = await fetch(`/api/shiftinstances/${instance._id}/shift`, {
       method: "PUT",

@@ -3,7 +3,7 @@ import { mdiCloseThick } from "@mdi/js";
 import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
 import { DateTime } from "luxon";
-import "../styles/ShiftDetails.css";
+import "../../styles/ShiftDetails.css";
 import { mdiPauseOctagonOutline, mdiAccountHardHatOutline } from "@mdi/js";
 import { mdiCloseOctagonOutline } from "@mdi/js";
 import AddInterruptionForm from "./AddInterruptionForm";

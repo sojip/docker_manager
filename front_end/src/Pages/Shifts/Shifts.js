@@ -1,4 +1,4 @@
-import "../styles/Shifts.css";
+import "../../styles/Shifts.css";
 import TextField from "@mui/material/TextField";
 import Icon from "@mdi/react";
 import { mdiPlusCircle } from "@mdi/js";

@@ -9,8 +9,9 @@ const AppHeader = () => {
   const closeprofileOptions = (e) => {
     let isopened = document.querySelector(".profileOptions.isopened");
     let optionsButton = document.querySelector(".toggleOptions");
-    if (e.target !== optionsButton && isopened !== null) {
-      document.querySelector(".profileOptions").classList.remove("isopened");
+    if (e.target !== optionsButton && !optionsButton.contains(e.target)) {
+      if (isopened !== null)
+        document.querySelector(".profileOptions").classList.remove("isopened");
     }
   };
   useEffect(() => {
@@ -20,7 +21,7 @@ const AppHeader = () => {
     };
   }, []);
 
-  function ToggleProfileOptions() {
+  function ToggleProfileOptions(e) {
     let profileOptions = document.querySelector(".profileOptions");
     profileOptions.classList.toggle("isopened");
     return;
@@ -50,13 +51,13 @@ const AppHeader = () => {
         <div className="profileImageContainer">
           <Icon path={mdiAccountTie} size={1} />
         </div>
-        <Icon
-          path={mdiChevronDown}
-          size={1.1}
+        <div
           onClick={ToggleProfileOptions}
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", display: "flex", alignitems: "center" }}
           className="toggleOptions"
-        />
+        >
+          <Icon path={mdiChevronDown} size={1.1} />
+        </div>
       </div>
       <ul className="profileOptions">
         <li>Log Out</li>

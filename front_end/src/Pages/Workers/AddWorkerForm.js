@@ -1,4 +1,4 @@
-import "../styles/AddWorkerForm.css";
+import "../../styles/AddWorkerForm.css";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Icon from "@mdi/react";
@@ -6,7 +6,7 @@ import { mdiCloseThick } from "@mdi/js";
 import { useState } from "react";
 import alertify from "alertifyjs";
 import "alertifyjs/build/css/alertify.css";
-import DefaultPhoto from "../img/photodefault.png";
+import DefaultPhoto from "../../img/photodefault.png";
 
 const AddWorkerForm = (props) => {
   const [datas, setdatas] = useState({});

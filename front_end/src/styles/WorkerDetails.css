@@ -157,3 +157,9 @@
     float: none;
   }
 }
+#showworkerbox .startedshift,
+#showworkerbox .endedshift {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

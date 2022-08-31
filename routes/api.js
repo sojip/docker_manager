@@ -36,7 +36,10 @@ router.get(
 //   shiftInstanceController.getDockerInterruptions
 // );
 
-router.get("/workers/:id/shifts", shiftInstanceController.getDockerShifts);
+router.get(
+  "/workers/:id/shiftsinstances",
+  shiftInstanceController.getDockerShifts
+);
 
 router.get("/shifts/:id", shiftController.getShift);
 router.get("/shifts/:id/workers", shiftInstanceController.getShiftDockers);

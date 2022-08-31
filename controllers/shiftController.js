@@ -6,14 +6,21 @@ module.exports.createShift = function (req, res, next) {
   var startdate = new Date(req.body.startdate);
   type === "jour" ? startdate.setHours(7) : startdate.setHours(19);
 
-  var shift = new Shift({
-    type: type,
-    startdate: startdate,
-  });
-
-  shift.save(function (err, shift_) {
+  Shift.find({ startdate: startdate }, function (err, shift) {
     if (err) return next(err);
-    return res.json(shift_);
+    if (shift)
+      return res
+        .status(400)
+        .json({ message: "Shift Already Exist, Please verify Date and Time" });
+    var shift = new Shift({
+      type: type,
+      startdate: startdate,
+    });
+
+    shift.save(function (err, shift_) {
+      if (err) return next(err);
+      return res.json(shift_);
+    });
   });
 };
 

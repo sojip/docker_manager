@@ -1,10 +1,10 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./components/Home";
-import Shifts from "./components/Shifts";
-import Workers from "./components/Workers";
-import Stats from "./components/Stats";
-import SignIn from "./components/SignIn";
+import Home from "./Pages/Home/Home";
+import Shifts from "./Pages/Shifts/Shifts";
+import Workers from "./Pages/Workers/Workers";
+import Stats from "./Pages/Stats/Stats";
+import SignIn from "./Pages/SignIn/SignIn";
 import DashboardLayout from "./components/DashboardLayout";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";

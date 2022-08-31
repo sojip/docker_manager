@@ -2,12 +2,14 @@ import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
-import "../styles/WorkerDetails.css";
+import "../../styles/WorkerDetails.css";
 import { DateTime, Interval } from "luxon";
 import TextField from "@mui/material/TextField";
 import alertify from "alertifyjs";
 import "alertifyjs/build/css/alertify.css";
 import { mdiPauseOctagon } from "@mdi/js";
+import { mdiCheckboxMultipleMarked } from "@mdi/js";
+import { mdiCheckboxMultipleBlank } from "@mdi/js";
 
 const WorkerDetails = (props) => {
   const [worker, setworker] = useState({
@@ -41,7 +43,7 @@ const WorkerDetails = (props) => {
   }
 
   async function getshifts(id, signal) {
-    const res = await fetch(`/api/workers/${id}/shifts`, {
+    const res = await fetch(`/api/workers/${id}/shiftsinstances`, {
       signal: signal,
     });
     const shifts = await res.json();
@@ -192,8 +194,8 @@ const WorkerDetails = (props) => {
       .then((datas) => {
         setworker(datas[0]);
         setshifts(datas[1]);
-        setphotoUrl(datas[2]);
         setsearchresults(datas[1]);
+        setphotoUrl(datas[2]);
         setisLoading(false);
       })
       .catch((e) => {
@@ -322,7 +324,7 @@ const WorkerDetails = (props) => {
                   <div>Shift {shift.shift.type}</div>
                   <div className="shiftItemgrid">
                     <div>
-                      Started on{" "}
+                      Shift Start Date{" "}
                       {DateTime.fromISO(shift.shift.startdate)
                         .setLocale("fr")
                         .toLocaleString({
@@ -335,7 +337,7 @@ const WorkerDetails = (props) => {
                     </div>
 
                     <div>
-                      Ended on{" "}
+                      Shift End Date{" "}
                       {DateTime.fromISO(shift.shift.enddate)
                         .setLocale("fr")
                         .toLocaleString({
@@ -346,24 +348,63 @@ const WorkerDetails = (props) => {
                           minute: "2-digit",
                         })}
                     </div>
-                    <div>
+                    <div className="startedshift">
                       Started shift{" "}
-                      <input
-                        type="checkbox"
-                        disabled
-                        checked={shift.startedshift}
-                      />
+                      {shift.startedshift ? (
+                        <Icon
+                          className="checkboxdone"
+                          path={mdiCheckboxMultipleMarked}
+                          size={1}
+                        />
+                      ) : (
+                        <Icon
+                          className="checkboxdone"
+                          path={mdiCheckboxMultipleBlank}
+                          size={1}
+                        />
+                      )}
                     </div>
-                    <div>
+                    <div className="endedshift">
                       Ended shift
-                      <input
-                        type="checkbox"
-                        disabled
-                        checked={shift.endedshift}
-                      />{" "}
+                      {shift.endedshift ? (
+                        <Icon
+                          className="checkboxdone"
+                          path={mdiCheckboxMultipleMarked}
+                          size={1}
+                        />
+                      ) : (
+                        <Icon
+                          className="checkboxdone"
+                          path={mdiCheckboxMultipleBlank}
+                          size={1}
+                        />
+                      )}
                     </div>
                   </div>
-                  {shift.interruptions ? (
+                  {shift.startedshift &&
+                    shift.endedshift &&
+                    shift.interruptions && (
+                      <div className="timeworked">
+                        Time Worked{" "}
+                        {shift.shift.duration -
+                          shift.interruptions.reduce(
+                            (total, current) => total + current.duration,
+                            0
+                          )}{" "}
+                        mins
+                      </div>
+                    )}
+                  {shift.startedshift &&
+                    shift.endedshift &&
+                    !shift.interruptions && (
+                      <div className="timeworked">
+                        Time Worked {shift.shift.duration} mins
+                      </div>
+                    )}
+                  {shift.startedshift && !shift.endedshift && (
+                    <div className="timeworked">Shift Not Ended</div>
+                  )}
+                  {/* {shift.interruptions ? (
                     <div className="timeworked">
                       Time Worked{" "}
                       {shift.shift.duration -
@@ -377,7 +418,7 @@ const WorkerDetails = (props) => {
                     <div className="timeworked">
                       Time Worked {shift.shift.duration} mins
                     </div>
-                  )}
+                  )} */}
                   {shift.interruptions !== undefined &&
                   shift.interruptions.length ? (
                     <div>

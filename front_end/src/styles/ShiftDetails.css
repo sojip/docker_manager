@@ -5,7 +5,7 @@
 #showshiftbox .interruptionForm,
 #showshiftbox .endShiftFormWrapper {
   display: block;
-  animation: fadeIn 1000ms;
+  animation: fadeIn 300ms;
 }
 
 @keyframes fadeIn {

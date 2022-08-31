@@ -1,7 +1,7 @@
 import Icon from "@mdi/react";
 import { mdiAccountPlusOutline } from "@mdi/js";
 import { mdiAccountHardHatOutline } from "@mdi/js";
-import "../styles/Workers.css";
+import "../../styles/Workers.css";
 import { useState, useEffect } from "react";
 import AddWorkerForm from "./AddWorkerForm";
 import WorkerDetails from "./WorkerDetails";

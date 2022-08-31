@@ -99,23 +99,48 @@ const AddInterruptionForm = (props) => {
           <Icon path={mdiCloseThick} size={1} />
         </div>
         <h2>Add Interruption</h2>
-        <TextField
-          onChange={handleChange}
-          required
-          label="Duration"
-          id="duration"
-          margin="normal"
-          type="number"
-          name="duration"
-          sx={{ width: "25ch" }}
-          InputLabelProps={{
-            shrink: true,
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill,minmax(250px, 1fr))",
+            gap: "15px",
           }}
-          InputProps={{
-            endAdornment: <InputAdornment position="end">mins</InputAdornment>,
-          }}
-        />
-        <br />
+        >
+          <TextField
+            onChange={handleChange}
+            required
+            label="Start Time"
+            id="starttime"
+            margin="normal"
+            type="time"
+            name="starttime"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{
+              // endAdornment: (
+              //   <InputAdornment position="end">mins</InputAdornment>
+              // ),
+              min: "12:00",
+            }}
+          />
+          <TextField
+            onChange={handleChange}
+            required
+            label="End Time"
+            id="endtime"
+            margin="normal"
+            type="time"
+            name="endtime"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            // InputProps={{
+            //   endAdornment: <InputAdornment position="end">mins</InputAdornment>,
+            // }}
+          />
+        </div>
+
         <TextField
           onChange={handleChange}
           fullWidth
@@ -124,6 +149,7 @@ const AddInterruptionForm = (props) => {
           name="description"
           margin="normal"
           multiline
+          minRows={2}
           maxRows={4}
           required
         />

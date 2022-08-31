@@ -11,7 +11,7 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { FormLabel } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
-import "../styles/AddShiftForm.css";
+import "../../styles/AddShiftForm.css";
 import alertify from "alertifyjs";
 import "alertifyjs/build/css/alertify.css";
 
@@ -70,6 +70,7 @@ const AddShiftForm = (props) => {
   }
 
   function handleSubmit(e) {
+    setisLoading(true);
     e.preventDefault();
     fetch("/api/shifts", {
       method: "POST",
@@ -80,6 +81,12 @@ const AddShiftForm = (props) => {
     })
       .then((res) => res.json())
       .then((shift) => {
+        if (shift.message) {
+          setisLoading(false);
+          alertify.set("notifier", "position", "top-center");
+          alertify.error(shift.message);
+          return null;
+        }
         setsearchShiftsResults([...shifts, shift]);
         setshifts([...shifts, shift]);
         let selectedworkers = workers.filter(
@@ -92,18 +99,22 @@ const AddShiftForm = (props) => {
         );
       })
       .then((result) => {
-        e.target.reset();
-        setdatas({ type: "", startdate: "" });
-        settime("");
-        alertify.set("notifier", "position", "top-center");
-        alertify.success("New Shift Added Successfully");
-        setworkers(
-          workers.map((worker) => {
-            return { ...worker, checked: false };
-          })
-        );
+        if (result !== null) {
+          e.target.reset();
+          setdatas({ type: "", startdate: "" });
+          settime("");
+          setisLoading(false);
+          alertify.set("notifier", "position", "top-center");
+          alertify.success("New Shift Added Successfully");
+          setworkers(
+            workers.map((worker) => {
+              return { ...worker, checked: false };
+            })
+          );
+        }
       })
       .catch((e) => {
+        setisLoading(false);
         alertify.set("notifier", "position", "top-center");
         alertify.error("An Error Occured");
         console.log(e);
