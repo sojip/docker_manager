@@ -30,6 +30,7 @@
   text-transform: capitalize;
   margin-top: 15px;
   transition: all 300ms;
+  color: black;
 }
 
 #signinform input[type="submit"]:active {

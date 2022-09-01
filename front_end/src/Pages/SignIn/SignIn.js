@@ -67,7 +67,7 @@ export default function SignIn(props) {
           left: "50%",
           transform: "translate(-50%, -50%)",
           bgcolor: "background.paper",
-          // boxShadow: 29,
+          boxShadow: 24,
           p: 4,
         }}
         autoComplete="off"
