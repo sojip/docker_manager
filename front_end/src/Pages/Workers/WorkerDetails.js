@@ -17,10 +17,15 @@ const WorkerDetails = (props) => {
     lastname: "",
     fingerprint: "",
     createdOn: "",
+    photo: "",
   });
   const [shifts, setshifts] = useState([]);
   const [searchresults, setsearchresults] = useState([]);
-  const [photoUrl, setphotoUrl] = useState("");
+  // const [filterby, setfilterby] = useState({
+  //   from: "",
+  //   to: "",
+  //   endedshift: "",
+  // });
   const { handleClose } = props;
   const { selected_id } = props;
   const { setisLoading } = props;
@@ -32,14 +37,6 @@ const WorkerDetails = (props) => {
     const worker = await res.json();
 
     return worker;
-  }
-
-  async function getPhoto(id, signal) {
-    const res = await fetch(`/api/workers/${id}/photo`, {
-      signal: signal,
-    });
-    const data = await res.json();
-    return data;
   }
 
   async function getshifts(id, signal) {
@@ -182,6 +179,18 @@ const WorkerDetails = (props) => {
     return setsearchresults(shifts);
   }
 
+  const handleFilterOptionsClick = (e) => {
+    let option = e.target.dataset.option;
+    if (option === "shiftended") {
+      setsearchresults(
+        searchresults.filter((shift) => shift.endedshift === true)
+      );
+    }
+
+    console.log(option);
+    return;
+  };
+
   useEffect(() => {
     setisLoading(true);
     let controller = new AbortController();
@@ -189,13 +198,11 @@ const WorkerDetails = (props) => {
     Promise.all([
       getWorker(selected_id, signal),
       getshifts(selected_id, signal),
-      getPhoto(selected_id, signal),
     ])
       .then((datas) => {
         setworker(datas[0]);
         setshifts(datas[1]);
         setsearchresults(datas[1]);
-        setphotoUrl(datas[2]);
         setisLoading(false);
       })
       .catch((e) => {
@@ -235,15 +242,14 @@ const WorkerDetails = (props) => {
 
       <div className="workerGeneralInfos">
         <div>
-          {photoUrl !== "" && (
+          {worker.photo !== "" && worker.photo !== undefined && (
             <div className="photoContainer">
-              <img src={photoUrl} alt="" />
+              <img src={worker.photo} alt="" />
             </div>
           )}
           <div>
             <div>{worker.firstname}</div>
             <div>{worker.lastname}</div>
-
             <div>
               Born on{" "}
               {DateTime.fromISO(worker.dateofbirth)
@@ -255,7 +261,6 @@ const WorkerDetails = (props) => {
                 })}
             </div>
             {worker.cni && <div>CNI N° {worker.cni}</div>}
-
             {worker.position && (
               <div style={{ fontStyle: "italic" }}>{worker.position}</div>
             )}
@@ -306,21 +311,40 @@ const WorkerDetails = (props) => {
       {searchresults.length > 0 ? (
         <div>
           <div className="workerstats">Total Shifts {searchresults.length}</div>
+          <div
+            className="workerstats filterOptions"
+            onClick={handleFilterOptionsClick}
+            data-option="shiftnotended"
+          >
+            Total Shift Not Ended{" "}
+            {searchresults.filter((shift) => shift.endedshift !== true).length}
+          </div>
+          <div
+            className="workerstats filterOptions"
+            onClick={handleFilterOptionsClick}
+            data-option="shiftended"
+          >
+            Total Shift Ended{" "}
+            {searchresults.filter((shift) => shift.endedshift === true).length}
+          </div>
           <div className="workerstats">
             Total Time Worked{" "}
-            {searchresults.reduce((total, shift) => {
-              if (!shift.interruptions) return total + shift.shift.duration;
-              return (
-                total +
-                shift.shift.duration -
-                shift.interruptions.reduce(
-                  (total_, current) => total_ + current.duration,
-                  0
-                )
-              );
-            }, 0)}{" "}
+            {searchresults
+              .filter((shift) => shift.endedshift === true)
+              .reduce((total, shift) => {
+                if (!shift.interruptions) return total + shift.shift.duration;
+                return (
+                  total +
+                  shift.shift.duration -
+                  shift.interruptions.reduce(
+                    (total_, current) => total_ + current.duration,
+                    0
+                  )
+                );
+              }, 0) === 0 && "---"}{" "}
             mins
           </div>
+
           <div className="shiftsgrid">
             {searchresults.map((shift) => {
               return (

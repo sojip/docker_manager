@@ -54,7 +54,8 @@
   left: 0;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  /* background-color: transparent; */
+  backdrop-filter: blur(5px);
   padding: 1vw;
   overflow-y: auto;
 }

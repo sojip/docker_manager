@@ -23,7 +23,7 @@ router.get(
   dockerController.getAllDockers
 );
 router.get("/workers/:id", dockerController.getDocker);
-router.get("/workers/:id/photo", dockerController.getPhoto);
+// router.get("/workers/:id/photo", dockerController.getPhoto);
 router.post("/shifts", shiftController.createShift);
 router.get("/shifts", shiftController.getAllShifts);
 router.get(

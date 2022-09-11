@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import alertify from "alertifyjs";
 import "alertifyjs/build/css/alertify.css";
 import Box from "@mui/material/Box";
@@ -23,6 +23,10 @@ const AddInterruptionForm = (props) => {
   const { interruptions } = props;
   const { setinterruptions } = props;
   const [datas, setdatas] = useState({});
+
+  useEffect(() => {
+    console.log(datas);
+  }, [datas]);
 
   const handleChange = (e) => {
     let name = e.target.name;

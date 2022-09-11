@@ -79,6 +79,13 @@
 #showworkerbox .workerstats {
   /* border: solid 1px red; */
   padding: 5px 0;
+  margin-top: 5px;
+}
+
+#showworkerbox .workerstats.filterOptions {
+  /* display: inline-block; */
+  /* border: solid 1px blue; */
+  width: max-content;
 }
 
 #showworkerbox .shiftsgrid {

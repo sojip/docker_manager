@@ -5,7 +5,7 @@ import { mdiAccountMultiple } from "@mdi/js";
 import { mdiCarShiftPattern } from "@mdi/js";
 import { mdiMonitorDashboard } from "@mdi/js";
 
-const Home = () => {
+const Home = (props) => {
   return (
     <div className="homeGrid">
       <div className="homeItem">
