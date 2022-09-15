@@ -10,6 +10,8 @@ import "alertifyjs/build/css/alertify.css";
 import { mdiPauseOctagon } from "@mdi/js";
 import { mdiCheckboxMultipleMarked } from "@mdi/js";
 import { mdiCheckboxMultipleBlank } from "@mdi/js";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { RadioGroup, Radio } from "@mui/material";
 
 const WorkerDetails = (props) => {
   const [worker, setworker] = useState({
@@ -21,11 +23,11 @@ const WorkerDetails = (props) => {
   });
   const [shifts, setshifts] = useState([]);
   const [searchresults, setsearchresults] = useState([]);
-  // const [filterby, setfilterby] = useState({
-  //   from: "",
-  //   to: "",
-  //   endedshift: "",
-  // });
+  const [filterby, setfilterby] = useState({
+    from: "",
+    to: "",
+    option: "all",
+  });
   const { handleClose } = props;
   const { selected_id } = props;
   const { setisLoading } = props;
@@ -47,9 +49,10 @@ const WorkerDetails = (props) => {
     return shifts;
   }
 
-  function handleSearchFrom(e) {
-    let dateFrom = e.target.value;
-    let dateTo = document.querySelector("#searchshiftend").value;
+  function handleSearchFrom(date) {
+    let dateFrom = date;
+    let dateTo = filterby.to;
+    let option = filterby.option;
     if (dateFrom !== "") {
       let searchShiftsIds = shifts
         .map((shift) => {
@@ -59,8 +62,9 @@ const WorkerDetails = (props) => {
               startdate: shift.shift.startdate.split("T")[0],
               enddate: shift.shift.enddate.split("T")[0],
             },
+            endedshift: shift.endedshift,
           };
-        })
+        }) //filter by date
         .filter((shift) => {
           if (dateTo !== "") {
             let interval = Interval.fromDateTimes(
@@ -77,6 +81,11 @@ const WorkerDetails = (props) => {
               DateTime.fromISO(dateFrom) ||
             DateTime.fromISO(shift.shift.enddate) >= DateTime.fromISO(dateFrom)
           );
+        }) //filter by option ["all", "ended", "notended"]
+        .filter((shift) => {
+          if (option === "ended") return shift.endedshift === true;
+          if (option === "notended") return shift.endedshift !== true;
+          return shift;
         })
         .map((shift) => shift._id);
 
@@ -90,6 +99,7 @@ const WorkerDetails = (props) => {
         .map((shift) => {
           return {
             _id: shift._id,
+            endedshift: shift.endedshift,
             shift: {
               startdate: shift.shift.startdate.split("T")[0],
               enddate: shift.shift.enddate.split("T")[0],
@@ -102,6 +112,11 @@ const WorkerDetails = (props) => {
               DateTime.fromISO(dateTo) ||
             DateTime.fromISO(shift.shift.enddate) <= DateTime.fromISO(dateTo)
           );
+        }) //filter by option ["all", "ended", "notended"]
+        .filter((shift) => {
+          if (option === "ended") return shift.endedshift === true;
+          if (option === "notended") return shift.endedshift !== true;
+          return shift;
         })
         .map((shift) => shift._id);
       return setsearchresults(
@@ -110,23 +125,39 @@ const WorkerDetails = (props) => {
         })
       );
     }
-    return setsearchresults(shifts);
+    //fitler by option only
+    let searchShiftsIds = shifts
+      .filter((shift) => {
+        if (option === "ended") return shift.endedshift === true;
+        if (option === "notended") return shift.endedshift !== true;
+        return shift;
+      })
+      .map((shift) => shift._id);
+
+    return setsearchresults(
+      shifts.filter((shift) => {
+        return searchShiftsIds.includes(shift._id);
+      })
+    );
   }
 
-  function handleSearchTo(e) {
-    let dateTo = e.target.value;
-    let dateFrom = document.querySelector("#searchshiftstart").value;
+  function handleSearchTo(date) {
+    let dateTo = date;
+    let dateFrom = filterby.from;
+    let option = filterby.option;
+
     if (dateTo !== "") {
       let searchShiftsIds = shifts
         .map((shift) => {
           return {
             _id: shift._id,
+            endedshift: shift.endedshift,
             shift: {
               startdate: shift.shift.startdate.split("T")[0],
               enddate: shift.shift.enddate.split("T")[0],
             },
           };
-        })
+        }) // filter by date
         .filter((shift) => {
           if (dateFrom !== "") {
             let interval = Interval.fromDateTimes(
@@ -143,6 +174,11 @@ const WorkerDetails = (props) => {
               DateTime.fromISO(dateTo) ||
             DateTime.fromISO(shift.shift.enddate) <= DateTime.fromISO(dateTo)
           );
+        }) // filter by option ["all", "ended", "notended"]
+        .filter((shift) => {
+          if (option === "ended") return shift.endedshift === true;
+          if (option === "notended") return shift.endedshift !== true;
+          return shift;
         })
         .map((shift) => shift._id);
 
@@ -168,6 +204,11 @@ const WorkerDetails = (props) => {
               DateTime.fromISO(dateFrom) ||
             DateTime.fromISO(shift.shift.enddate) >= DateTime.fromISO(dateFrom)
           );
+        }) //filter by option ["all", "ended", "notended"]
+        .filter((shift) => {
+          if (option === "ended") return shift.endedshift === true;
+          if (option === "notended") return shift.endedshift !== true;
+          return shift;
         })
         .map((shift) => shift._id);
       return setsearchresults(
@@ -176,19 +217,30 @@ const WorkerDetails = (props) => {
         })
       );
     }
-    return setsearchresults(shifts);
+    //fitler by option only
+    let searchShiftsIds = shifts
+      .filter((shift) => {
+        if (option === "ended") return shift.endedshift === true;
+        if (option === "notended") return shift.endedshift !== true;
+        return shift;
+      })
+      .map((shift) => shift._id);
+
+    return setsearchresults(
+      shifts.filter((shift) => {
+        return searchShiftsIds.includes(shift._id);
+      })
+    );
   }
 
-  const handleFilterOptionsClick = (e) => {
-    let option = e.target.dataset.option;
-    if (option === "shiftended") {
-      setsearchresults(
-        searchresults.filter((shift) => shift.endedshift === true)
-      );
-    }
+  const handleChange = (e) => {
+    let name = e.target.name;
+    let value = e.target.value;
+    setfilterby({ ...filterby, [name]: value });
+  };
 
-    console.log(option);
-    return;
+  const handleFilterOptionsClick = (e) => {
+    setfilterby({ ...filterby, option: e.target.value });
   };
 
   useEffect(() => {
@@ -220,6 +272,12 @@ const WorkerDetails = (props) => {
   useEffect(() => {
     console.log(searchresults);
   }, [searchresults]);
+
+  useEffect(() => {
+    handleSearchFrom(filterby.from);
+    // handleSearchTo(filterby.to);
+    console.log(filterby);
+  }, [filterby]);
 
   return (
     <Box
@@ -291,7 +349,8 @@ const WorkerDetails = (props) => {
             fullWidth
             margin="normal"
             name="from"
-            onChange={handleSearchFrom}
+            // onChange={handleSearchFrom}
+            onChange={handleChange}
           />
         </div>
         <div>
@@ -304,29 +363,40 @@ const WorkerDetails = (props) => {
             fullWidth
             margin="normal"
             name="to"
-            onChange={handleSearchTo}
+            // onChange={handleSearchTo}
+            onChange={handleChange}
           />
         </div>
       </div>
+      <RadioGroup
+        row
+        aria-labelledby="radio-buttons-group-label"
+        name="radio-buttons-group"
+        onChange={handleFilterOptionsClick}
+        value={filterby.option}
+      >
+        <FormControlLabel
+          value="all"
+          control={<Radio />}
+          label="All"
+          labelPlacement="start"
+        />
+        <FormControlLabel
+          value="ended"
+          control={<Radio />}
+          label="Ended"
+          labelPlacement="start"
+        />
+        <FormControlLabel
+          value="notended"
+          control={<Radio />}
+          label="Not Ended"
+          labelPlacement="start"
+        />
+      </RadioGroup>
       {searchresults.length > 0 ? (
         <div>
           <div className="workerstats">Total Shifts {searchresults.length}</div>
-          <div
-            className="workerstats filterOptions"
-            onClick={handleFilterOptionsClick}
-            data-option="shiftnotended"
-          >
-            Total Shift Not Ended{" "}
-            {searchresults.filter((shift) => shift.endedshift !== true).length}
-          </div>
-          <div
-            className="workerstats filterOptions"
-            onClick={handleFilterOptionsClick}
-            data-option="shiftended"
-          >
-            Total Shift Ended{" "}
-            {searchresults.filter((shift) => shift.endedshift === true).length}
-          </div>
           <div className="workerstats">
             Total Time Worked{" "}
             {searchresults
@@ -341,10 +411,9 @@ const WorkerDetails = (props) => {
                     0
                   )
                 );
-              }, 0) === 0 && "---"}{" "}
+              }, 0)}{" "}
             mins
           </div>
-
           <div className="shiftsgrid">
             {searchresults.map((shift) => {
               return (
@@ -432,21 +501,6 @@ const WorkerDetails = (props) => {
                   {shift.startedshift && !shift.endedshift && (
                     <div className="timeworked">Shift Not Ended</div>
                   )}
-                  {/* {shift.interruptions ? (
-                    <div className="timeworked">
-                      Time Worked{" "}
-                      {shift.shift.duration -
-                        shift.interruptions.reduce(
-                          (total, current) => total + current.duration,
-                          0
-                        )}{" "}
-                      mins
-                    </div>
-                  ) : (
-                    <div className="timeworked">
-                      Time Worked {shift.shift.duration} mins
-                    </div>
-                  )} */}
                   {shift.interruptions !== undefined &&
                   shift.interruptions.length ? (
                     <div>

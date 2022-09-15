@@ -69,7 +69,7 @@ module.exports.endShift = function (req, res, next) {
   var operation = {
     type: req.body.opsType,
     position: req.body.opsposition,
-    vessel: req.body.opsvessel || undefined,
+    vessel: req.body.opsType === "navire" ? req.body.opsvessel : undefined,
     description: req.body.opsdescription,
   };
   ShiftInstance.findByIdAndUpdate(
@@ -78,10 +78,24 @@ module.exports.endShift = function (req, res, next) {
       endedshift: true,
       operation: operation,
     },
-    { new: true },
+    { new: true, populate: { path: "docker" } },
     function (err, instance) {
       if (err) return next(err);
       return res.json(instance);
     }
   );
+};
+
+module.exports.getInterruptionShiftInstances = function (req, res, next) {
+  let id = mongoose.Types.ObjectId(req.params.id);
+  console.log(id);
+  ShiftInstance.find({
+    interruptions: id,
+  })
+    .select("docker")
+    .populate("docker")
+    .exec(function (err, instances) {
+      if (err) return next(err);
+      return res.json(instances);
+    });
 };

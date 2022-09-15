@@ -23,7 +23,6 @@ router.get(
   dockerController.getAllDockers
 );
 router.get("/workers/:id", dockerController.getDocker);
-// router.get("/workers/:id/photo", dockerController.getPhoto);
 router.post("/shifts", shiftController.createShift);
 router.get("/shifts", shiftController.getAllShifts);
 router.get(
@@ -31,17 +30,17 @@ router.get(
   interruptionController.getShiftInterruptions
 );
 
-// router.get(
-//   "/workers/:id/interruptions",
-//   shiftInstanceController.getDockerInterruptions
-// );
-
 router.get(
   "/workers/:id/shiftsinstances",
   shiftInstanceController.getDockerShifts
 );
+router.get(
+  "/interruptions/:id/shiftinstances",
+  shiftInstanceController.getInterruptionShiftInstances
+);
 
 router.get("/shifts/:id", shiftController.getShift);
+router.put("/shifts/:id", shiftController.endShift);
 router.get("/shifts/:id/workers", shiftInstanceController.getShiftDockers);
 router.post("/interruptions", interruptionController.createInterruption);
 router.get("/interruptions", interruptionController.getAllInterruptions);

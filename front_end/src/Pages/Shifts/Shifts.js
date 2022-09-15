@@ -88,6 +88,10 @@ const Shifts = (props) => {
       controller.abort();
     };
   }, []);
+
+  useEffect(() => {
+    console.log(shifts);
+  }, [shifts]);
   return (
     <div className="shiftsContainer">
       <h3>Shifts</h3>
@@ -134,6 +138,8 @@ const Shifts = (props) => {
               setisLoading={setisLoading}
               handleClose={handleClose}
               selected_id={selected_id}
+              shifts={shifts}
+              setshifts={setshifts}
             />
           )}
         </div>

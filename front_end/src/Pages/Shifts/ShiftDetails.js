@@ -11,16 +11,26 @@ import EndShiftForm from "./EndShiftForm";
 import alertify from "alertifyjs";
 import "alertifyjs/build/css/alertify.css";
 import { mdiPauseOctagon } from "@mdi/js";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import { mdiCheckboxMultipleMarked } from "@mdi/js";
+import { mdiCheckboxMultipleBlank } from "@mdi/js";
 
 const ShiftsDetails = (props) => {
   const { handleClose } = props;
   const { selected_id } = props;
   const { setisLoading } = props;
+  const { setshifts } = props;
+  const { shifts } = props;
   const [shift, setshift] = useState({});
   const [shiftinstances, setshiftinstances] = useState([]);
+  const [instancesSearchResults, setinstancesSearchResults] = useState([]);
   const [interruptions, setinterruptions] = useState([]);
   const [addInterruption, setaddInterruption] = useState(false);
   const [endShift, setendShift] = useState(false);
+  const [filterby, setfilterby] = useState("all");
 
   async function getShift(signal) {
     const res = await fetch(`/api/shifts/${selected_id}`, {
@@ -43,9 +53,17 @@ const ShiftsDetails = (props) => {
       signal: signal,
     });
     const datas = await res.json();
-    console.log("interruptions");
-    console.log(datas);
-    return datas;
+    return Promise.all(
+      datas.map((interruption) => getInterruptionInstances(interruption))
+    );
+  }
+
+  async function getInterruptionInstances(interruption) {
+    const res = await fetch(
+      `/api/interruptions/${interruption._id}/shiftinstances`
+    );
+    const instances = await res.json();
+    return { ...interruption, instances };
   }
 
   const handleAddInterruptionClick = () => {
@@ -100,10 +118,45 @@ const ShiftsDetails = (props) => {
     );
   };
 
+  const showInterruptionDetails = (e) => {
+    //if there is a already one open, close
+    const interruptionWorkersOpened = document.querySelector(
+      ".interruptionWorkers.show"
+    );
+    if (interruptionWorkersOpened)
+      interruptionWorkersOpened.classList.remove("show");
+    const target = e.currentTarget;
+    const id = target.getAttribute("id");
+    const interruptionWorkers = document.querySelector(
+      `.interruptionWorkers[data-interruption="${id}"]`
+    );
+    interruptionWorkers.classList.add("show");
+  };
+
+  const closeInterruptionDetails = (e) => {
+    const target = e.target;
+    const interruptionWorkers = document.querySelector(
+      ".interruptionWorkers.show"
+    );
+    if (
+      !target.classList.contains("interruptionItem") &&
+      !target.closest(".interruptionItem")
+    ) {
+      if (interruptionWorkers) interruptionWorkers.classList.remove("show");
+    }
+  };
+
+  const handleFilterChange = (e) => {
+    const value = e.target.value;
+    setfilterby(value);
+  };
+
   useEffect(() => {
     setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
+
+    window.addEventListener("click", closeInterruptionDetails);
 
     Promise.all([
       getShift(signal),
@@ -112,6 +165,7 @@ const ShiftsDetails = (props) => {
     ])
       .then((datas) => {
         setshift(datas[0]);
+        // setinstancesSearchResults(datas[1]);
         setshiftinstances(
           datas[1].map((instance) => {
             return { ...instance, checked: false };
@@ -129,12 +183,27 @@ const ShiftsDetails = (props) => {
 
     return () => {
       controller.abort();
+      window.removeEventListener("click", closeInterruptionDetails);
     };
   }, []);
 
   useEffect(() => {
-    console.log(shiftinstances);
-  }, [shiftinstances]);
+    switch (filterby) {
+      case "ended":
+        setinstancesSearchResults(
+          shiftinstances.filter((instance) => instance.endedshift === true)
+        );
+        break;
+      case "notended":
+        setinstancesSearchResults(
+          shiftinstances.filter((instance) => instance.endedshift !== true)
+        );
+        break;
+      default:
+        setinstancesSearchResults(shiftinstances);
+        break;
+    }
+  }, [filterby, shiftinstances]);
 
   return (
     <Box
@@ -148,27 +217,27 @@ const ShiftsDetails = (props) => {
         margin: "auto",
         boxShadow: 24,
         p: 4,
-        // position: "absolute",
-        // bottom: 0,
       }}
     >
       <div className="closeModalWrapper" id="closeModal" onClick={handleClose}>
         <Icon path={mdiCloseThick} size={1} />
       </div>
       <h3>General</h3>
-      <div className="callToActions">
-        <div
-          className="oulinedButtonWrapper"
-          onClick={handleAddInterruptionClick}
-        >
-          <Icon path={mdiPauseOctagonOutline} size={1} />
-          Add Interruption
+      {shift.status && shift.status === "opened" && (
+        <div className="callToActions">
+          <div
+            className="oulinedButtonWrapper"
+            onClick={handleAddInterruptionClick}
+          >
+            <Icon path={mdiPauseOctagonOutline} size={1} />
+            Add Interruption
+          </div>
+          <div className="oulinedButtonWrapper" onClick={handleEndShiftClick}>
+            <Icon path={mdiCloseOctagonOutline} size={1} />
+            Close Shift
+          </div>
         </div>
-        <div className="oulinedButtonWrapper" onClick={handleEndShiftClick}>
-          <Icon path={mdiCloseOctagonOutline} size={1} />
-          Close Shift
-        </div>
-      </div>
+      )}
       {addInterruption && (
         <AddInterruptionForm
           handleCloseAddInterruptionForm={handleCloseAddInterruptionForm}
@@ -182,10 +251,13 @@ const ShiftsDetails = (props) => {
       )}
       {endShift && (
         <EndShiftForm
+          selected_id={selected_id}
           handleCloseEndShiftForm={handleCloseEndShiftForm}
           shiftinstances={shiftinstances}
           setshiftinstances={setshiftinstances}
           handleCheckboxChange={handleCheckboxChange}
+          setshifts={setshifts}
+          shifts={shifts}
         />
       )}
 
@@ -213,45 +285,132 @@ const ShiftsDetails = (props) => {
         </div>
       </div>
       <h3>Workers</h3>
-      <div className="workersgrid">
-        {shiftinstances.map((instance) => {
-          return (
-            <div key={instance.docker._id} className="workerItem">
-              <div className="profileContainer">
-                <Icon
-                  id="workerIcon"
-                  path={mdiAccountHardHatOutline}
-                  size={2.5}
-                />
-                <div className="name">
-                  <div>{instance.docker.firstname}</div>
-                  <div>{instance.docker.lastname}</div>
+      {shift.status && shift.status === "closed" && (
+        <FormControl>
+          <RadioGroup
+            row
+            aria-labelledby="radio-buttons-group-label"
+            name="row-radio-buttons-group"
+            value={filterby}
+            onChange={handleFilterChange}
+          >
+            <FormControlLabel
+              value="all"
+              control={<Radio />}
+              label="All"
+              labelPlacement="start"
+            />
+            <FormControlLabel
+              value="ended"
+              control={<Radio />}
+              label="Shift Ended"
+              labelPlacement="start"
+            />
+            <FormControlLabel
+              value="notended"
+              control={<Radio />}
+              label="Shift Not Ended"
+              labelPlacement="start"
+            />
+          </RadioGroup>
+        </FormControl>
+      )}
+      {instancesSearchResults.length > 0 ? (
+        <div className="workersgrid">
+          {instancesSearchResults.map((instance) => {
+            return (
+              <div key={instance.docker._id} className="workerItem">
+                <div className="profileContainer">
+                  <Icon
+                    id="workerIcon"
+                    path={mdiAccountHardHatOutline}
+                    size={2.5}
+                  />
+                  <div className="name">
+                    <div>{instance.docker.firstname}</div>
+                    <div>{instance.docker.lastname}</div>
+                  </div>
+                </div>
+                <div>
+                  Born On{" "}
+                  {DateTime.fromISO(instance.docker.dateofbirth)
+                    .setLocale("fr")
+                    .toLocaleString({
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                </div>
+                <div className="startedshift">
+                  Started shift{" "}
+                  {instance.startedshift ? (
+                    <Icon
+                      className="checkboxdone"
+                      path={mdiCheckboxMultipleMarked}
+                      size={1}
+                    />
+                  ) : (
+                    <Icon
+                      className="checkboxdone"
+                      path={mdiCheckboxMultipleBlank}
+                      size={1}
+                    />
+                  )}
+                </div>
+                <div className="endedshift">
+                  Ended shift
+                  {instance.endedshift ? (
+                    <Icon
+                      className="checkboxdone"
+                      path={mdiCheckboxMultipleMarked}
+                      size={1}
+                    />
+                  ) : (
+                    <Icon
+                      className="checkboxdone"
+                      path={mdiCheckboxMultipleBlank}
+                      size={1}
+                    />
+                  )}
                 </div>
               </div>
-              <div>
-                Born On{" "}
-                {DateTime.fromISO(instance.docker.dateofbirth)
-                  .setLocale("fr")
-                  .toLocaleString({
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+      ) : (
+        <div className="noDatasInfos">No Workers...</div>
+      )}
+      <div style={{ marginTop: "15px" }}>
+        Total workers {instancesSearchResults.length}
       </div>
       <h3>Interruptions / Incidents</h3>
       {interruptions.length > 0 ? (
         <div className="interruptionsgrid">
           {interruptions.map((interruption) => {
             return (
-              <div key={interruption._id} className="interruptionItem">
+              <div
+                key={interruption._id}
+                className="interruptionItem"
+                onClick={showInterruptionDetails}
+                id={interruption._id}
+              >
                 <Icon path={mdiPauseOctagon} size={1} />
                 <div>
                   <div>{interruption.duration} mins</div>
                   <div>{interruption.description}</div>
+                </div>
+                <div
+                  className="interruptionWorkers"
+                  data-interruption={interruption._id}
+                >
+                  <ul>
+                    {interruption.instances &&
+                      interruption.instances.map((instance) => (
+                        <li
+                          key={instance._id}
+                        >{`${instance.docker.firstname} ${instance.docker.lastname}`}</li>
+                      ))}
+                  </ul>
                 </div>
               </div>
             );

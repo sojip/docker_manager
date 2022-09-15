@@ -26,16 +26,19 @@ let shiftInstanceSchema = new Schema({
     type: {
       type: String,
       enum: ["navire", "yard", "magasin"],
+      // required: true,
     },
     position: {
       type: String,
       lowercase: true,
       trim: true,
+      // required: true,
     },
     description: {
       type: String,
       lowercase: true,
       trim: true,
+      // required: true,
     },
     vessel: {
       type: String,

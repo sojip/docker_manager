@@ -95,6 +95,24 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
+  animation: fadeIn 300ms;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#showshiftbox .workersgrid .workerItem .startedshift,
+#showshiftbox .workersgrid .workerItem .endedshift {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 #showshiftbox .profileContainer {
@@ -103,18 +121,60 @@
 }
 
 #showshiftbox .interruptionsgrid .interruptionItem {
-  /* line-height: 1.5rem; */
   display: grid;
   grid-template-columns: min-content 1fr;
   gap: 5px;
+  cursor: pointer;
+}
+
+#showshiftbox .interruptionsgrid .interruptionItem .interruptionWorkers {
+  position: absolute;
+  /* width: 80%; */
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  /* background-color: var(--orange-white-color); */
+  background-color: black;
+  border: solid 1px black;
+  color: white;
+  padding: 10px;
+  padding-bottom: 30px;
+  line-height: 1.5rem;
+  text-transform: capitalize;
+  display: none;
+  clip-path: polygon(
+    0% 0%,
+    100% 0%,
+    100% 80%,
+    55% 80%,
+    35% 100%,
+    40% 80%,
+    0% 80%
+  );
+}
+
+#showshiftbox .interruptionsgrid .interruptionItem .interruptionWorkers.show {
+  display: block;
+}
+
+#showshiftbox .interruptionsgrid .interruptionItem .interruptionWorkers ul {
+  margin: 0;
+  /* padding: 0; */
+  list-style-type: square;
+}
+
+#showshiftbox .interruptionsgrid .interruptionItem .interruptionWorkers ul li {
+  margin: 0;
+  padding: 0;
+}
+
+#showshiftbox .interruptionsgrid .interruptionItem.detailed {
+  border: solid 1px red;
+  /* scale: 2; */
 }
 
 #showshiftbox .interruptionsgrid .interruptionItem div > div:first-child {
-  /* border: solid 1px red; */
   margin-bottom: 5px;
-  /* text-align: right;
-  margin-top: 10px;
-  font-weight: bold; */
 }
 
 #showshiftbox h3:nth-of-type(3) {

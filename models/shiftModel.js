@@ -34,8 +34,8 @@ let shiftSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["Opened", "Closed"],
-      default: "Opened",
+      enum: ["opened", "closed"],
+      default: "opened",
       required: true,
     },
   },

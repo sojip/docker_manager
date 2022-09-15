@@ -8,10 +8,11 @@ module.exports.createShift = function (req, res, next) {
 
   Shift.find({ startdate: startdate }, function (err, shift) {
     if (err) return next(err);
-    if (shift)
+    if (shift.length)
       return res
         .status(400)
         .json({ message: "Shift Already Exist, Please verify Date and Time" });
+
     var shift = new Shift({
       type: type,
       startdate: startdate,
@@ -37,4 +38,20 @@ module.exports.getShift = function (req, res, next) {
     if (err) return next(err);
     return res.json(shift_);
   });
+};
+
+module.exports.endShift = function (req, res, next) {
+  var id = req.params.id;
+  console.log(id);
+  Shift.findByIdAndUpdate(
+    mongoose.Types.ObjectId(id),
+    { status: "closed" },
+    {
+      new: true,
+    },
+    function (err, shift) {
+      if (err) return next(err);
+      return res.json(shift);
+    }
+  );
 };

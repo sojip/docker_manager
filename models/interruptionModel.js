@@ -12,12 +12,14 @@ let interruptionSchema = new Schema(
       type: Number,
       required: true,
     },
-    // starttime: {
-    //   required: true,
-    // },
-    // endtime: {
-    //   required: true,
-    // },
+    starttime: {
+      type: String,
+      required: true,
+    },
+    endtime: {
+      type: String,
+      required: true,
+    },
     description: {
       type: String,
       trim: true,

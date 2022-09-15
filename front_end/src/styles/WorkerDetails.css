@@ -11,8 +11,8 @@
 }
 
 #showworkerbox .workerGeneralInfos .photoContainer {
-  max-width: 150px;
-  max-height: 150px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
@@ -79,13 +79,16 @@
 #showworkerbox .workerstats {
   /* border: solid 1px red; */
   padding: 5px 0;
-  margin-top: 5px;
+  /* margin-top: 5px; */
 }
 
-#showworkerbox .workerstats.filterOptions {
+#showworkerbox .filterOptions {
   /* display: inline-block; */
   /* border: solid 1px blue; */
-  width: max-content;
+  /* width: max-content; */
+  margin: 0;
+  padding: 0;
+  /* border: solid 1px red; */
 }
 
 #showworkerbox .shiftsgrid {

@@ -27,8 +27,8 @@
 #addworkerform #photolabel {
   /* border: solid 1px red; */
   display: block;
-  max-width: 150px;
-  max-height: 150px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   cursor: pointer;
   margin: 10px auto;

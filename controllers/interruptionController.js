@@ -3,11 +3,15 @@ var mongoose = require("mongoose");
 
 module.exports.createInterruption = function (req, res, next) {
   var shift = mongoose.Types.ObjectId(req.body.shift);
+  var starttime = req.body.starttime;
+  var endtime = req.body.endtime;
   var duration = Number(req.body.duration);
   var description = req.body.description;
 
   var interruption = new Interruption({
     shift: shift,
+    starttime: starttime,
+    endtime: endtime,
     duration: duration,
     description: description,
   });

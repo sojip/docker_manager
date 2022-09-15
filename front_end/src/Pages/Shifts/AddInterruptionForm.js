@@ -6,13 +6,13 @@ import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import {
   TextField,
-  InputAdornment,
   FormControl,
   FormLabel,
   FormGroup,
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
+import { DateTime, Interval } from "luxon";
 
 const AddInterruptionForm = (props) => {
   const { handleCloseAddInterruptionForm } = props;
@@ -23,14 +23,24 @@ const AddInterruptionForm = (props) => {
   const { interruptions } = props;
   const { setinterruptions } = props;
   const [datas, setdatas] = useState({});
+  const [shift, setshift] = useState({});
+  const [shifttime, setshifttime] = useState({
+    startat: "",
+    endat: "",
+  });
 
   useEffect(() => {
-    console.log(datas);
-  }, [datas]);
+    getShiftTimes();
+  }, []);
+
+  useEffect(() => {
+    console.log(shifttime);
+  }, [shifttime]);
 
   const handleChange = (e) => {
     let name = e.target.name;
     let value = e.target.value;
+    console.log(e.target.min);
     setdatas({ ...datas, [name]: value });
   };
 
@@ -50,6 +60,21 @@ const AddInterruptionForm = (props) => {
 
     const datas = await res.json();
     return datas;
+  }
+
+  async function getShiftTimes() {
+    const res = await fetch(`/api/shifts/${selected_id}`);
+    const shift = await res.json();
+    setshift(shift);
+    switch (shift.type) {
+      case "jour":
+        setshifttime({ startat: "07:00", endat: "19:00" });
+        break;
+      case "nuit":
+        setshifttime({ startat: "19:00", endat: "07:00" });
+        break;
+    }
+    return;
   }
 
   const handleSelectAll = (e) => {
@@ -72,15 +97,56 @@ const AddInterruptionForm = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    let interruptionStartDate;
+    let interruptionEndDate;
+    if (shift.type === "jour") {
+      interruptionStartDate = new Date(shift.startdate.split("T")[0]);
+      interruptionEndDate = new Date(shift.startdate.split("T")[0]);
+    }
+    if (shift.type === "nuit") {
+      let beforeMidnightHours = [19, 20, 21, 22, 23];
+      beforeMidnightHours.includes(Number(datas.starttime.split(":")[0]))
+        ? (interruptionStartDate = new Date(shift.startdate.split("T")[0]))
+        : (interruptionStartDate = new Date(shift.enddate.split("T")[0]));
+      beforeMidnightHours.includes(Number(datas.endtime.split(":")[0]))
+        ? (interruptionEndDate = new Date(shift.startdate.split("T")[0]))
+        : (interruptionEndDate = new Date(shift.enddate.split("T")[0]));
+    }
+    interruptionStartDate.setHours(
+      Number(datas.starttime.split(":")[0]),
+      Number(datas.starttime.split(":")[1])
+    );
+    interruptionEndDate.setHours(
+      Number(datas.endtime.split(":")[0]),
+      Number(datas.endtime.split(":")[1])
+    );
+
+    if (interruptionEndDate <= interruptionStartDate) {
+      alert("End Time should be after the Start Time");
+      return;
+    }
+
+    let interruptionInterval = Interval.fromDateTimes(
+      DateTime.fromJSDate(interruptionStartDate),
+      DateTime.fromJSDate(interruptionEndDate)
+    )
+      .toDuration("minutes")
+      .toObject();
     fetch("/api/interruptions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...datas, shift: selected_id }),
+      body: JSON.stringify({
+        ...datas,
+        shift: selected_id,
+        duration: interruptionInterval.minutes,
+      }),
     })
       .then((res) => res.json())
       .then((interruption) => {
+        console.log(interruption);
+
         setinterruptions([...interruptions, interruption]);
         let selectedInstances = shiftinstances.filter(
           (instance) => instance.checked === true
@@ -96,6 +162,7 @@ const AddInterruptionForm = (props) => {
         e.target.reset();
         alertify.set("notifier", "position", "top-center");
         alertify.success("New Interruption Added Successfully");
+        document.querySelector("#selectall").checked = false;
         setshiftinstances(
           shiftinstances.map((instance) => {
             return { ...instance, checked: false };
@@ -139,11 +206,9 @@ const AddInterruptionForm = (props) => {
             InputLabelProps={{
               shrink: true,
             }}
-            InputProps={{
-              // endAdornment: (
-              //   <InputAdornment position="end">mins</InputAdornment>
-              // ),
-              min: "12:00",
+            inputProps={{
+              min: shifttime.startat,
+              max: shifttime.endat,
             }}
           />
           <TextField
@@ -157,9 +222,10 @@ const AddInterruptionForm = (props) => {
             InputLabelProps={{
               shrink: true,
             }}
-            // InputProps={{
-            //   endAdornment: <InputAdornment position="end">mins</InputAdornment>,
-            // }}
+            inputProps={{
+              min: shifttime.startat,
+              max: shifttime.endat,
+            }}
           />
         </div>
 
