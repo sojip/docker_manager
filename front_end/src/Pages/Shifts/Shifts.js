@@ -15,7 +15,7 @@ const Shifts = (props) => {
   const [open, setOpen] = useState(false);
   const [addShift, setaddShift] = useState(false);
   const [showShift, setshowShift] = useState(false);
-  const [selected_id, setselectedid] = useState("");
+  const [selected_id, setselectedid] = useState({});
   let handleOpen = () => {
     setOpen(true);
     document.querySelector("body").style.overflowY = "hidden";
@@ -53,8 +53,8 @@ const Shifts = (props) => {
         })
         .filter((shift) => {
           return (
-            new Date(shift.startdate).valueOf() === new Date(date).valueOf() ||
-            new Date(shift.enddate).valueOf() === new Date(date).valueOf()
+            new Date(shift.startdate).valueOf() >= new Date(date).valueOf() ||
+            new Date(shift.enddate).valueOf() >= new Date(date).valueOf()
           );
         })
         .map((shift) => shift._id);
@@ -90,7 +90,7 @@ const Shifts = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log(shifts);
+    setsearchShiftsResults(shifts);
   }, [shifts]);
   return (
     <div className="shiftsContainer">
@@ -127,7 +127,6 @@ const Shifts = (props) => {
           {addShift && (
             <AddShiftForm
               handleClose={handleClose}
-              setsearchShiftsResults={setsearchShiftsResults}
               shifts={shifts}
               setshifts={setshifts}
               setisLoading={setisLoading}

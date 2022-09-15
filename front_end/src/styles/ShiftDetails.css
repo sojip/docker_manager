@@ -129,27 +129,25 @@
 
 #showshiftbox .interruptionsgrid .interruptionItem .interruptionWorkers {
   position: absolute;
-  /* width: 80%; */
   left: 0;
   right: 0;
   bottom: 100%;
-  /* background-color: var(--orange-white-color); */
-  background-color: black;
-  border: solid 1px black;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(6px);
   color: white;
   padding: 10px;
-  padding-bottom: 30px;
+  padding-bottom: 40px;
   line-height: 1.5rem;
   text-transform: capitalize;
   display: none;
   clip-path: polygon(
     0% 0%,
     100% 0%,
-    100% 80%,
-    55% 80%,
+    100% calc(100% - 20px),
+    55% calc(100% - 20px),
     35% 100%,
-    40% 80%,
-    0% 80%
+    40% calc(100% - 20px),
+    0% calc(100% - 20px)
   );
 }
 

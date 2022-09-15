@@ -3,7 +3,7 @@ import alertify from "alertifyjs";
 import "alertifyjs/build/css/alertify.css";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
-import { mdiCloseThick } from "@mdi/js";
+import { mdiCloseThick, mdiFormatLineStyle } from "@mdi/js";
 import {
   TextField,
   FormControl,
@@ -22,8 +22,10 @@ const AddInterruptionForm = (props) => {
   const { selected_id } = props;
   const { interruptions } = props;
   const { setinterruptions } = props;
+  const { setisLoading } = props;
   const [datas, setdatas] = useState({});
   const [shift, setshift] = useState({});
+  const [selectall, setselectall] = useState(false);
   const [shifttime, setshifttime] = useState({
     startat: "",
     endat: "",
@@ -40,7 +42,6 @@ const AddInterruptionForm = (props) => {
   const handleChange = (e) => {
     let name = e.target.name;
     let value = e.target.value;
-    console.log(e.target.min);
     setdatas({ ...datas, [name]: value });
   };
 
@@ -78,7 +79,8 @@ const AddInterruptionForm = (props) => {
   }
 
   const handleSelectAll = (e) => {
-    const checked = e.target.checked;
+    const checked = !selectall;
+    setselectall(!selectall);
     if (checked) {
       return setshiftinstances(
         shiftinstances.map((instance) => {
@@ -95,8 +97,17 @@ const AddInterruptionForm = (props) => {
     );
   };
 
+  async function getInterruptionInstances(interruption) {
+    const res = await fetch(
+      `/api/interruptions/${interruption._id}/shiftinstances`
+    );
+    const instances = await res.json();
+    return { ...interruption, instances };
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setisLoading(true);
     let interruptionStartDate;
     let interruptionEndDate;
     if (shift.type === "jour") {
@@ -122,6 +133,7 @@ const AddInterruptionForm = (props) => {
     );
 
     if (interruptionEndDate <= interruptionStartDate) {
+      setisLoading(false);
       alert("End Time should be after the Start Time");
       return;
     }
@@ -145,31 +157,36 @@ const AddInterruptionForm = (props) => {
     })
       .then((res) => res.json())
       .then((interruption) => {
-        console.log(interruption);
-
-        setinterruptions([...interruptions, interruption]);
         let selectedInstances = shiftinstances.filter(
           (instance) => instance.checked === true
         );
-        return Promise.all(
-          selectedInstances.map((instance) => {
+        return Promise.all([
+          ...selectedInstances.map((instance) => {
             return updateInstancesInterruptions(instance, interruption);
-          })
-        );
+          }),
+          interruption,
+        ]);
       })
       .then((result) => {
-        console.log(result);
+        let interruption = JSON.parse(
+          JSON.stringify(result[result.length - 1])
+        );
+        interruption.instances = result.slice(0, -1);
+        console.log(interruption);
+        setinterruptions([...interruptions, interruption]);
         e.target.reset();
         alertify.set("notifier", "position", "top-center");
         alertify.success("New Interruption Added Successfully");
-        document.querySelector("#selectall").checked = false;
         setshiftinstances(
           shiftinstances.map((instance) => {
             return { ...instance, checked: false };
           })
         );
+        setselectall(false);
+        setisLoading(false);
       })
       .catch((e) => {
+        setisLoading(false);
         alertify.set("notifier", "position", "top-center");
         alertify.error("An Error Occured");
         console.log(e);
@@ -245,7 +262,13 @@ const AddInterruptionForm = (props) => {
           <FormLabel component="legend">Select Workers</FormLabel>
           <FormGroup>
             <FormControlLabel
-              control={<Checkbox id={"selectall"} onChange={handleSelectAll} />}
+              control={
+                <Checkbox
+                  id={"selectall"}
+                  checked={selectall}
+                  onChange={handleSelectAll}
+                />
+              }
               label={`Everybody`}
             />
           </FormGroup>

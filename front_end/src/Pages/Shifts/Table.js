@@ -8,6 +8,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { useState } from "react";
 import { DateTime } from "luxon";
+import uuid from "react-uuid";
 
 const columns = [
   { id: "type", label: "Type", minWidth: 100 },
@@ -117,7 +118,7 @@ export default function StickyHeadTable(props) {
                     {columns.map((column) => {
                       const value = shift[column.id];
                       return (
-                        <TableCell key={column.id} align={column.align}>
+                        <TableCell key={uuid()} align={column.align}>
                           {column.format ? column.format(value) : value}
                         </TableCell>
                       );

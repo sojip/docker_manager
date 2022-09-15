@@ -21,7 +21,6 @@ const AddShiftForm = (props) => {
   const [workers, setworkers] = useState([]);
 
   let { handleClose } = props;
-  let { setsearchShiftsResults } = props;
   let { shifts } = props;
   let { setshifts } = props;
   let { setisLoading } = props;
@@ -93,8 +92,7 @@ const AddShiftForm = (props) => {
           alertify.error(data.message);
           return;
         }
-        setsearchShiftsResults([...shifts, data]);
-        setshifts([...shifts, data]);
+        setshifts([data, ...shifts]);
         return Promise.all(
           selectedworkers.map((worker) => {
             return createShiftInstance(data, worker);

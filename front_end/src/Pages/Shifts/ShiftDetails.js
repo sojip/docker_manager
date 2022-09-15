@@ -20,10 +20,10 @@ import { mdiCheckboxMultipleBlank } from "@mdi/js";
 
 const ShiftsDetails = (props) => {
   const { handleClose } = props;
-  const { selected_id } = props;
   const { setisLoading } = props;
   const { setshifts } = props;
   const { shifts } = props;
+  const { selected_id } = props;
   const [shift, setshift] = useState({});
   const [shiftinstances, setshiftinstances] = useState([]);
   const [instancesSearchResults, setinstancesSearchResults] = useState([]);
@@ -164,8 +164,9 @@ const ShiftsDetails = (props) => {
       getInterruptions(signal),
     ])
       .then((datas) => {
-        setshift(datas[0]);
+        // setshift(datas[0]);
         // setinstancesSearchResults(datas[1]);
+        setshift(datas[0]);
         setshiftinstances(
           datas[1].map((instance) => {
             return { ...instance, checked: false };
@@ -188,6 +189,7 @@ const ShiftsDetails = (props) => {
   }, []);
 
   useEffect(() => {
+    console.log(shiftinstances);
     switch (filterby) {
       case "ended":
         setinstancesSearchResults(
@@ -238,26 +240,29 @@ const ShiftsDetails = (props) => {
           </div>
         </div>
       )}
-      {addInterruption && (
+      {addInterruption && shift.status === "opened" && (
         <AddInterruptionForm
+          selected_id={selected_id}
           handleCloseAddInterruptionForm={handleCloseAddInterruptionForm}
+          handleCheckboxChange={handleCheckboxChange}
           shiftinstances={shiftinstances}
           setshiftinstances={setshiftinstances}
-          handleCheckboxChange={handleCheckboxChange}
-          selected_id={selected_id}
           interruptions={interruptions}
           setinterruptions={setinterruptions}
+          setisLoading={setisLoading}
         />
       )}
-      {endShift && (
+      {endShift && shift.status === "opened" && (
         <EndShiftForm
           selected_id={selected_id}
           handleCloseEndShiftForm={handleCloseEndShiftForm}
+          handleCheckboxChange={handleCheckboxChange}
           shiftinstances={shiftinstances}
           setshiftinstances={setshiftinstances}
-          handleCheckboxChange={handleCheckboxChange}
-          setshifts={setshifts}
           shifts={shifts}
+          setshifts={setshifts}
+          setshift={setshift}
+          setisLoading={setisLoading}
         />
       )}
 

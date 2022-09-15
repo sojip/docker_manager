@@ -14,7 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { TextField } from "@mui/material";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const EndShiftForm = (props) => {
   const { handleCloseEndShiftForm } = props;
@@ -24,6 +24,8 @@ const EndShiftForm = (props) => {
   const { selected_id } = props;
   const { setshifts } = props;
   const { shifts } = props;
+  const { setshift } = props;
+  const { setisLoading } = props;
   const [formdatas, setformdatas] = useState({});
 
   // useEffect(() => {
@@ -68,6 +70,7 @@ const EndShiftForm = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setisLoading(true);
     let selectedInstances = shiftinstances.filter(
       (instance) => instance.checked === true
     );
@@ -77,23 +80,13 @@ const EndShiftForm = (props) => {
       })
     )
       .then((newInstances) => {
-        let newInstancesIndexes = newInstances.map((newinstance) =>
-          shiftinstances.indexOf(
-            shiftinstances.find((instance) => newinstance._id === instance._id)
-          )
-        );
-
         setshiftinstances(
-          shiftinstances.map((instance) => {
-            if (
-              newInstancesIndexes.includes(shiftinstances.indexOf(instance))
-            ) {
-              return {
-                ...newInstances[shiftinstances.indexOf(instance)],
-                checked: false,
-              };
-            }
-            return { ...instance, checked: false };
+          shiftinstances.map((shiftinstance) => {
+            let instance = newInstances.find(
+              (instance) => instance._id === shiftinstance._id
+            );
+            if (instance) return { ...instance, checked: false };
+            return { ...shiftinstance, checked: false };
           })
         );
       }) //Change the status of the shift
@@ -102,7 +95,7 @@ const EndShiftForm = (props) => {
           method: "PUT",
         });
         const shift = await res.json();
-        console.log(shift);
+        setshift(shift);
         setshifts(
           shifts.map((shift_) => {
             if (shift_._id === shift._id) return shift;
@@ -113,9 +106,10 @@ const EndShiftForm = (props) => {
         alertify.success("Shift Closed Successfully");
         e.target.reset();
         setformdatas({});
-        //setshift to the new shift
+        setisLoading(false);
       })
       .catch((e) => {
+        setisLoading(false);
         alertify.set("notifier", "position", "top-center");
         alertify.error("An Error Occured");
         console.log(e);

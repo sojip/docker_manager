@@ -57,11 +57,13 @@ module.exports.addInterruption = function (req, res, next) {
   ShiftInstance.findByIdAndUpdate(
     id,
     { $push: { interruptions: [interruption] } },
-    function (err, instance) {
+    { new: true }
+  )
+    .populate("docker")
+    .exec(function (err, instance) {
       if (err) return next(err);
       return res.json(instance);
-    }
-  );
+    });
 };
 
 module.exports.endShift = function (req, res, next) {

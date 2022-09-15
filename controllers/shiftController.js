@@ -26,10 +26,16 @@ module.exports.createShift = function (req, res, next) {
 };
 
 module.exports.getAllShifts = function (req, res, next) {
-  Shift.find({}, function (err, shifts) {
-    if (err) return next(err);
-    return res.json(shifts);
-  });
+  Shift.find({})
+    .sort({ createdAt: -1 })
+    .exec(function (err, shifts) {
+      if (err) return next(err);
+      return res.json(shifts);
+    });
+  // Shift.find({}, function (err, shifts) {
+  //   if (err) return next(err);
+  //   return res.json(shifts);
+  // });
 };
 
 module.exports.getShift = function (req, res, next) {
