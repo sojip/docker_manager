@@ -84,7 +84,8 @@
 #showshiftbox .interruptionsgrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
-  gap: 15px;
+  align-items: flex-start;
+  gap: 17.5px;
 }
 
 #showshiftbox .workersgrid .workerItem,
@@ -94,10 +95,11 @@
   padding: 5px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
   /* justify-content: space-between; */
   position: relative;
   animation: fadeIn 300ms;
+  border-radius: 10px;
 }
 
 #showshiftbox .workersgrid .workerItem {

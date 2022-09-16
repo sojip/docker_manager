@@ -386,7 +386,9 @@ const ShiftsDetails = (props) => {
                 )}
                 {instance.operation && instance.operation.description && (
                   <div>
-                    Operation Description {instance.operation.description}
+                    <div>Operation description</div>
+                    <div>{instance.operation.description}</div>
+                    {/* Operation Description {instance.operation.description} */}
                   </div>
                 )}
               </div>
