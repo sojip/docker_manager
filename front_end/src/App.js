@@ -41,7 +41,7 @@ function App() {
             path="/"
             element={
               <ProtectedRoute isLoggedIn={isLoggedIn}>
-                <DashboardLayout />
+                <DashboardLayout setisLoggedIn={setisLoggedIn} />
               </ProtectedRoute>
             }
           >

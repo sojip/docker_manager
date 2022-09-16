@@ -4,8 +4,10 @@ import { mdiMenu } from "@mdi/js";
 import { mdiAccountTie } from "@mdi/js";
 import "../styles/AppHeader.css";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-const AppHeader = () => {
+const AppHeader = (props) => {
+  const { setisLoggedIn } = props;
   const closeprofileOptions = (e) => {
     let isopened = document.querySelector(".profileOptions.isopened");
     let optionsButton = document.querySelector(".toggleOptions");
@@ -38,6 +40,11 @@ const AppHeader = () => {
     });
     return;
   }
+
+  function handleLogOut(e) {
+    localStorage.removeItem("utoken");
+    setisLoggedIn(false);
+  }
   return (
     <header>
       <Icon
@@ -60,7 +67,7 @@ const AppHeader = () => {
         </div>
       </div>
       <ul className="profileOptions">
-        <li>Log Out</li>
+        <li onClick={handleLogOut}>Log Out</li>
         <li>Profile</li>
       </ul>
     </header>
