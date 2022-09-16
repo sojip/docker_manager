@@ -141,97 +141,97 @@ const WorkerDetails = (props) => {
     );
   }
 
-  function handleSearchTo(date) {
-    let dateTo = date;
-    let dateFrom = filterby.from;
-    let option = filterby.option;
+  // function handleSearchTo(date) {
+  //   let dateTo = date;
+  //   let dateFrom = filterby.from;
+  //   let option = filterby.option;
 
-    if (dateTo !== "") {
-      let searchShiftsIds = shifts
-        .map((shift) => {
-          return {
-            _id: shift._id,
-            endedshift: shift.endedshift,
-            shift: {
-              startdate: shift.shift.startdate.split("T")[0],
-              enddate: shift.shift.enddate.split("T")[0],
-            },
-          };
-        }) // filter by date
-        .filter((shift) => {
-          if (dateFrom !== "") {
-            let interval = Interval.fromDateTimes(
-              DateTime.fromISO(dateFrom),
-              DateTime.fromISO(dateTo).plus({ days: 1 })
-            );
-            return (
-              interval.contains(DateTime.fromISO(shift.shift.startdate)) ||
-              interval.contains(DateTime.fromISO(shift.shift.enddate))
-            );
-          }
-          return (
-            DateTime.fromISO(shift.shift.startdate) <=
-              DateTime.fromISO(dateTo) ||
-            DateTime.fromISO(shift.shift.enddate) <= DateTime.fromISO(dateTo)
-          );
-        }) // filter by option ["all", "ended", "notended"]
-        .filter((shift) => {
-          if (option === "ended") return shift.endedshift === true;
-          if (option === "notended") return shift.endedshift !== true;
-          return shift;
-        })
-        .map((shift) => shift._id);
+  //   if (dateTo !== "") {
+  //     let searchShiftsIds = shifts
+  //       .map((shift) => {
+  //         return {
+  //           _id: shift._id,
+  //           endedshift: shift.endedshift,
+  //           shift: {
+  //             startdate: shift.shift.startdate.split("T")[0],
+  //             enddate: shift.shift.enddate.split("T")[0],
+  //           },
+  //         };
+  //       }) // filter by date
+  //       .filter((shift) => {
+  //         if (dateFrom !== "") {
+  //           let interval = Interval.fromDateTimes(
+  //             DateTime.fromISO(dateFrom),
+  //             DateTime.fromISO(dateTo).plus({ days: 1 })
+  //           );
+  //           return (
+  //             interval.contains(DateTime.fromISO(shift.shift.startdate)) ||
+  //             interval.contains(DateTime.fromISO(shift.shift.enddate))
+  //           );
+  //         }
+  //         return (
+  //           DateTime.fromISO(shift.shift.startdate) <=
+  //             DateTime.fromISO(dateTo) ||
+  //           DateTime.fromISO(shift.shift.enddate) <= DateTime.fromISO(dateTo)
+  //         );
+  //       }) // filter by option ["all", "ended", "notended"]
+  //       .filter((shift) => {
+  //         if (option === "ended") return shift.endedshift === true;
+  //         if (option === "notended") return shift.endedshift !== true;
+  //         return shift;
+  //       })
+  //       .map((shift) => shift._id);
 
-      return setsearchresults(
-        shifts.filter((shift) => {
-          return searchShiftsIds.includes(shift._id);
-        })
-      );
-    } else if (dateFrom !== "") {
-      let searchShiftsIds = shifts
-        .map((shift) => {
-          return {
-            _id: shift._id,
-            shift: {
-              startdate: shift.shift.startdate.split("T")[0],
-              enddate: shift.shift.enddate.split("T")[0],
-            },
-          };
-        })
-        .filter((shift) => {
-          return (
-            DateTime.fromISO(shift.shift.startdate) >=
-              DateTime.fromISO(dateFrom) ||
-            DateTime.fromISO(shift.shift.enddate) >= DateTime.fromISO(dateFrom)
-          );
-        }) //filter by option ["all", "ended", "notended"]
-        .filter((shift) => {
-          if (option === "ended") return shift.endedshift === true;
-          if (option === "notended") return shift.endedshift !== true;
-          return shift;
-        })
-        .map((shift) => shift._id);
-      return setsearchresults(
-        shifts.filter((shift) => {
-          return searchShiftsIds.includes(shift._id);
-        })
-      );
-    }
-    //fitler by option only
-    let searchShiftsIds = shifts
-      .filter((shift) => {
-        if (option === "ended") return shift.endedshift === true;
-        if (option === "notended") return shift.endedshift !== true;
-        return shift;
-      })
-      .map((shift) => shift._id);
+  //     return setsearchresults(
+  //       shifts.filter((shift) => {
+  //         return searchShiftsIds.includes(shift._id);
+  //       })
+  //     );
+  //   } else if (dateFrom !== "") {
+  //     let searchShiftsIds = shifts
+  //       .map((shift) => {
+  //         return {
+  //           _id: shift._id,
+  //           shift: {
+  //             startdate: shift.shift.startdate.split("T")[0],
+  //             enddate: shift.shift.enddate.split("T")[0],
+  //           },
+  //         };
+  //       })
+  //       .filter((shift) => {
+  //         return (
+  //           DateTime.fromISO(shift.shift.startdate) >=
+  //             DateTime.fromISO(dateFrom) ||
+  //           DateTime.fromISO(shift.shift.enddate) >= DateTime.fromISO(dateFrom)
+  //         );
+  //       }) //filter by option ["all", "ended", "notended"]
+  //       .filter((shift) => {
+  //         if (option === "ended") return shift.endedshift === true;
+  //         if (option === "notended") return shift.endedshift !== true;
+  //         return shift;
+  //       })
+  //       .map((shift) => shift._id);
+  //     return setsearchresults(
+  //       shifts.filter((shift) => {
+  //         return searchShiftsIds.includes(shift._id);
+  //       })
+  //     );
+  //   }
+  //   //fitler by option only
+  //   let searchShiftsIds = shifts
+  //     .filter((shift) => {
+  //       if (option === "ended") return shift.endedshift === true;
+  //       if (option === "notended") return shift.endedshift !== true;
+  //       return shift;
+  //     })
+  //     .map((shift) => shift._id);
 
-    return setsearchresults(
-      shifts.filter((shift) => {
-        return searchShiftsIds.includes(shift._id);
-      })
-    );
-  }
+  //   return setsearchresults(
+  //     shifts.filter((shift) => {
+  //       return searchShiftsIds.includes(shift._id);
+  //     })
+  //   );
+  // }
 
   const handleChange = (e) => {
     let name = e.target.name;
@@ -270,13 +270,7 @@ const WorkerDetails = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log(searchresults);
-  }, [searchresults]);
-
-  useEffect(() => {
     handleSearchFrom(filterby.from);
-    // handleSearchTo(filterby.to);
-    console.log(filterby);
   }, [filterby]);
 
   return (
@@ -477,6 +471,20 @@ const WorkerDetails = (props) => {
                         />
                       )}
                     </div>
+                    {shift.operation && shift.operation.type && (
+                      <div>Operation Type {shift.operation.type}</div>
+                    )}
+                    {shift.operation && shift.operation.vessel && (
+                      <div>Operation Vessel {shift.operation.vessel}</div>
+                    )}
+                    {shift.operation && shift.operation.position && (
+                      <div>Operation Position {shift.operation.position}</div>
+                    )}
+                    {shift.operation && shift.operation.description && (
+                      <div>
+                        Operation Description {shift.operation.description}
+                      </div>
+                    )}
                   </div>
                   {shift.startedshift &&
                     shift.endedshift &&

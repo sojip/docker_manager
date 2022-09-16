@@ -66,29 +66,18 @@
 }
 
 #showworkerbox .findshifts {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
   gap: 15px;
-}
-
-#showworkerbox .findshifts div {
-  flex: 1 0 calc(50% -7.5px);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 #showworkerbox .workerstats {
-  /* border: solid 1px red; */
   padding: 5px 0;
-  /* margin-top: 5px; */
 }
 
 #showworkerbox .filterOptions {
-  /* display: inline-block; */
-  /* border: solid 1px blue; */
-  /* width: max-content; */
   margin: 0;
   padding: 0;
-  /* border: solid 1px red; */
 }
 
 #showworkerbox .shiftsgrid {

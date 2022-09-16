@@ -164,8 +164,6 @@ const ShiftsDetails = (props) => {
       getInterruptions(signal),
     ])
       .then((datas) => {
-        // setshift(datas[0]);
-        // setinstancesSearchResults(datas[1]);
         setshift(datas[0]);
         setshiftinstances(
           datas[1].map((instance) => {
@@ -189,7 +187,6 @@ const ShiftsDetails = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log(shiftinstances);
     switch (filterby) {
       case "ended":
         setinstancesSearchResults(
@@ -378,6 +375,20 @@ const ShiftsDetails = (props) => {
                     />
                   )}
                 </div>
+                {instance.operation && instance.operation.type && (
+                  <div>Operation Type {instance.operation.type}</div>
+                )}
+                {instance.operation && instance.operation.vessel && (
+                  <div>Operation Vessel {instance.operation.vessel}</div>
+                )}
+                {instance.operation && instance.operation.position && (
+                  <div>Operation Position {instance.operation.position}</div>
+                )}
+                {instance.operation && instance.operation.description && (
+                  <div>
+                    Operation Description {instance.operation.description}
+                  </div>
+                )}
               </div>
             );
           })}

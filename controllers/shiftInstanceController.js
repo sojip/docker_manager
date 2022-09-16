@@ -21,7 +21,7 @@ module.exports.createShiftInstance = function (req, res, next) {
 module.exports.getShiftDockers = function (req, res, next) {
   var id = req.params.id;
   ShiftInstance.find({ shift: mongoose.Types.ObjectId(id) })
-    .select("docker startedshift endedshift")
+    .select("docker startedshift endedshift operation")
     .populate("docker")
     .exec(function (err, dockers) {
       if (err) return next(err);
@@ -42,7 +42,7 @@ module.exports.getShiftDockers = function (req, res, next) {
 module.exports.getDockerShifts = function (req, res, next) {
   var id = req.params.id;
   ShiftInstance.find({ docker: mongoose.Types.ObjectId(id) })
-    .select("shift startedshift endedshift interruptions")
+    .select("shift startedshift endedshift interruptions operation")
     .populate("shift interruptions")
     .exec(function (err, shifts) {
       if (err) return next(err);

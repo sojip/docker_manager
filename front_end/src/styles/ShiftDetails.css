@@ -94,9 +94,15 @@
   padding: 5px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 8px;
+  /* justify-content: space-between; */
   position: relative;
   animation: fadeIn 300ms;
+}
+
+#showshiftbox .workersgrid .workerItem {
+  text-transform: capitalize;
+  /* line-height: 1.5rem; */
 }
 
 @keyframes fadeIn {

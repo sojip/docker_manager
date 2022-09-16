@@ -98,8 +98,8 @@ const EndShiftForm = (props) => {
         setshift(shift);
         setshifts(
           shifts.map((shift_) => {
-            if (shift_._id === shift._id) return shift;
-            return shift;
+            if (shift_._id === shift._id) return { ...shift };
+            return { ...shift_ };
           })
         );
         alertify.set("notifier", "position", "top-center");
