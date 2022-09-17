@@ -17,6 +17,9 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import { mdiCheckboxMultipleMarked } from "@mdi/js";
 import { mdiCheckboxMultipleBlank } from "@mdi/js";
+import { Settings } from "luxon";
+
+Settings.defaultZone = "UTC+1";
 
 const ShiftsDetails = (props) => {
   const { handleClose } = props;
@@ -151,6 +154,7 @@ const ShiftsDetails = (props) => {
   };
 
   useEffect(() => {
+    console.log(Settings.defaultZone);
     setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
