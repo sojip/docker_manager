@@ -49,10 +49,11 @@ const WorkerDetails = (props) => {
     return shifts;
   }
 
-  function handleSearchFrom(date) {
-    let dateFrom = date;
-    let dateTo = filterby.to;
-    let option = filterby.option;
+  function handleSearchAndFilter(filter) {
+    let dateFrom = filter.from;
+    let dateTo = filter.to;
+    let option = filter.option;
+    //handle dateFrom is set - dateTo is set && dateFrom is set - dateTo is not set
     if (dateFrom !== "") {
       let searchShiftsIds = shifts
         .map((shift) => {
@@ -64,7 +65,7 @@ const WorkerDetails = (props) => {
             },
             endedshift: shift.endedshift,
           };
-        }) //filter by date
+        })
         .filter((shift) => {
           if (dateTo !== "") {
             let interval = Interval.fromDateTimes(
@@ -93,7 +94,7 @@ const WorkerDetails = (props) => {
         shifts.filter((shift) => {
           return searchShiftsIds.includes(shift._id);
         })
-      );
+      ); // handle dateTo only is set
     } else if (dateTo !== "") {
       let searchShiftsIds = shifts
         .map((shift) => {
@@ -141,98 +142,6 @@ const WorkerDetails = (props) => {
     );
   }
 
-  // function handleSearchTo(date) {
-  //   let dateTo = date;
-  //   let dateFrom = filterby.from;
-  //   let option = filterby.option;
-
-  //   if (dateTo !== "") {
-  //     let searchShiftsIds = shifts
-  //       .map((shift) => {
-  //         return {
-  //           _id: shift._id,
-  //           endedshift: shift.endedshift,
-  //           shift: {
-  //             startdate: shift.shift.startdate.split("T")[0],
-  //             enddate: shift.shift.enddate.split("T")[0],
-  //           },
-  //         };
-  //       }) // filter by date
-  //       .filter((shift) => {
-  //         if (dateFrom !== "") {
-  //           let interval = Interval.fromDateTimes(
-  //             DateTime.fromISO(dateFrom),
-  //             DateTime.fromISO(dateTo).plus({ days: 1 })
-  //           );
-  //           return (
-  //             interval.contains(DateTime.fromISO(shift.shift.startdate)) ||
-  //             interval.contains(DateTime.fromISO(shift.shift.enddate))
-  //           );
-  //         }
-  //         return (
-  //           DateTime.fromISO(shift.shift.startdate) <=
-  //             DateTime.fromISO(dateTo) ||
-  //           DateTime.fromISO(shift.shift.enddate) <= DateTime.fromISO(dateTo)
-  //         );
-  //       }) // filter by option ["all", "ended", "notended"]
-  //       .filter((shift) => {
-  //         if (option === "ended") return shift.endedshift === true;
-  //         if (option === "notended") return shift.endedshift !== true;
-  //         return shift;
-  //       })
-  //       .map((shift) => shift._id);
-
-  //     return setsearchresults(
-  //       shifts.filter((shift) => {
-  //         return searchShiftsIds.includes(shift._id);
-  //       })
-  //     );
-  //   } else if (dateFrom !== "") {
-  //     let searchShiftsIds = shifts
-  //       .map((shift) => {
-  //         return {
-  //           _id: shift._id,
-  //           shift: {
-  //             startdate: shift.shift.startdate.split("T")[0],
-  //             enddate: shift.shift.enddate.split("T")[0],
-  //           },
-  //         };
-  //       })
-  //       .filter((shift) => {
-  //         return (
-  //           DateTime.fromISO(shift.shift.startdate) >=
-  //             DateTime.fromISO(dateFrom) ||
-  //           DateTime.fromISO(shift.shift.enddate) >= DateTime.fromISO(dateFrom)
-  //         );
-  //       }) //filter by option ["all", "ended", "notended"]
-  //       .filter((shift) => {
-  //         if (option === "ended") return shift.endedshift === true;
-  //         if (option === "notended") return shift.endedshift !== true;
-  //         return shift;
-  //       })
-  //       .map((shift) => shift._id);
-  //     return setsearchresults(
-  //       shifts.filter((shift) => {
-  //         return searchShiftsIds.includes(shift._id);
-  //       })
-  //     );
-  //   }
-  //   //fitler by option only
-  //   let searchShiftsIds = shifts
-  //     .filter((shift) => {
-  //       if (option === "ended") return shift.endedshift === true;
-  //       if (option === "notended") return shift.endedshift !== true;
-  //       return shift;
-  //     })
-  //     .map((shift) => shift._id);
-
-  //   return setsearchresults(
-  //     shifts.filter((shift) => {
-  //       return searchShiftsIds.includes(shift._id);
-  //     })
-  //   );
-  // }
-
   const handleChange = (e) => {
     let name = e.target.name;
     let value = e.target.value;
@@ -261,7 +170,7 @@ const WorkerDetails = (props) => {
         if (e.name !== "AbortError") {
           setisLoading(false);
           alertify.error("An Error Occured");
-          console.log(e);
+          alert(e);
         }
       });
     return () => {
@@ -270,7 +179,7 @@ const WorkerDetails = (props) => {
   }, []);
 
   useEffect(() => {
-    handleSearchFrom(filterby.from);
+    handleSearchAndFilter(filterby);
   }, [filterby]);
 
   return (
@@ -343,7 +252,6 @@ const WorkerDetails = (props) => {
             fullWidth
             margin="normal"
             name="from"
-            // onChange={handleSearchFrom}
             onChange={handleChange}
           />
         </div>
@@ -357,7 +265,6 @@ const WorkerDetails = (props) => {
             fullWidth
             margin="normal"
             name="to"
-            // onChange={handleSearchTo}
             onChange={handleChange}
           />
         </div>
@@ -482,7 +389,8 @@ const WorkerDetails = (props) => {
                     )}
                     {shift.operation && shift.operation.description && (
                       <div>
-                        Operation Description {shift.operation.description}
+                        Operation Description <br />{" "}
+                        {shift.operation.description}
                       </div>
                     )}
                   </div>

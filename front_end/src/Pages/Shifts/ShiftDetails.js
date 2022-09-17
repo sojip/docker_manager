@@ -119,7 +119,6 @@ const ShiftsDetails = (props) => {
   };
 
   const showInterruptionDetails = (e) => {
-    //if there is a already one open, close
     const interruptionWorkersOpened = document.querySelector(
       ".interruptionWorkers.show"
     );
@@ -333,7 +332,7 @@ const ShiftsDetails = (props) => {
                     <div>{instance.docker.lastname}</div>
                   </div>
                 </div>
-                <div>
+                {/* <div>
                   Born On{" "}
                   {DateTime.fromISO(instance.docker.dateofbirth)
                     .setLocale("fr")
@@ -342,53 +341,64 @@ const ShiftsDetails = (props) => {
                       month: "long",
                       day: "numeric",
                     })}
-                </div>
-                <div className="startedshift">
-                  Started shift{" "}
-                  {instance.startedshift ? (
-                    <Icon
-                      className="checkboxdone"
-                      path={mdiCheckboxMultipleMarked}
-                      size={1}
-                    />
-                  ) : (
-                    <Icon
-                      className="checkboxdone"
-                      path={mdiCheckboxMultipleBlank}
-                      size={1}
-                    />
+                </div> */}
+                <div className="workerItemSubgrid">
+                  <div className="startedshift">
+                    Started shift{" "}
+                    {instance.startedshift ? (
+                      <Icon
+                        className="checkboxdone"
+                        path={mdiCheckboxMultipleMarked}
+                        size={1}
+                      />
+                    ) : (
+                      <Icon
+                        className="checkboxdone"
+                        path={mdiCheckboxMultipleBlank}
+                        size={1}
+                      />
+                    )}
+                  </div>
+                  <div className="endedshift">
+                    Ended shift
+                    {instance.endedshift ? (
+                      <Icon
+                        className="checkboxdone"
+                        path={mdiCheckboxMultipleMarked}
+                        size={1}
+                      />
+                    ) : (
+                      <Icon
+                        className="checkboxdone"
+                        path={mdiCheckboxMultipleBlank}
+                        size={1}
+                      />
+                    )}
+                  </div>
+
+                  {instance.operation && instance.operation.type && (
+                    <div className="operationdetails">
+                      <div>Operation Type</div>
+                      <div> {instance.operation.type}</div>
+                    </div>
+                  )}
+                  {instance.operation && instance.operation.vessel && (
+                    <div className="operationdetails">
+                      <div>Operation Vessel</div>
+                      <div>{instance.operation.vessel}</div>
+                    </div>
+                  )}
+                  {instance.operation && instance.operation.position && (
+                    <div className="operationdetails">
+                      <div>Operation Position</div>
+                      <div>{instance.operation.position}</div>
+                    </div>
                   )}
                 </div>
-                <div className="endedshift">
-                  Ended shift
-                  {instance.endedshift ? (
-                    <Icon
-                      className="checkboxdone"
-                      path={mdiCheckboxMultipleMarked}
-                      size={1}
-                    />
-                  ) : (
-                    <Icon
-                      className="checkboxdone"
-                      path={mdiCheckboxMultipleBlank}
-                      size={1}
-                    />
-                  )}
-                </div>
-                {instance.operation && instance.operation.type && (
-                  <div>Operation Type {instance.operation.type}</div>
-                )}
-                {instance.operation && instance.operation.vessel && (
-                  <div>Operation Vessel {instance.operation.vessel}</div>
-                )}
-                {instance.operation && instance.operation.position && (
-                  <div>Operation Position {instance.operation.position}</div>
-                )}
                 {instance.operation && instance.operation.description && (
-                  <div>
+                  <div className="operationdetails">
                     <div>Operation description</div>
                     <div>{instance.operation.description}</div>
-                    {/* Operation Description {instance.operation.description} */}
                   </div>
                 )}
               </div>
@@ -421,6 +431,11 @@ const ShiftsDetails = (props) => {
                   className="interruptionWorkers"
                   data-interruption={interruption._id}
                 >
+                  {interruption.starttime && (
+                    <div className="interruptionTime">
+                      {interruption.starttime} - {interruption.endtime}
+                    </div>
+                  )}
                   <ul>
                     {interruption.instances &&
                       interruption.instances.map((instance) => (
@@ -435,7 +450,7 @@ const ShiftsDetails = (props) => {
           })}
         </div>
       ) : (
-        <div className="noDatasInfos">No Interruptions / Incidents</div>
+        <div className="noDatasInfos">No Interruptions / Incidents...</div>
       )}
     </Box>
   );

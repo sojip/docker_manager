@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function SignIn(props) {
   const { setisLoggedIn } = props;
+  const { setisLoading } = props;
   const [datas, setdatas] = useState({});
   let navigate = useNavigate();
 
@@ -21,6 +22,7 @@ export default function SignIn(props) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setisLoading(true);
     fetch("/api/login", {
       method: "POST",
       headers: {
@@ -41,8 +43,10 @@ export default function SignIn(props) {
           setisLoggedIn(true);
           navigate("/", { replace: true });
         }
+        setisLoading(false);
       })
       .catch((e) => {
+        setisLoading(false);
         alertify.set("notifier", "position", "top-center");
         alertify.error("An Error Occured");
         console.log(e);
@@ -73,7 +77,6 @@ export default function SignIn(props) {
         onSubmit={handleSubmit}
       >
         <h1>Docker Manager</h1>
-        {/* <h2>Log In</h2> */}
         <TextField
           id="username"
           label="Username"

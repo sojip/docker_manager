@@ -80,7 +80,25 @@
   border: solid 2px var(--orange-color);
 }
 
-#showshiftbox .workersgrid,
+#showshiftbox .workersgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  align-items: flex-start;
+  gap: 20px;
+}
+
+#showshiftbox .workerItemSubgrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+
+#showshiftbox .workerItem .operationdetails {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 #showshiftbox .interruptionsgrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
@@ -92,11 +110,10 @@
 #showshiftbox .interruptionsgrid .interruptionItem {
   box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
     rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
-  padding: 5px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  /* justify-content: space-between; */
+  gap: 5px;
   position: relative;
   animation: fadeIn 300ms;
   border-radius: 10px;
@@ -104,7 +121,6 @@
 
 #showshiftbox .workersgrid .workerItem {
   text-transform: capitalize;
-  /* line-height: 1.5rem; */
 }
 
 @keyframes fadeIn {
@@ -159,13 +175,21 @@
   );
 }
 
+#showshiftbox
+  .interruptionsgrid
+  .interruptionItem
+  .interruptionWorkers
+  .interruptionTime {
+  font-weight: bold;
+  text-align: center;
+}
+
 #showshiftbox .interruptionsgrid .interruptionItem .interruptionWorkers.show {
   display: block;
 }
 
 #showshiftbox .interruptionsgrid .interruptionItem .interruptionWorkers ul {
   margin: 0;
-  /* padding: 0; */
   list-style-type: square;
 }
 
@@ -176,7 +200,6 @@
 
 #showshiftbox .interruptionsgrid .interruptionItem.detailed {
   border: solid 1px red;
-  /* scale: 2; */
 }
 
 #showshiftbox .interruptionsgrid .interruptionItem div > div:first-child {

@@ -60,7 +60,11 @@ function App() {
             path="/signin"
             element={
               <ProtectedSignIn isLoggedIn={isLoggedIn}>
-                <SignIn isLoggedIn={isLoggedIn} setisLoggedIn={setisLoggedIn} />
+                <SignIn
+                  isLoggedIn={isLoggedIn}
+                  setisLoggedIn={setisLoggedIn}
+                  setisLoading={setisLoading}
+                />
               </ProtectedSignIn>
             }
           />
