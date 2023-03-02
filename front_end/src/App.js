@@ -12,6 +12,11 @@ import Loader from "./components/Loader";
 import AuthProvider from "./auth/AuthProvider";
 import useAuthContext from "./auth/useAuthContext";
 
+// Add this in your component file
+require("react-dom");
+window.React2 = require("react");
+console.log(window.React1 === window.React2);
+
 let ProtectedRoute = ({ children }) => {
   const auth = useAuthContext();
   console.log(auth);
