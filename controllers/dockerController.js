@@ -41,16 +41,3 @@ module.exports.getDocker = function (req, res, next) {
     return res.json(docker);
   });
 };
-
-// module.exports.getPhoto = function (req, res, next) {
-//   var id = req.params.id;
-//   Docker.findById(mongoose.Types.ObjectId(id))
-//     .select("photo")
-//     .exec(function (err, docker) {
-//       if (err) return next(err);
-//       if (docker.photo !== undefined) {
-//         return res.json(`${docker.photo}`);
-//       }
-//       return res.json("");
-//     });
-// };

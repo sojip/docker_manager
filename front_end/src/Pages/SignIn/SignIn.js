@@ -1,18 +1,15 @@
 import "../../styles/SignIn.css";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Icon from "@mdi/react";
-import alertify from "alertifyjs";
-import "alertifyjs/build/css/alertify.css";
 import { useState } from "react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import useAuthContext from "../../auth/useAuthContext";
 
 export default function SignIn(props) {
-  const { setisLoggedIn } = props;
-  const { setisLoading } = props;
   const [datas, setdatas] = useState({});
-  let navigate = useNavigate();
+  const auth = useAuthContext();
+  const { setisLoading } = props;
 
   const handleChange = (e) => {
     let name = e.target.name;
@@ -32,33 +29,26 @@ export default function SignIn(props) {
     })
       .then((res) => res.json())
       .then((datas) => {
-        if (datas.message) {
-          alertify.set("notifier", "position", "top-center");
-          alertify.notify(datas.message, "custom");
+        console.table(datas);
+        if (!datas.user) {
+          toast.error(datas.message);
+          setisLoading(false);
+          return;
         }
-        if (datas.token) {
-          alertify.set("notifier", "position", "top-center");
-          alertify.success("Logged In Successfully");
-          localStorage.setItem("utoken", datas.token);
-          setisLoggedIn(true);
-          navigate("/", { replace: true });
-        }
+        toast.success("Logged In Successfully");
+        auth.setuser({ id: datas.user._id, access_token: datas.access_token });
         setisLoading(false);
       })
       .catch((e) => {
         setisLoading(false);
-        alertify.set("notifier", "position", "top-center");
-        alertify.error("An Error Occured");
-        console.log(e);
+        toast.error("An Error Occured");
+        console.table(e);
       });
   };
 
-  useEffect(() => {
-    console.log(datas);
-  }, [datas]);
-
   return (
     <div className="full-screen-container">
+      <ToastContainer />
       <Box
         component="form"
         id="signinform"

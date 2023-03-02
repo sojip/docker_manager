@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import alertify from "alertifyjs";
-import "alertifyjs/build/css/alertify.css";
+// import alertify from "alertifyjs";
+// import "alertifyjs/build/css/alertify.css";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
 import { mdiCloseThick, mdiFormatLineStyle } from "@mdi/js";
@@ -175,8 +175,8 @@ const AddInterruptionForm = (props) => {
         console.log(interruption);
         setinterruptions([...interruptions, interruption]);
         e.target.reset();
-        alertify.set("notifier", "position", "top-center");
-        alertify.success("New Interruption Added Successfully");
+        // alertify.set("notifier", "position", "top-center");
+        // alertify.success("New Interruption Added Successfully");
         setshiftinstances(
           shiftinstances.map((instance) => {
             return { ...instance, checked: false };
@@ -187,8 +187,8 @@ const AddInterruptionForm = (props) => {
       })
       .catch((e) => {
         setisLoading(false);
-        alertify.set("notifier", "position", "top-center");
-        alertify.error("An Error Occured");
+        // alertify.set("notifier", "position", "top-center");
+        // alertify.error("An Error Occured");
         console.log(e);
       });
   };

@@ -19,7 +19,7 @@ const upload = multer({ storage: storage });
 router.post("/workers", upload.single("photo"), dockerController.createDocker);
 router.get(
   "/workers",
-  //   passport.authenticate("jwt", { session: false }),
+  passport.authenticate("access_token", { session: false }),
   dockerController.getAllDockers
 );
 router.get("/workers/:id", dockerController.getDocker);
@@ -61,14 +61,52 @@ router.post("/login", async (req, res, next) => {
         if (error) return next(error);
 
         const body = { _id: user._id };
-        const token = jwt.sign({ user: body }, process.env.jwtsecret);
+        const access_token = jwt.sign(
+          { user: body },
+          process.env.access_token_secret
+        );
+        const refresh_token = jwt.sign(
+          { user: body },
+          process.env.refresh_token_secret
+          // { expiresIn: 10 }
+        );
+        // added cookie to store jwt token in memory for test
+        res.cookie("refresh_token", refresh_token, {
+          httpOnly: true,
+          sameSite: true,
+        });
 
-        return res.json({ token, username: user.username });
+        return res.json({ access_token, user: body });
       });
     } catch (error) {
       return new Error("An Error Occured");
     }
   })(req, res, next);
 });
+
+router.get("/logout", (req, res, next) => {
+  if (req.cookies["refresh_token"]) {
+    res.clearCookie("refresh_token").status(200).json({
+      message: "You have logged out",
+    });
+  } else {
+    res.status(401).json({
+      error: "Invalid jwt",
+    });
+  }
+});
+
+router.get(
+  "/refresh_token",
+  passport.authenticate("refresh_token", { session: false }),
+  (req, res, next) => {
+    const user = { ...req.user };
+    const access_token = jwt.sign(
+      { user: user },
+      process.env.access_token_secret
+    );
+    res.json({ access_token, user: user });
+  }
+);
 
 module.exports = router;

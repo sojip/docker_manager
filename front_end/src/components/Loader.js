@@ -1,25 +1,20 @@
 import "../styles/Loader.css";
 import { useEffect } from "react";
 
-const Loader = (props) => {
-  const { isActive } = props;
-
+const Loader = () => {
   useEffect(() => {
-    if (isActive) document.querySelector("body").style.overflowY = "hidden";
+    document.querySelector("body").style.overflowY = "hidden";
     return () => {
       let modal = document.querySelector(".modal");
-      if (modal === undefined || modal === null)
-        document.querySelector("body").style.overflowY = "auto";
+      if (!modal) document.querySelector("body").style.overflowY = "auto";
     };
-  }, [isActive]);
+  }, []);
 
-  return isActive ? (
+  return (
     <div className="LoaderWrapper">
       <div className="spinner"></div>
       <span>PLEASE WAIT...</span>
     </div>
-  ) : (
-    <></>
   );
 };
 

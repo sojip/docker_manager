@@ -36,11 +36,38 @@ passport.use(
 );
 
 passport.use(
+  "access_token",
   new JWTstrategy(
     {
-      secretOrKey: process.env.jwtsecret,
-      //   jwtFromRequest: ExtractJWT.fromUrlQueryParameter("token"),
+      secretOrKey: process.env.access_token_secret,
+      // jwtFromRequest: cookieExtractor,
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+    },
+    async (token, done) => {
+      try {
+        return done(null, token.user);
+      } catch (error) {
+        done(error);
+      }
+    }
+  )
+);
+
+//extract jwt from cookie for test
+const cookieExtractor = (req) => {
+  let refresh_token = null;
+  if (req && req.cookies) {
+    refresh_token = req.cookies["refresh_token"];
+  }
+  return refresh_token;
+};
+
+passport.use(
+  "refresh_token",
+  new JWTstrategy(
+    {
+      secretOrKey: process.env.refresh_token_secret,
+      jwtFromRequest: cookieExtractor,
     },
     async (token, done) => {
       try {

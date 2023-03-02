@@ -8,8 +8,8 @@ import { mdiPauseOctagonOutline, mdiAccountHardHatOutline } from "@mdi/js";
 import { mdiCloseOctagonOutline } from "@mdi/js";
 import AddInterruptionForm from "./AddInterruptionForm";
 import EndShiftForm from "./EndShiftForm";
-import alertify from "alertifyjs";
-import "alertifyjs/build/css/alertify.css";
+// import alertify from "alertifyjs";
+// import "alertifyjs/build/css/alertify.css";
 import { mdiPauseOctagon } from "@mdi/js";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
@@ -179,7 +179,7 @@ const ShiftsDetails = (props) => {
       .catch((e) => {
         if (e.name !== "AbortError") {
           setisLoading(false);
-          alertify.error("An Error Occured");
+          // alertify.error("An Error Occured");
         }
       });
 

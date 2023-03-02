@@ -7,11 +7,13 @@ import AddWorkerForm from "./AddWorkerForm";
 import WorkerDetails from "./WorkerDetails";
 import TextField from "@mui/material/TextField";
 import { DateTime } from "luxon";
-import alertify from "alertifyjs";
-import "alertifyjs/build/css/alertify.css";
+import useAuthContext from "../../auth/useAuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Workers = (props) => {
   const { setisLoading } = props;
+  const auth = useAuthContext();
   let [workers, setworkers] = useState([]);
   const [selected_id, setselectedid] = useState("");
   const [searchWorkersResults, setsearchWorkersResults] = useState([]);
@@ -44,10 +46,18 @@ const Workers = (props) => {
   }
 
   async function getWorkers(signal) {
-    const res = await fetch("/api/workers", {
-      signal: signal,
-    });
-    const workers = await res.json();
+    let workers = [];
+    try {
+      const res = await fetch("/api/workers", {
+        signal: signal,
+        headers: {
+          Authorization: `Bearer ${auth.user.access_token}`,
+        },
+      });
+      workers = await res.json();
+    } catch (e) {
+      if (e.name !== "AbortError") throw new Error("Can't Fetch Workers");
+    }
     return workers;
   }
 
@@ -81,9 +91,8 @@ const Workers = (props) => {
       })
       .catch((e) => {
         if (e.name !== "AbortError") {
-          alertify.error("An Error Occured");
           setisLoading(false);
-          console.log(e);
+          toast.error(e.message);
         }
       });
 
@@ -94,6 +103,7 @@ const Workers = (props) => {
 
   return (
     <div className="workerscontainer">
+      <ToastContainer />
       <h3>Workers</h3>
       <div className="oulinedButtonWrapper" onClick={handleAddWorkerClick}>
         <Icon path={mdiAccountPlusOutline} size={1} />

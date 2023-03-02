@@ -4,9 +4,7 @@ var mongoose = require("mongoose");
 module.exports.createShift = function (req, res, next) {
   var type = req.body.type;
   var startdate = new Date(req.body.startdate);
-  // type === "jour" ? startdate.setHours(7) : startdate.setHours(19);
   type === "jour" ? startdate.setUTCHours(6) : startdate.setUTCHours(18);
-  console.log(startdate);
 
   Shift.find({ startdate: startdate }, function (err, shift) {
     if (err) return next(err);
@@ -35,10 +33,6 @@ module.exports.getAllShifts = function (req, res, next) {
       if (err) return next(err);
       return res.json(shifts);
     });
-  // Shift.find({}, function (err, shifts) {
-  //   if (err) return next(err);
-  //   return res.json(shifts);
-  // });
 };
 
 module.exports.getShift = function (req, res, next) {

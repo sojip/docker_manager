@@ -4,10 +4,10 @@ import { mdiMenu } from "@mdi/js";
 import { mdiAccountTie } from "@mdi/js";
 import "../styles/AppHeader.css";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import useAuthContext from "../auth/useAuthContext";
 
 const AppHeader = (props) => {
-  const { setisLoggedIn } = props;
+  const auth = useAuthContext();
   const closeprofileOptions = (e) => {
     let isopened = document.querySelector(".profileOptions.isopened");
     let optionsButton = document.querySelector(".toggleOptions");
@@ -42,8 +42,13 @@ const AppHeader = (props) => {
   }
 
   function handleLogOut(e) {
-    localStorage.removeItem("utoken");
-    setisLoggedIn(false);
+    fetch("/api/logout")
+      .then(() => {
+        auth.setuser(null);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
   return (
     <header>

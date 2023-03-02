@@ -12,8 +12,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { FormLabel } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import "../../styles/AddShiftForm.css";
-import alertify from "alertifyjs";
-import "alertifyjs/build/css/alertify.css";
+// import alertify from "alertifyjs";
+// import "alertifyjs/build/css/alertify.css";
 
 const AddShiftForm = (props) => {
   const [datas, setdatas] = useState({ type: "", startdate: "" });
@@ -73,7 +73,7 @@ const AddShiftForm = (props) => {
     e.preventDefault();
     let selectedworkers = workers.filter((worker) => worker.checked === true);
     if (selectedworkers.length === 0) {
-      alertify.error("Select Workers Please");
+      // alertify.error("Select Workers Please");
       setisLoading(false);
       return;
     }
@@ -88,8 +88,8 @@ const AddShiftForm = (props) => {
       .then((data) => {
         if (data.message) {
           setisLoading(false);
-          alertify.set("notifier", "position", "top-center");
-          alertify.error(data.message);
+          // alertify.set("notifier", "position", "top-center");
+          // alertify.error(data.message);
           return;
         }
         setshifts([data, ...shifts]);
@@ -105,8 +105,8 @@ const AddShiftForm = (props) => {
           setdatas({ type: "", startdate: "" });
           settime("");
           setisLoading(false);
-          alertify.set("notifier", "position", "top-center");
-          alertify.success("New Shift Added Successfully");
+          // alertify.set("notifier", "position", "top-center");
+          // alertify.success("New Shift Added Successfully");
           setworkers(
             workers.map((worker) => {
               return { ...worker, checked: false };
@@ -116,8 +116,8 @@ const AddShiftForm = (props) => {
       })
       .catch((e) => {
         setisLoading(false);
-        alertify.set("notifier", "position", "top-center");
-        alertify.error("An Error Occured");
+        // alertify.set("notifier", "position", "top-center");
+        // alertify.error("An Error Occured");
         console.log(e);
       });
   }
@@ -139,7 +139,7 @@ const AddShiftForm = (props) => {
       .catch((e) => {
         if (e.name !== "AbortError") {
           setisLoading(false);
-          alertify.error("An Error Occured");
+          // alertify.error("An Error Occured");
         }
       });
 

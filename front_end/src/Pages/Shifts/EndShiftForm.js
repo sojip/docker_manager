@@ -5,8 +5,8 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import alertify from "alertifyjs";
-import "alertifyjs/build/css/alertify.css";
+// import alertify from "alertifyjs";
+// import "alertifyjs/build/css/alertify.css";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
@@ -102,16 +102,16 @@ const EndShiftForm = (props) => {
             return { ...shift_ };
           })
         );
-        alertify.set("notifier", "position", "top-center");
-        alertify.success("Shift Closed Successfully");
+        // alertify.set("notifier", "position", "top-center");
+        // alertify.success("Shift Closed Successfully");
         e.target.reset();
         setformdatas({});
         setisLoading(false);
       })
       .catch((e) => {
         setisLoading(false);
-        alertify.set("notifier", "position", "top-center");
-        alertify.error("An Error Occured");
+        // alertify.set("notifier", "position", "top-center");
+        // alertify.error("An Error Occured");
         console.log(e);
       });
   };

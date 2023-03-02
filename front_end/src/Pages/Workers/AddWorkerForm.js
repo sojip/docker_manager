@@ -4,8 +4,8 @@ import TextField from "@mui/material/TextField";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import { useState } from "react";
-import alertify from "alertifyjs";
-import "alertifyjs/build/css/alertify.css";
+// import alertify from "alertifyjs";
+// import "alertifyjs/build/css/alertify.css";
 import DefaultPhoto from "../../img/photodefault.png";
 
 const AddWorkerForm = (props) => {
@@ -54,16 +54,16 @@ const AddWorkerForm = (props) => {
       .then((res) => res.json())
       .then((worker) => {
         setisLoading(false);
-        alertify.set("notifier", "position", "top-center");
-        alertify.success("New Worker Created Successfully");
+        // alertify.set("notifier", "position", "top-center");
+        // alertify.success("New Worker Created Successfully");
         setsearchWorkersResults([...workers, worker]);
         setworkers([...workers, worker]);
         e.target.reset();
         setphotoSrc(DefaultPhoto);
       })
       .catch((e) => {
-        alertify.set("notifier", "position", "top-center");
-        alertify.error("An Error Occured");
+        // alertify.set("notifier", "position", "top-center");
+        // alertify.error("An Error Occured");
         setisLoading(false);
         console.log(e);
       });
@@ -79,10 +79,6 @@ const AddWorkerForm = (props) => {
         padding: "2vh 1vw",
         margin: "auto",
         "& > :not(style)": { width: "100%" },
-        // position: "absolute",
-        // top: "50%",
-        // left: "50%",
-        // transform: "translate(-50%, -50%)",
         bgcolor: "background.paper",
         boxShadow: 24,
         p: 4,

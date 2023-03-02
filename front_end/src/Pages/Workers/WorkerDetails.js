@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import "../../styles/WorkerDetails.css";
 import { DateTime, Interval } from "luxon";
 import TextField from "@mui/material/TextField";
-import alertify from "alertifyjs";
-import "alertifyjs/build/css/alertify.css";
+// import alertify from "alertifyjs";
+// import "alertifyjs/build/css/alertify.css";
 import { mdiPauseOctagon } from "@mdi/js";
 import { mdiCheckboxMultipleMarked } from "@mdi/js";
 import { mdiCheckboxMultipleBlank } from "@mdi/js";
@@ -169,7 +169,7 @@ const WorkerDetails = (props) => {
       .catch((e) => {
         if (e.name !== "AbortError") {
           setisLoading(false);
-          alertify.error("An Error Occured");
+          // alertify.error("An Error Occured");
           alert(e);
         }
       });

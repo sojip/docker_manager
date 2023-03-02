@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import StickyHeadTable from "./Table";
 import AddShiftForm from "./AddShiftForm";
 import ShiftDetails from "./ShiftDetails";
-import alertify from "alertifyjs";
+// import alertify from "alertifyjs";
 
 const Shifts = (props) => {
   const { setisLoading } = props;
@@ -81,7 +81,7 @@ const Shifts = (props) => {
       .catch((e) => {
         if (e.name !== "AbortError") {
           setisLoading(false);
-          alertify.error("An Error Occured");
+          // alertify.error("An Error Occured");
         }
       });
     return () => {
