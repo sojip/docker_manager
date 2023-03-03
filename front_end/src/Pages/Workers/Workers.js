@@ -45,22 +45,6 @@ const Workers = (props) => {
     setselectedid(e.currentTarget.id);
   }
 
-  async function getWorkers(signal) {
-    let workers = [];
-    try {
-      const res = await fetch("/api/workers", {
-        signal: signal,
-        headers: {
-          Authorization: `Bearer ${auth.user.access_token}`,
-        },
-      });
-      workers = await res.json();
-    } catch (e) {
-      if (e.name !== "AbortError") throw new Error("Can't Fetch Workers");
-    }
-    return workers;
-  }
-
   let search = (arr, str) => {
     return arr.filter((x) =>
       [x.firstname, x.lastname, x.cni]
@@ -83,10 +67,24 @@ const Workers = (props) => {
     let controller = new AbortController();
     let signal = controller.signal;
 
-    getWorkers(signal)
+    fetch("/api/workers", {
+      signal: signal,
+      headers: {
+        Authorization: `Bearer ${auth.user.access_token}`,
+      },
+    })
+      .then((res) => {
+        if (res.status === 401) {
+          toast.error("Unauthorized");
+          return;
+        }
+        return res.json();
+      })
       .then((workers) => {
-        setworkers(workers);
-        setsearchWorkersResults(workers);
+        if (workers !== undefined) {
+          setworkers(workers);
+          setsearchWorkersResults(workers);
+        }
         setisLoading(false);
       })
       .catch((e) => {

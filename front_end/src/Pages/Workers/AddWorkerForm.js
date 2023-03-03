@@ -4,16 +4,15 @@ import TextField from "@mui/material/TextField";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import { useState } from "react";
-// import alertify from "alertifyjs";
-// import "alertifyjs/build/css/alertify.css";
 import DefaultPhoto from "../../img/photodefault.png";
+import { ToastContainer, toast } from "react-toastify";
 
 const AddWorkerForm = (props) => {
   const [datas, setdatas] = useState({});
   const [photoSrc, setphotoSrc] = useState(DefaultPhoto);
   let { handleClose } = props;
-  let { setworkers } = props;
   let { workers } = props;
+  let { setworkers } = props;
   let { setsearchWorkersResults } = props;
   let { setisLoading } = props;
 
@@ -35,12 +34,13 @@ const AddWorkerForm = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setisLoading(true);
-    //send mutltipart form data
     const photo = document.querySelector("#photo");
     if (photo.files.length === 0) {
-      // TO DO require photo
+      toast.error("Please Add A Photo");
+      return;
     }
+    setisLoading(true);
+    //send mutltipart form data
     let formData = new FormData();
     formData.append("photo", photo.files[0]);
     const keys = Object.keys(datas);
@@ -53,19 +53,15 @@ const AddWorkerForm = (props) => {
     })
       .then((res) => res.json())
       .then((worker) => {
-        setisLoading(false);
-        // alertify.set("notifier", "position", "top-center");
-        // alertify.success("New Worker Created Successfully");
         setsearchWorkersResults([...workers, worker]);
         setworkers([...workers, worker]);
         e.target.reset();
         setphotoSrc(DefaultPhoto);
+        setisLoading(false);
       })
       .catch((e) => {
-        // alertify.set("notifier", "position", "top-center");
-        // alertify.error("An Error Occured");
         setisLoading(false);
-        console.log(e);
+        toast.error(e.message);
       });
   };
 
@@ -86,6 +82,8 @@ const AddWorkerForm = (props) => {
       autoComplete="off"
       onSubmit={handleSubmit}
     >
+      <ToastContainer />
+
       <div className="closeModalWrapper" id="closeModal" onClick={handleClose}>
         <Icon path={mdiCloseThick} size={1} />
       </div>
