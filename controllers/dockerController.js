@@ -1,15 +1,31 @@
 const { default: mongoose } = require("mongoose");
 const Docker = require("../models/dockerModel");
 const path = require("path");
+var sharp = require("sharp");
+var fs = require("fs");
+var crypto = require("crypto");
 
-module.exports.createDocker = function (req, res, next) {
+module.exports.createDocker = async function (req, res, next) {
+  //compress photo
+  const filename = req.file.filename;
+  const extension = req.file.mimetype.replace("image/", "");
+  console.table(extension);
+  const filenameCompressed =
+    crypto.randomUUID() + "-" + filename.replace(extension, "jpeg");
+  console.table(filenameCompressed);
+  await sharp(req.file.path)
+    .toFormat("jpeg", { mozjpeg: true })
+    .toFile(path.resolve(req.file.destination, filenameCompressed));
+  //save docker in database
   var firstname = req.body.firstname;
   var lastname = req.body.lastname;
-  var dateofbirth = new Date(req.body.dateofbirth);
+  var dateofbirth = req.body.dateofbirth;
   var position = req.body.position;
   var cni = req.body.cni;
   var fingerprint = req.body.fingerprint || undefined;
-  var photo = req.file.path.replace("public", "");
+  var photo = req.file.destination.replace("/public", "") + filenameCompressed;
+  console.table(photo);
+
   var docker = new Docker({
     firstname: firstname,
     lastname: lastname,
@@ -19,6 +35,8 @@ module.exports.createDocker = function (req, res, next) {
     photo: photo,
     cni: cni,
   });
+
+  fs.unlinkSync(req.file.path);
 
   docker.save(function (err, docker) {
     if (err) return next(err);

@@ -8,6 +8,7 @@ var shiftInstanceController = require("../controllers/shiftInstanceController");
 var passport = require("passport");
 require("dotenv").config();
 const multer = require("multer");
+
 var storage = multer.diskStorage({
   destination: "./public/uploads/",
   filename: function (req, file, cb) {
@@ -60,7 +61,11 @@ router.post("/login", async (req, res, next) => {
       req.login(user, { session: false }, async (error) => {
         if (error) return next(error);
 
-        const body = { _id: user._id };
+        const body = {
+          _id: user._id,
+          username: user.username,
+          profile: user.profile,
+        };
         const access_token = jwt.sign(
           { user: body },
           process.env.access_token_secret
@@ -101,6 +106,7 @@ router.get(
   passport.authenticate("refresh_token", { session: false }),
   (req, res, next) => {
     const user = { ...req.user };
+    console.table(user);
     const access_token = jwt.sign(
       { user: user },
       process.env.access_token_secret

@@ -29,16 +29,6 @@ module.exports.getShiftDockers = function (req, res, next) {
     });
 };
 
-// module.exports.getDockerInterruptions = function (req, res, next) {
-//   var id = req.params.id;
-//   ShiftInstance.find({ docker: mongoose.Types.ObjectId(id) })
-//     .populate("interruptions")
-//     .exec(function (err, interruptions) {
-//       if (err) return res.status(500).json({ err });
-//       return res.json(interruptions);
-//     });
-// };
-
 module.exports.getDockerShifts = function (req, res, next) {
   var id = req.params.id;
   ShiftInstance.find({ docker: mongoose.Types.ObjectId(id) })
@@ -90,7 +80,6 @@ module.exports.endShift = function (req, res, next) {
 
 module.exports.getInterruptionShiftInstances = function (req, res, next) {
   let id = mongoose.Types.ObjectId(req.params.id);
-  console.log(id);
   ShiftInstance.find({
     interruptions: id,
   })

@@ -4,7 +4,7 @@ import { mdiMenu } from "@mdi/js";
 import { mdiAccountTie } from "@mdi/js";
 import "../styles/AppHeader.css";
 import { useEffect } from "react";
-import useAuthContext from "../auth/useAuthContext";
+import useAuthContext from "../components/auth/useAuthContext";
 
 const AppHeader = (props) => {
   const auth = useAuthContext();
@@ -58,7 +58,7 @@ const AppHeader = (props) => {
         onClick={ToggleNav}
         style={{ cursor: "pointer" }}
       />
-      <h3>Welcome Sojip {/* add username */}</h3>
+      <h3>Welcome {auth.user.username}</h3>
       <div className="wrapper">
         <div className="profileImageContainer">
           <Icon path={mdiAccountTie} size={1} />

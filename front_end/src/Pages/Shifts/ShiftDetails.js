@@ -8,8 +8,6 @@ import { mdiPauseOctagonOutline, mdiAccountHardHatOutline } from "@mdi/js";
 import { mdiCloseOctagonOutline } from "@mdi/js";
 import AddInterruptionForm from "./AddInterruptionForm";
 import EndShiftForm from "./EndShiftForm";
-// import alertify from "alertifyjs";
-// import "alertifyjs/build/css/alertify.css";
 import { mdiPauseOctagon } from "@mdi/js";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
@@ -18,6 +16,7 @@ import FormControl from "@mui/material/FormControl";
 import { mdiCheckboxMultipleMarked } from "@mdi/js";
 import { mdiCheckboxMultipleBlank } from "@mdi/js";
 import { Settings } from "luxon";
+import { toast } from "react-toastify";
 
 Settings.defaultZone = "UTC+1";
 
@@ -27,13 +26,19 @@ const ShiftsDetails = (props) => {
   const { setshifts } = props;
   const { shifts } = props;
   const { selected_id } = props;
-  const [shift, setshift] = useState({});
+  const [shift, setshift] = useState({
+    type: "",
+    startdate: "",
+    enddate: "",
+    duration: "",
+    status: "",
+  });
   const [shiftinstances, setshiftinstances] = useState([]);
   const [instancesSearchResults, setinstancesSearchResults] = useState([]);
   const [interruptions, setinterruptions] = useState([]);
+  const [filterby, setfilterby] = useState("all");
   const [addInterruption, setaddInterruption] = useState(false);
   const [endShift, setendShift] = useState(false);
-  const [filterby, setfilterby] = useState("all");
 
   async function getShift(signal) {
     const res = await fetch(`/api/shifts/${selected_id}`, {
@@ -179,7 +184,7 @@ const ShiftsDetails = (props) => {
       .catch((e) => {
         if (e.name !== "AbortError") {
           setisLoading(false);
-          // alertify.error("An Error Occured");
+          toast.error("An Error Occured");
         }
       });
 
@@ -225,7 +230,7 @@ const ShiftsDetails = (props) => {
         <Icon path={mdiCloseThick} size={1} />
       </div>
       <h3>General</h3>
-      {shift.status && shift.status === "opened" && (
+      {shift.status === "opened" && (
         <div className="callToActions">
           <div
             className="oulinedButtonWrapper"
@@ -290,7 +295,7 @@ const ShiftsDetails = (props) => {
         </div>
       </div>
       <h3>Workers</h3>
-      {shift.status && shift.status === "closed" && (
+      {shift.status === "closed" && (
         <FormControl>
           <RadioGroup
             row
@@ -336,16 +341,6 @@ const ShiftsDetails = (props) => {
                     <div>{instance.docker.lastname}</div>
                   </div>
                 </div>
-                {/* <div>
-                  Born On{" "}
-                  {DateTime.fromISO(instance.docker.dateofbirth)
-                    .setLocale("fr")
-                    .toLocaleString({
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                </div> */}
                 <div className="workerItemSubgrid">
                   <div className="startedshift">
                     Started shift{" "}
@@ -380,26 +375,26 @@ const ShiftsDetails = (props) => {
                     )}
                   </div>
 
-                  {instance.operation && instance.operation.type && (
+                  {instance.operation?.type && (
                     <div className="operationdetails">
                       <div>Operation Type</div>
                       <div> {instance.operation.type}</div>
                     </div>
                   )}
-                  {instance.operation && instance.operation.vessel && (
+                  {instance.operation?.vessel && (
                     <div className="operationdetails">
                       <div>Operation Vessel</div>
                       <div>{instance.operation.vessel}</div>
                     </div>
                   )}
-                  {instance.operation && instance.operation.position && (
+                  {instance.operation?.position && (
                     <div className="operationdetails">
                       <div>Operation Position</div>
                       <div>{instance.operation.position}</div>
                     </div>
                   )}
                 </div>
-                {instance.operation && instance.operation.description && (
+                {instance.operation?.description && (
                   <div className="operationdetails">
                     <div>Operation description</div>
                     <div>{instance.operation.description}</div>
@@ -435,11 +430,10 @@ const ShiftsDetails = (props) => {
                   className="interruptionWorkers"
                   data-interruption={interruption._id}
                 >
-                  {interruption.starttime && (
-                    <div className="interruptionTime">
-                      {interruption.starttime} - {interruption.endtime}
-                    </div>
-                  )}
+                  <div className="interruptionTime">
+                    {interruption.starttime} - {interruption.endtime}
+                  </div>
+
                   <ul>
                     {interruption.instances &&
                       interruption.instances.map((instance) => (

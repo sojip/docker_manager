@@ -16,6 +16,10 @@ header {
   z-index: 3;
 }
 
+header h3 {
+  text-transform: capitalize;
+}
+
 header h3,
 header ul {
   margin: 0;

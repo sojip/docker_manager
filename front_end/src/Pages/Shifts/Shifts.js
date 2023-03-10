@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import StickyHeadTable from "./Table";
 import AddShiftForm from "./AddShiftForm";
 import ShiftDetails from "./ShiftDetails";
-// import alertify from "alertifyjs";
+import { toast, ToastContainer } from "react-toastify";
 
 const Shifts = (props) => {
   const { setisLoading } = props;
@@ -75,13 +75,12 @@ const Shifts = (props) => {
     getShifts(signal)
       .then((shifts) => {
         setshifts(shifts);
-        setsearchShiftsResults(shifts);
         setisLoading(false);
       })
       .catch((e) => {
         if (e.name !== "AbortError") {
           setisLoading(false);
-          // alertify.error("An Error Occured");
+          toast.error("An Error Occured");
         }
       });
     return () => {
@@ -92,6 +91,7 @@ const Shifts = (props) => {
   useEffect(() => {
     setsearchShiftsResults(shifts);
   }, [shifts]);
+
   return (
     <div className="shiftsContainer">
       <h3>Shifts</h3>
@@ -124,12 +124,12 @@ const Shifts = (props) => {
       )}
       {open && (
         <div className="modal">
+          <ToastContainer />
           {addShift && (
             <AddShiftForm
-              handleClose={handleClose}
-              shifts={shifts}
-              setshifts={setshifts}
               setisLoading={setisLoading}
+              handleClose={handleClose}
+              setshifts={setshifts}
             />
           )}
           {showShift && (

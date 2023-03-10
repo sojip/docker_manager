@@ -40,7 +40,6 @@ passport.use(
   new JWTstrategy(
     {
       secretOrKey: process.env.access_token_secret,
-      // jwtFromRequest: cookieExtractor,
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
     },
     async (token, done) => {
@@ -53,7 +52,7 @@ passport.use(
   )
 );
 
-//extract jwt from cookie for test
+//extract refresh token from cookie
 const cookieExtractor = (req) => {
   let refresh_token = null;
   if (req && req.cookies) {

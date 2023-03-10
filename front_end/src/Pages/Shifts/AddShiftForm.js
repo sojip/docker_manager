@@ -12,22 +12,58 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { FormLabel } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import "../../styles/AddShiftForm.css";
-// import alertify from "alertifyjs";
-// import "alertifyjs/build/css/alertify.css";
+import useAuthContext from "../../components/auth/useAuthContext";
+import { toast } from "react-toastify";
 
 const AddShiftForm = (props) => {
+  const auth = useAuthContext();
   const [datas, setdatas] = useState({ type: "", startdate: "" });
   const [time, settime] = useState("");
   const [workers, setworkers] = useState([]);
-
   let { handleClose } = props;
-  let { shifts } = props;
   let { setshifts } = props;
   let { setisLoading } = props;
 
   let style = {
     marginBottom: "15px",
   };
+
+  async function getWorkers(signal) {
+    const res = await fetch("/api/workers", {
+      signal: signal,
+      headers: {
+        Authorization: `Bearer ${auth.user.access_token}`,
+      },
+    });
+    const workers = await res.json();
+    return workers;
+  }
+
+  useEffect(() => {
+    setisLoading(true);
+    let controller = new AbortController();
+    let signal = controller.signal;
+
+    getWorkers(signal)
+      .then((workers) => {
+        setworkers(
+          workers.map((worker) => {
+            return { ...worker, checked: false };
+          })
+        );
+        setisLoading(false);
+      })
+      .catch((e) => {
+        if (e.name !== "AbortError") {
+          setisLoading(false);
+          toast.error("An Error Occured");
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   const handleChange = (event) => {
     let value = event.target.value;
@@ -43,14 +79,6 @@ const AddShiftForm = (props) => {
         return worker;
       })
     );
-  }
-
-  async function getWorkers(signal) {
-    const res = await fetch("/api/workers", {
-      signal: signal,
-    });
-    const workers = await res.json();
-    return workers;
   }
 
   async function createShiftInstance(shift, docker) {
@@ -73,7 +101,7 @@ const AddShiftForm = (props) => {
     e.preventDefault();
     let selectedworkers = workers.filter((worker) => worker.checked === true);
     if (selectedworkers.length === 0) {
-      // alertify.error("Select Workers Please");
+      toast.error("Select Workers Please");
       setisLoading(false);
       return;
     }
@@ -88,11 +116,10 @@ const AddShiftForm = (props) => {
       .then((data) => {
         if (data.message) {
           setisLoading(false);
-          // alertify.set("notifier", "position", "top-center");
-          // alertify.error(data.message);
+          toast.error(data.message);
           return;
         }
-        setshifts([data, ...shifts]);
+        setshifts((shifts) => [data, ...shifts]);
         return Promise.all(
           selectedworkers.map((worker) => {
             return createShiftInstance(data, worker);
@@ -105,8 +132,7 @@ const AddShiftForm = (props) => {
           setdatas({ type: "", startdate: "" });
           settime("");
           setisLoading(false);
-          // alertify.set("notifier", "position", "top-center");
-          // alertify.success("New Shift Added Successfully");
+          toast.success("New Shift Added Successfully");
           setworkers(
             workers.map((worker) => {
               return { ...worker, checked: false };
@@ -116,37 +142,10 @@ const AddShiftForm = (props) => {
       })
       .catch((e) => {
         setisLoading(false);
-        // alertify.set("notifier", "position", "top-center");
-        // alertify.error("An Error Occured");
+        toast.error("An Error Occured");
         console.log(e);
       });
   }
-
-  useEffect(() => {
-    setisLoading(true);
-    let controller = new AbortController();
-    let signal = controller.signal;
-
-    getWorkers(signal)
-      .then((workers) => {
-        setworkers(
-          workers.map((worker) => {
-            return { ...worker, checked: false };
-          })
-        );
-        setisLoading(false);
-      })
-      .catch((e) => {
-        if (e.name !== "AbortError") {
-          setisLoading(false);
-          // alertify.error("An Error Occured");
-        }
-      });
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
 
   return (
     <Box

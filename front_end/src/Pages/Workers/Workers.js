@@ -7,7 +7,7 @@ import AddWorkerForm from "./AddWorkerForm";
 import WorkerDetails from "./WorkerDetails";
 import TextField from "@mui/material/TextField";
 import { DateTime } from "luxon";
-import useAuthContext from "../../auth/useAuthContext";
+import useAuthContext from "../../components/auth/useAuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

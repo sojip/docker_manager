@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-// import alertify from "alertifyjs";
-// import "alertifyjs/build/css/alertify.css";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
-import { mdiCloseThick, mdiFormatLineStyle } from "@mdi/js";
+import { mdiCloseThick } from "@mdi/js";
 import {
   TextField,
   FormControl,
@@ -15,11 +13,11 @@ import {
 import { DateTime, Interval } from "luxon";
 
 const AddInterruptionForm = (props) => {
+  const { selected_id } = props;
   const { handleCloseAddInterruptionForm } = props;
   const { handleCheckboxChange } = props;
   const { shiftinstances } = props;
   const { setshiftinstances } = props;
-  const { selected_id } = props;
   const { interruptions } = props;
   const { setinterruptions } = props;
   const { setisLoading } = props;
@@ -74,6 +72,8 @@ const AddInterruptionForm = (props) => {
       case "nuit":
         setshifttime({ startat: "19:00", endat: "07:00" });
         break;
+      default:
+        setshifttime({ startat: "07:00", endat: "19:00" });
     }
     return;
   }
