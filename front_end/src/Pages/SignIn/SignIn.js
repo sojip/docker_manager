@@ -4,7 +4,7 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import useAuthContext from "../../components/auth/useAuthContext";
+import useAuthContext from "../../auth/useAuthContext";
 
 export default function SignIn(props) {
   const [datas, setdatas] = useState({});
@@ -29,7 +29,6 @@ export default function SignIn(props) {
     })
       .then((res) => res.json())
       .then((datas) => {
-        console.table(datas);
         if (!datas.user) {
           toast.error(datas.message);
           setisLoading(false);
@@ -46,8 +45,7 @@ export default function SignIn(props) {
       })
       .catch((e) => {
         setisLoading(false);
-        toast.error("An Error Occured");
-        console.table(e);
+        toast.error(e);
       });
   };
 

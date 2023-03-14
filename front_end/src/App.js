@@ -9,13 +9,8 @@ import DashboardLayout from "./components/DashboardLayout";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import Loader from "./components/Loader";
-import AuthProvider from "./components/auth/AuthProvider";
-import useAuthContext from "./components/auth/useAuthContext";
-
-// Add this in your component file
-require("react-dom");
-window.React2 = require("react");
-console.log(window.React1 === window.React2);
+import AuthProvider from "./auth/AuthProvider";
+import useAuthContext from "./auth/useAuthContext";
 
 let ProtectedRoute = ({ children }) => {
   const auth = useAuthContext();

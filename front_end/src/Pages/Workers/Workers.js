@@ -7,7 +7,7 @@ import AddWorkerForm from "./AddWorkerForm";
 import WorkerDetails from "./WorkerDetails";
 import TextField from "@mui/material/TextField";
 import { DateTime } from "luxon";
-import useAuthContext from "../../components/auth/useAuthContext";
+import useAuthContext from "../../auth/useAuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -166,17 +166,16 @@ const Workers = (props) => {
           {addWorker && (
             <AddWorkerForm
               handleClose={handleClose}
-              workers={workers}
+              setisLoading={setisLoading}
               setworkers={setworkers}
               setsearchWorkersResults={setsearchWorkersResults}
-              setisLoading={setisLoading}
             />
           )}
           {showWorker && (
             <WorkerDetails
               handleClose={handleClose}
-              selected_id={selected_id}
               setisLoading={setisLoading}
+              selected_id={selected_id}
             />
           )}
         </div>

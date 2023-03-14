@@ -4,7 +4,7 @@ import TextField from "@mui/material/TextField";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import { useState, useEffect } from "react";
-import DefaultPhoto from "../../img/photodefault.png";
+import DefaultPhoto from "../../img/workerdefault.png";
 import { ToastContainer, toast } from "react-toastify";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -16,7 +16,6 @@ const AddWorkerForm = (props) => {
   });
   const [photoSrc, setphotoSrc] = useState(DefaultPhoto);
   let { handleClose } = props;
-  let { workers } = props;
   let { setworkers } = props;
   let { setsearchWorkersResults } = props;
   let { setisLoading } = props;
@@ -60,8 +59,8 @@ const AddWorkerForm = (props) => {
       .then((res) => res.json())
       .then((worker) => {
         //add worker to the workers view
-        setsearchWorkersResults([...workers, worker]);
-        setworkers([...workers, worker]);
+        setworkers((workers) => [...workers, worker]);
+        setsearchWorkersResults((workers) => [...workers, worker]);
         //reset form
         e.target.reset();
         setdatas({

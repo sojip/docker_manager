@@ -4,7 +4,7 @@ import { mdiMenu } from "@mdi/js";
 import { mdiAccountTie } from "@mdi/js";
 import "../styles/AppHeader.css";
 import { useEffect } from "react";
-import useAuthContext from "../components/auth/useAuthContext";
+import useAuthContext from "../auth/useAuthContext";
 
 const AppHeader = (props) => {
   const auth = useAuthContext();

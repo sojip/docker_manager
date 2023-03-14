@@ -12,7 +12,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { FormLabel } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import "../../styles/AddShiftForm.css";
-import useAuthContext from "../../components/auth/useAuthContext";
+import useAuthContext from "../../auth/useAuthContext";
 import { toast } from "react-toastify";
 
 const AddShiftForm = (props) => {

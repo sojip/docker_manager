@@ -1,5 +1,5 @@
 import AuthContext from "./AuthContext";
-import useAuthListener from "./useAuthListener";
+import useAuthListener from "./Auth";
 
 const AuthProvider = ({ children }) => {
   const { ischecking, user, setuser } = useAuthListener();

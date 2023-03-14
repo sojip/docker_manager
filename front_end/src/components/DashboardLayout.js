@@ -3,10 +3,9 @@ import AppNav from "./AppNav";
 import { Outlet } from "react-router-dom";
 
 const DashboardLayout = (props) => {
-  const { setisLoggedIn } = props;
   return (
     <>
-      <AppHeader setisLoggedIn={setisLoggedIn} />
+      <AppHeader />
       <AppNav />
       <main className="main">
         <Outlet />

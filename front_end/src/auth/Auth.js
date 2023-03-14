@@ -28,9 +28,12 @@ const useAuthListener = () => {
           access_token: data.access_token,
         });
         setischecking(false);
+        return;
       })
       .catch((e) => {
         if (e.name === "AbortError") return;
+        setischecking(false);
+        setuser(null);
         alert(e);
       });
 
