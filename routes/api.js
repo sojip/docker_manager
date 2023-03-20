@@ -1,13 +1,14 @@
 var express = require("express");
-var router = express.Router();
-const jwt = require("jsonwebtoken");
 var dockerController = require("../controllers/dockerController");
 var shiftController = require("../controllers/shiftController");
 var interruptionController = require("../controllers/interruptionController");
 var shiftInstanceController = require("../controllers/shiftInstanceController");
+var authController = require("../controllers/authController");
 var passport = require("passport");
 require("dotenv").config();
 const multer = require("multer");
+
+var router = express.Router();
 
 var storage = multer.diskStorage({
   destination: "./public/uploads/",
@@ -51,68 +52,12 @@ router.put(
   shiftInstanceController.addInterruption
 );
 router.put("/shiftinstances/:id/shift", shiftInstanceController.endShift);
-
-//authentication
-router.post("/login", async (req, res, next) => {
-  passport.authenticate("login", async (err, user, info) => {
-    try {
-      if (err !== null) return new Error("An Error occured");
-      if (!user) return res.json(info);
-      req.login(user, { session: false }, async (error) => {
-        if (error) return next(error);
-
-        const body = {
-          _id: user._id,
-          username: user.username,
-          profile: user.profile,
-        };
-        const access_token = jwt.sign(
-          { user: body },
-          process.env.access_token_secret
-        );
-        const refresh_token = jwt.sign(
-          { user: body },
-          process.env.refresh_token_secret
-          // { expiresIn: 10 }
-        );
-        // added cookie to store jwt token in memory for test
-        res.cookie("refresh_token", refresh_token, {
-          httpOnly: true,
-          sameSite: true,
-        });
-
-        return res.json({ access_token, user: body });
-      });
-    } catch (error) {
-      return new Error("An Error Occured");
-    }
-  })(req, res, next);
-});
-
-router.get("/logout", (req, res, next) => {
-  if (req.cookies["refresh_token"]) {
-    res.clearCookie("refresh_token").status(200).json({
-      message: "You have logged out",
-    });
-  } else {
-    res.status(401).json({
-      error: "Invalid jwt",
-    });
-  }
-});
-
+router.post("/login", authController.login);
+router.get("/logout", authController.logout);
 router.get(
   "/refresh_token",
   passport.authenticate("refresh_token", { session: false }),
-  (req, res, next) => {
-    const user = { ...req.user };
-    console.table(user);
-    const access_token = jwt.sign(
-      { user: user },
-      process.env.access_token_secret
-    );
-    res.json({ access_token, user: user });
-  }
+  authController.refreshToken
 );
 
 module.exports = router;
