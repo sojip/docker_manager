@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
@@ -11,31 +11,26 @@ import {
   Checkbox,
 } from "@mui/material";
 import { DateTime, Interval } from "luxon";
+import { toast } from "react-toastify";
+import { SelectedShiftContext } from "./Shifts";
 
 const AddInterruptionForm = (props) => {
-  const { selected_id } = props;
-  const { handleCloseAddInterruptionForm } = props;
+  const { selected_shift } = useContext(SelectedShiftContext);
+  const { closeForms } = props;
   const { handleCheckboxChange } = props;
   const { shiftinstances } = props;
   const { setshiftinstances } = props;
-  const { interruptions } = props;
   const { setinterruptions } = props;
   const { setisLoading } = props;
   const [datas, setdatas] = useState({});
-  const [shift, setshift] = useState({});
   const [selectall, setselectall] = useState(false);
-  const [shifttime, setshifttime] = useState({
-    startat: "",
-    endat: "",
-  });
-
-  useEffect(() => {
-    getShiftTimes();
-  }, []);
-
-  useEffect(() => {
-    console.log(shifttime);
-  }, [shifttime]);
+  const shifttime =
+    selected_shift.type === "jour"
+      ? { startat: "07:00", endat: "19:00" }
+      : {
+          startat: "19:00",
+          endat: "07:00",
+        };
 
   const handleChange = (e) => {
     let name = e.target.name;
@@ -61,23 +56,6 @@ const AddInterruptionForm = (props) => {
     return datas;
   }
 
-  async function getShiftTimes() {
-    const res = await fetch(`/api/shifts/${selected_id}`);
-    const shift = await res.json();
-    setshift(shift);
-    switch (shift.type) {
-      case "jour":
-        setshifttime({ startat: "07:00", endat: "19:00" });
-        break;
-      case "nuit":
-        setshifttime({ startat: "19:00", endat: "07:00" });
-        break;
-      default:
-        setshifttime({ startat: "07:00", endat: "19:00" });
-    }
-    return;
-  }
-
   const handleSelectAll = (e) => {
     const checked = !selectall;
     setselectall(!selectall);
@@ -97,31 +75,39 @@ const AddInterruptionForm = (props) => {
     );
   };
 
-  async function getInterruptionInstances(interruption) {
-    const res = await fetch(
-      `/api/interruptions/${interruption._id}/shiftinstances`
-    );
-    const instances = await res.json();
-    return { ...interruption, instances };
-  }
-
   const handleSubmit = (e) => {
     e.preventDefault();
+    //Verify that a user has been selected
+    let selectedInstances = shiftinstances.filter(
+      (instance) => instance.checked === true
+    );
+    if (selectedInstances.length === 0) {
+      alert("select user please");
+      return;
+    }
     setisLoading(true);
     let interruptionStartDate;
     let interruptionEndDate;
-    if (shift.type === "jour") {
-      interruptionStartDate = new Date(shift.startdate.split("T")[0]);
-      interruptionEndDate = new Date(shift.startdate.split("T")[0]);
+    if (selected_shift.type === "jour") {
+      interruptionStartDate = new Date(selected_shift.startdate.split("T")[0]);
+      interruptionEndDate = new Date(selected_shift.startdate.split("T")[0]);
     }
-    if (shift.type === "nuit") {
+    if (selected_shift.type === "nuit") {
       let beforeMidnightHours = [19, 20, 21, 22, 23];
       beforeMidnightHours.includes(Number(datas.starttime.split(":")[0]))
-        ? (interruptionStartDate = new Date(shift.startdate.split("T")[0]))
-        : (interruptionStartDate = new Date(shift.enddate.split("T")[0]));
+        ? (interruptionStartDate = new Date(
+            selected_shift.startdate.split("T")[0]
+          ))
+        : (interruptionStartDate = new Date(
+            selected_shift.enddate.split("T")[0]
+          ));
       beforeMidnightHours.includes(Number(datas.endtime.split(":")[0]))
-        ? (interruptionEndDate = new Date(shift.startdate.split("T")[0]))
-        : (interruptionEndDate = new Date(shift.enddate.split("T")[0]));
+        ? (interruptionEndDate = new Date(
+            selected_shift.startdate.split("T")[0]
+          ))
+        : (interruptionEndDate = new Date(
+            selected_shift.enddate.split("T")[0]
+          ));
     }
     interruptionStartDate.setHours(
       Number(datas.starttime.split(":")[0]),
@@ -151,7 +137,7 @@ const AddInterruptionForm = (props) => {
       },
       body: JSON.stringify({
         ...datas,
-        shift: selected_id,
+        shift: selected_shift._id,
         duration: interruptionInterval.minutes,
       }),
     })
@@ -168,15 +154,11 @@ const AddInterruptionForm = (props) => {
         ]);
       })
       .then((result) => {
-        let interruption = JSON.parse(
-          JSON.stringify(result[result.length - 1])
-        );
+        let interruption = result[result.length - 1];
         interruption.instances = result.slice(0, -1);
-        console.log(interruption);
-        setinterruptions([...interruptions, interruption]);
+        setinterruptions((interruptions) => [...interruptions, interruption]);
         e.target.reset();
-        // alertify.set("notifier", "position", "top-center");
-        // alertify.success("New Interruption Added Successfully");
+        toast.success("New Interruption Added Succesffully");
         setshiftinstances(
           shiftinstances.map((instance) => {
             return { ...instance, checked: false };
@@ -187,8 +169,7 @@ const AddInterruptionForm = (props) => {
       })
       .catch((e) => {
         setisLoading(false);
-        // alertify.set("notifier", "position", "top-center");
-        // alertify.error("An Error Occured");
+        toast.error("An Error Occured");
         console.log(e);
       });
   };
@@ -200,8 +181,9 @@ const AddInterruptionForm = (props) => {
         id="addInterruptionForm"
         autoComplete="off"
         onSubmit={handleSubmit}
+        className="shiftDetailsForm"
       >
-        <div className="closeForm" onClick={handleCloseAddInterruptionForm}>
+        <div className="closeForm" onClick={closeForms}>
           <Icon path={mdiCloseThick} size={1} />
         </div>
         <h2>Add Interruption</h2>

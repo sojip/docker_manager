@@ -5,8 +5,6 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-// import alertify from "alertifyjs";
-// import "alertifyjs/build/css/alertify.css";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
@@ -14,23 +12,20 @@ import MenuItem from "@mui/material/MenuItem";
 import { TextField } from "@mui/material";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { ShiftsContext } from "./Shifts";
+import { SelectedShiftContext } from "./Shifts";
+import { toast } from "react-toastify";
 
 const EndShiftForm = (props) => {
-  const { handleCloseEndShiftForm } = props;
-  const { shiftinstances } = props;
+  const { closeForms } = props;
   const { handleCheckboxChange } = props;
+  const { shiftinstances } = props;
   const { setshiftinstances } = props;
-  const { selected_id } = props;
-  const { setshifts } = props;
-  const { shifts } = props;
-  const { setshift } = props;
   const { setisLoading } = props;
+  const { shifts, setshifts } = useContext(ShiftsContext);
+  const { selected_shift, setselectedshift } = useContext(SelectedShiftContext);
   const [formdatas, setformdatas] = useState({});
-
-  // useEffect(() => {
-  //   console.log(formdatas);
-  // }, [formdatas]);
 
   async function endShift(instance) {
     const res = await fetch(`/api/shiftinstances/${instance._id}/shift`, {
@@ -91,27 +86,25 @@ const EndShiftForm = (props) => {
         );
       }) //Change the status of the shift
       .then(async () => {
-        const res = await fetch(`/api/shifts/${selected_id}`, {
+        const res = await fetch(`/api/shifts/${selected_shift._id}`, {
           method: "PUT",
         });
-        const shift = await res.json();
-        setshift(shift);
+        const _shift = await res.json();
+        setselectedshift(_shift);
         setshifts(
-          shifts.map((shift_) => {
-            if (shift_._id === shift._id) return { ...shift };
-            return { ...shift_ };
+          shifts.map((_shift) => {
+            if (_shift._id === selected_shift._id) return { ...selected_shift };
+            return { ..._shift };
           })
         );
-        // alertify.set("notifier", "position", "top-center");
-        // alertify.success("Shift Closed Successfully");
-        e.target.reset();
+        toast.success("Shift Closed Successfully");
         setformdatas({});
         setisLoading(false);
+        e.target.reset();
       })
       .catch((e) => {
         setisLoading(false);
-        // alertify.set("notifier", "position", "top-center");
-        // alertify.error("An Error Occured");
+        toast.error("An Error Occured");
         console.log(e);
       });
   };
@@ -123,8 +116,9 @@ const EndShiftForm = (props) => {
         id="endShiftForm"
         onSubmit={handleSubmit}
         autoComplete="off"
+        className="shiftDetailsForm"
       >
-        <div className="closeForm" onClick={handleCloseEndShiftForm}>
+        <div className="closeForm" onClick={closeForms}>
           <Icon path={mdiCloseThick} size={1} />
         </div>
         <h2>Close Shift</h2>

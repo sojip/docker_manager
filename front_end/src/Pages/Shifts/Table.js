@@ -6,9 +6,10 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { DateTime } from "luxon";
 import uuid from "react-uuid";
+import { SelectedShiftContext } from "./Shifts";
 
 const columns = [
   { id: "type", label: "Type", minWidth: 100 },
@@ -66,7 +67,7 @@ export default function StickyHeadTable(props) {
   const { shifts } = props;
   const { handleOpen } = props;
   const { setshowShift } = props;
-  const { setselectedid } = props;
+  const { setselectedshift } = useContext(SelectedShiftContext);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -78,10 +79,10 @@ export default function StickyHeadTable(props) {
   };
 
   function handleClick(e) {
-    console.log(e.currentTarget.id);
     handleOpen();
     setshowShift(true);
-    setselectedid(e.currentTarget.id);
+    // setselectedshift(e.currentTarget.id);
+    setselectedshift(shifts.find((shift) => shift._id === e.currentTarget.id));
   }
 
   return (

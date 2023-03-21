@@ -45,7 +45,6 @@ module.exports.createDocker = async function (req, res, next) {
 };
 
 module.exports.getAllDockers = function (req, res, next) {
-  // console.log(req.user);
   Docker.find({}, function (err, dockers) {
     if (err) return next(err);
     return res.json(dockers);

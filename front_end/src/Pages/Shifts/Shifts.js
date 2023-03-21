@@ -2,20 +2,23 @@ import "../../styles/Shifts.css";
 import TextField from "@mui/material/TextField";
 import Icon from "@mdi/react";
 import { mdiPlusCircle } from "@mdi/js";
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext } from "react";
 import StickyHeadTable from "./Table";
 import AddShiftForm from "./AddShiftForm";
 import ShiftDetails from "./ShiftDetails";
 import { toast, ToastContainer } from "react-toastify";
 
+export const ShiftsContext = createContext();
+export const SelectedShiftContext = createContext();
+
 const Shifts = (props) => {
   const { setisLoading } = props;
   const [shifts, setshifts] = useState([]);
   const [searchShiftsResults, setsearchShiftsResults] = useState([]);
+  const [selected_shift, setselectedshift] = useState({});
   const [open, setOpen] = useState(false);
   const [addShift, setaddShift] = useState(false);
   const [showShift, setshowShift] = useState(false);
-  const [selected_id, setselectedid] = useState({});
   let handleOpen = () => {
     setOpen(true);
     document.querySelector("body").style.overflowY = "hidden";
@@ -93,57 +96,58 @@ const Shifts = (props) => {
   }, [shifts]);
 
   return (
-    <div className="shiftsContainer">
-      <h3>Shifts</h3>
-      <div className="oulinedButtonWrapper" onClick={handleAddShiftClick}>
-        <Icon path={mdiPlusCircle} size={1} />
-        Start New Shift
-      </div>
-      <div className="searchWrapper">
-        <TextField
-          type="date"
-          id="searchshift"
-          helperText="Select A Date"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          onChange={handleSearch}
-        />
-      </div>
-      {searchShiftsResults.length > 0 ? (
-        <div className="table">
-          <StickyHeadTable
-            shifts={searchShiftsResults}
-            handleOpen={handleOpen}
-            setshowShift={setshowShift}
-            setselectedid={setselectedid}
-          />
-        </div>
-      ) : (
-        <div className="noDatasInfos">No Shifts ...</div>
-      )}
-      {open && (
-        <div className="modal">
-          <ToastContainer />
-          {addShift && (
-            <AddShiftForm
-              setisLoading={setisLoading}
-              handleClose={handleClose}
-              setshifts={setshifts}
+    <ShiftsContext.Provider value={{ shifts, setshifts }}>
+      <SelectedShiftContext.Provider
+        value={{ selected_shift, setselectedshift }}
+      >
+        <div className="shiftsContainer">
+          <h3>Shifts</h3>
+          <div className="oulinedButtonWrapper" onClick={handleAddShiftClick}>
+            <Icon path={mdiPlusCircle} size={1} />
+            Start New Shift
+          </div>
+          <div className="searchWrapper">
+            <TextField
+              type="date"
+              id="searchshift"
+              helperText="Select A Date"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              onChange={handleSearch}
             />
+          </div>
+          {searchShiftsResults.length > 0 ? (
+            <div className="table">
+              <StickyHeadTable
+                shifts={searchShiftsResults}
+                handleOpen={handleOpen}
+                setshowShift={setshowShift}
+              />
+            </div>
+          ) : (
+            <div className="noDatasInfos">No Shifts ...</div>
           )}
-          {showShift && (
-            <ShiftDetails
-              setisLoading={setisLoading}
-              handleClose={handleClose}
-              selected_id={selected_id}
-              shifts={shifts}
-              setshifts={setshifts}
-            />
+          {open && (
+            <div className="modal">
+              <ToastContainer />
+              {addShift && (
+                <AddShiftForm
+                  setisLoading={setisLoading}
+                  handleClose={handleClose}
+                />
+              )}
+              {showShift && (
+                <ShiftDetails
+                  setisLoading={setisLoading}
+                  handleClose={handleClose}
+                />
+              )}
+            </div>
           )}
         </div>
-      )}
-    </div>
+      </SelectedShiftContext.Provider>
+    </ShiftsContext.Provider>
   );
 };
 

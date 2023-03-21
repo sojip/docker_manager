@@ -14,14 +14,16 @@ import Checkbox from "@mui/material/Checkbox";
 import "../../styles/AddShiftForm.css";
 import useAuthContext from "../../auth/useAuthContext";
 import { toast } from "react-toastify";
+import { useContext } from "react";
+import { ShiftsContext } from "./Shifts";
 
 const AddShiftForm = (props) => {
   const auth = useAuthContext();
   const [datas, setdatas] = useState({ type: "", startdate: "" });
   const [time, settime] = useState("");
   const [workers, setworkers] = useState([]);
+  const { setshifts } = useContext(ShiftsContext);
   let { handleClose } = props;
-  let { setshifts } = props;
   let { setisLoading } = props;
 
   let style = {

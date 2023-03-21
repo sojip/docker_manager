@@ -1,7 +1,7 @@
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import Box from "@mui/material/Box";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { DateTime } from "luxon";
 import "../../styles/ShiftDetails.css";
 import { mdiPauseOctagonOutline, mdiAccountHardHatOutline } from "@mdi/js";
@@ -17,22 +17,14 @@ import { mdiCheckboxMultipleMarked } from "@mdi/js";
 import { mdiCheckboxMultipleBlank } from "@mdi/js";
 import { Settings } from "luxon";
 import { toast } from "react-toastify";
+import { SelectedShiftContext } from "./Shifts";
 
 Settings.defaultZone = "UTC+1";
 
 const ShiftsDetails = (props) => {
   const { handleClose } = props;
   const { setisLoading } = props;
-  const { setshifts } = props;
-  const { shifts } = props;
-  const { selected_id } = props;
-  const [shift, setshift] = useState({
-    type: "",
-    startdate: "",
-    enddate: "",
-    duration: "",
-    status: "",
-  });
+  const { selected_shift } = useContext(SelectedShiftContext);
   const [shiftinstances, setshiftinstances] = useState([]);
   const [instancesSearchResults, setinstancesSearchResults] = useState([]);
   const [interruptions, setinterruptions] = useState([]);
@@ -40,16 +32,8 @@ const ShiftsDetails = (props) => {
   const [addInterruption, setaddInterruption] = useState(false);
   const [endShift, setendShift] = useState(false);
 
-  async function getShift(signal) {
-    const res = await fetch(`/api/shifts/${selected_id}`, {
-      signal: signal,
-    });
-    const datas = await res.json();
-    return datas;
-  }
-
   async function getShiftInstances(signal) {
-    const res = await fetch(`/api/shifts/${selected_id}/workers`, {
+    const res = await fetch(`/api/shifts/${selected_shift._id}/workers`, {
       signal: signal,
     });
     const datas = await res.json();
@@ -57,7 +41,7 @@ const ShiftsDetails = (props) => {
   }
 
   async function getInterruptions(signal) {
-    const res = await fetch(`/api/shifts/${selected_id}/interruptions`, {
+    const res = await fetch(`/api/shifts/${selected_shift._id}/interruptions`, {
       signal: signal,
     });
     const datas = await res.json();
@@ -94,26 +78,18 @@ const ShiftsDetails = (props) => {
     );
   };
 
-  const handleCloseAddInterruptionForm = () => {
-    let form = document.querySelector("#addInterruptionForm");
-    form.reset();
-    setshiftinstances(
-      shiftinstances.map((instance) => {
-        return { ...instance, checked: false };
-      })
-    );
-    setaddInterruption(false);
-  };
-
-  const handleCloseEndShiftForm = () => {
-    let form = document.querySelector("#endShiftForm");
-    form.reset();
+  const closeForms = () => {
+    let forms = document.querySelectorAll(".shiftDetailsForm");
+    forms.forEach((form) => {
+      form.reset();
+    });
     setshiftinstances(
       shiftinstances.map((instance) => {
         return { ...instance, checked: false };
       })
     );
     setendShift(false);
+    setaddInterruption(false);
   };
 
   const handleCheckboxChange = (e) => {
@@ -159,26 +135,18 @@ const ShiftsDetails = (props) => {
   };
 
   useEffect(() => {
-    console.log(Settings.defaultZone);
     setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
 
-    window.addEventListener("click", closeInterruptionDetails);
-
-    Promise.all([
-      getShift(signal),
-      getShiftInstances(signal),
-      getInterruptions(signal),
-    ])
+    Promise.all([getShiftInstances(signal), getInterruptions(signal)])
       .then((datas) => {
-        setshift(datas[0]);
         setshiftinstances(
-          datas[1].map((instance) => {
+          datas[0].map((instance) => {
             return { ...instance, checked: false };
           })
         );
-        setinterruptions(datas[2]);
+        setinterruptions(datas[1]);
         setisLoading(false);
       })
       .catch((e) => {
@@ -188,6 +156,7 @@ const ShiftsDetails = (props) => {
         }
       });
 
+    window.addEventListener("click", closeInterruptionDetails);
     return () => {
       controller.abort();
       window.removeEventListener("click", closeInterruptionDetails);
@@ -230,7 +199,7 @@ const ShiftsDetails = (props) => {
         <Icon path={mdiCloseThick} size={1} />
       </div>
       <h3>General</h3>
-      {shift.status === "opened" && (
+      {selected_shift.status === "opened" && (
         <div className="callToActions">
           <div
             className="oulinedButtonWrapper"
@@ -245,57 +214,55 @@ const ShiftsDetails = (props) => {
           </div>
         </div>
       )}
-      {addInterruption && shift.status === "opened" && (
+      {selected_shift.status === "opened" && addInterruption && (
         <AddInterruptionForm
-          selected_id={selected_id}
-          handleCloseAddInterruptionForm={handleCloseAddInterruptionForm}
           handleCheckboxChange={handleCheckboxChange}
           shiftinstances={shiftinstances}
           setshiftinstances={setshiftinstances}
-          interruptions={interruptions}
           setinterruptions={setinterruptions}
           setisLoading={setisLoading}
+          closeForms={closeForms}
         />
       )}
-      {endShift && shift.status === "opened" && (
+      {selected_shift.status === "opened" && endShift && (
         <EndShiftForm
-          selected_id={selected_id}
-          handleCloseEndShiftForm={handleCloseEndShiftForm}
           handleCheckboxChange={handleCheckboxChange}
           shiftinstances={shiftinstances}
           setshiftinstances={setshiftinstances}
-          shifts={shifts}
-          setshifts={setshifts}
-          setshift={setshift}
           setisLoading={setisLoading}
+          closeForms={closeForms}
         />
       )}
 
       <div className="generalInfos">
-        <div>Shift {shift.type}</div>
+        <div>Shift {selected_shift.type}</div>
         <div>
           Start On{" "}
-          {DateTime.fromISO(shift.startdate).setLocale("fr").toLocaleString({
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "numeric",
-            minute: "2-digit",
-          })}
+          {DateTime.fromISO(selected_shift.startdate)
+            .setLocale("fr")
+            .toLocaleString({
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            })}
         </div>
         <div>
           End On{" "}
-          {DateTime.fromISO(shift.enddate).setLocale("fr").toLocaleString({
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "numeric",
-            minute: "2-digit",
-          })}
+          {DateTime.fromISO(selected_shift.enddate)
+            .setLocale("fr")
+            .toLocaleString({
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            })}
         </div>
       </div>
       <h3>Workers</h3>
-      {shift.status === "closed" && (
+      {selected_shift.status === "closed" && (
         <FormControl>
           <RadioGroup
             row
