@@ -1,6 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 :root {
-  /* --orange-color: #f97316; */
   --orange-color: #fb923c;
   --orange-white-color: #fff7ed;
 }
@@ -21,7 +19,6 @@ body {
   width: 100%;
   height: 100%;
   margin: 0;
-  /* font-family: "Roboto", sans-serif; */
   font-family: "Ubuntu", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

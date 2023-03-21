@@ -1,0 +1,47 @@
+.statsContainer {
+  background-image: url(../img/undraw_under_construction_-46-pa.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  /* border: solid 2px red; */
+  height: 87.5vh;
+  background-color: white;
+  background-blend-mode: darken;
+  position: relative;
+}
+
+.statsContainer h3 {
+  margin-top: 0;
+}
+
+.marquee {
+  height: 2rem;
+  overflow: hidden;
+  position: relative;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.marquee div {
+  width: 200%;
+  /* border: solid 1px blue; */
+  position: absolute;
+  overflow: hidden;
+  animation: marquee 7s linear infinite;
+  height: 30px;
+  text-align: right;
+}
+.marquee span {
+  float: left;
+  width: 50%;
+  font-size: 2rem;
+}
+
+@keyframes marquee {
+  from {
+    left: 0;
+  }
+  to {
+    left: -100%;
+  }
+}

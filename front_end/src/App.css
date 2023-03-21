@@ -9,7 +9,6 @@
   padding-right: 1vw;
   transition: all 300ms;
   overflow-x: hidden;
-  /* border: solid 1px red; */
 }
 
 .main::after {

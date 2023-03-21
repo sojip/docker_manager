@@ -4,7 +4,7 @@ nav {
   left: 0;
   bottom: 0;
   /* padding: 0 1vw; */
-  padding-top: 12vh;
+  padding-top: 10.5vh;
   height: 100vh;
   width: calc(24px + 2vw);
   transition: width 300ms;
