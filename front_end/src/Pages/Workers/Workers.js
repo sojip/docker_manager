@@ -46,8 +46,8 @@ const Workers = (props) => {
   }
 
   let search = (arr, str) => {
-    return arr.filter((x) =>
-      [x.firstname, x.lastname, x.cni]
+    return arr.filter((el) =>
+      [el.firstname, el.lastname, el.cni]
         .join(" ")
         .toLowerCase()
         .includes(str.toLowerCase())
@@ -55,7 +55,8 @@ const Workers = (props) => {
   };
 
   function handleSearch(e) {
-    let value = e.target.value;
+    let value =
+      e?.target.value || document.querySelector("#searchworker").value;
     if (value !== "") {
       return setsearchWorkersResults(search(workers, value));
     }
@@ -73,18 +74,9 @@ const Workers = (props) => {
         Authorization: `Bearer ${auth.user.access_token}`,
       },
     })
-      .then((res) => {
-        if (res.status === 401) {
-          toast.error("Unauthorized");
-          return;
-        }
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((workers) => {
-        if (workers !== undefined) {
-          setworkers(workers);
-          setsearchWorkersResults(workers);
-        }
+        setworkers(workers);
         setisLoading(false);
       })
       .catch((e) => {
@@ -98,6 +90,10 @@ const Workers = (props) => {
       controller.abort();
     };
   }, []);
+
+  useEffect(() => {
+    handleSearch();
+  }, [workers]);
 
   return (
     <div className="workerscontainer">
@@ -120,44 +116,42 @@ const Workers = (props) => {
         />
       </div>
       {searchWorkersResults.length > 0 ? (
-        <>
-          <div className="workersGrid">
-            {searchWorkersResults.map((worker) => {
-              return (
-                <div
-                  className="workerCard"
-                  key={worker._id}
-                  id={worker._id}
-                  onClick={handleShowWorkerClick}
-                >
-                  <div className="profileContainer">
-                    <Icon
-                      className="workerIcon"
-                      path={mdiAccountHardHatOutline}
-                      size={2.5}
-                    />
-                    <div className="name">
-                      <div>{worker.firstname}</div>
-                      <div>{worker.lastname}</div>
-                    </div>
+        <div className="workersGrid">
+          {searchWorkersResults.map((worker) => {
+            return (
+              <div
+                className="workerCard"
+                key={worker._id}
+                id={worker._id}
+                onClick={handleShowWorkerClick}
+              >
+                <div className="profileContainer">
+                  <Icon
+                    className="workerIcon"
+                    path={mdiAccountHardHatOutline}
+                    size={2.5}
+                  />
+                  <div className="name">
+                    <div>{worker.firstname}</div>
+                    <div>{worker.lastname}</div>
                   </div>
-                  <div>
-                    Born On{" "}
-                    {DateTime.fromISO(worker.dateofbirth)
-                      .setLocale("fr")
-                      .toLocaleString({
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                  </div>
-                  {worker.cni && <div>CNI N° {worker.cni}</div>}
-                  <div className="seemore">See More</div>
                 </div>
-              );
-            })}
-          </div>
-        </>
+                <div>
+                  Born On{" "}
+                  {DateTime.fromISO(worker.dateofbirth)
+                    .setLocale("fr")
+                    .toLocaleString({
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                </div>
+                {worker.cni && <div>CNI N° {worker.cni}</div>}
+                <div className="seemore">See More</div>
+              </div>
+            );
+          })}
+        </div>
       ) : (
         <div className="noDatasInfos">No Workers ...</div>
       )}
@@ -168,7 +162,6 @@ const Workers = (props) => {
               handleClose={handleClose}
               setisLoading={setisLoading}
               setworkers={setworkers}
-              setsearchWorkersResults={setsearchWorkersResults}
             />
           )}
           {showWorker && (

@@ -12,20 +12,25 @@ import MenuItem from "@mui/material/MenuItem";
 import { TextField } from "@mui/material";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { ShiftsContext } from "./Shifts";
 import { SelectedShiftContext } from "./Shifts";
 import { toast } from "react-toastify";
 
 const EndShiftForm = (props) => {
-  const { closeForms } = props;
-  const { handleCheckboxChange } = props;
-  const { shiftinstances } = props;
-  const { setshiftinstances } = props;
-  const { setisLoading } = props;
+  const { GLOBAL_STATE, dispatch, setisLoading } = props;
   const { shifts, setshifts } = useContext(ShiftsContext);
   const { selected_shift, setselectedshift } = useContext(SelectedShiftContext);
   const [formdatas, setformdatas] = useState({});
+  const [shiftinstances, setshiftinstances] = useState(
+    GLOBAL_STATE.shiftinstances.map((instance) => {
+      return { ...instance, checked: false };
+    })
+  );
+
+  useEffect(() => {
+    console.log(formdatas);
+  }, [formdatas]);
 
   async function endShift(instance) {
     const res = await fetch(`/api/shiftinstances/${instance._id}/shift`, {
@@ -43,13 +48,10 @@ const EndShiftForm = (props) => {
     let name = e.target.name;
     let value = e.target.value;
     if (dataset !== undefined) {
-      let selectedinstance = shiftinstances.find((instance) => {
-        return instance._id === dataset.instance;
-      });
       return setformdatas({
         ...formdatas,
-        [selectedinstance._id]: {
-          ...formdatas[selectedinstance._id],
+        [dataset.instance]: {
+          ...formdatas[dataset.instance],
           [name]: value,
         },
       });
@@ -63,25 +65,33 @@ const EndShiftForm = (props) => {
     });
   };
 
+  const handleCheckboxChange = (e) => {
+    setshiftinstances(
+      shiftinstances.map((instance) => {
+        if (instance.docker._id === e.target.id)
+          instance.checked = !instance.checked;
+        return instance;
+      })
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setisLoading(true);
     let selectedInstances = shiftinstances.filter(
       (instance) => instance.checked === true
     );
+    if (selectedInstances.length === 0) return;
     Promise.all(
       selectedInstances.map((instance) => {
         return endShift(instance);
       })
     )
       .then((newInstances) => {
+        dispatch({ type: "END_SHIFT_INSTANCES", payload: newInstances });
         setshiftinstances(
-          shiftinstances.map((shiftinstance) => {
-            let instance = newInstances.find(
-              (instance) => instance._id === shiftinstance._id
-            );
-            if (instance) return { ...instance, checked: false };
-            return { ...shiftinstance, checked: false };
+          shiftinstances.map((instance) => {
+            return { ...instance, checked: false };
           })
         );
       }) //Change the status of the shift
@@ -89,11 +99,11 @@ const EndShiftForm = (props) => {
         const res = await fetch(`/api/shifts/${selected_shift._id}`, {
           method: "PUT",
         });
-        const _shift = await res.json();
-        setselectedshift(_shift);
+        const shift = await res.json();
+        setselectedshift(shift);
         setshifts(
           shifts.map((_shift) => {
-            if (_shift._id === selected_shift._id) return { ...selected_shift };
+            if (_shift._id === shift._id) return { ...shift };
             return { ..._shift };
           })
         );
@@ -118,7 +128,15 @@ const EndShiftForm = (props) => {
         autoComplete="off"
         className="shiftDetailsForm"
       >
-        <div className="closeForm" onClick={closeForms}>
+        <div
+          className="closeForm"
+          onClick={() => {
+            dispatch({
+              type: "TOGGLE_ENDSHIFT_FORM",
+              payload: false,
+            });
+          }}
+        >
           <Icon path={mdiCloseThick} size={1} />
         </div>
         <h2>Close Shift</h2>
@@ -158,13 +176,15 @@ const EndShiftForm = (props) => {
                           labelId="opsTypeLabel"
                           id="opsTypeSelect"
                           value={
-                            formdatas[instance._id] !== undefined &&
-                            formdatas[instance._id].opsType !== undefined
+                            formdatas[instance._id]?.opsType !== undefined
                               ? formdatas[instance._id].opsType
                               : ""
                           }
                           label="Operation Type"
                           name="opsType"
+                          inputProps={{
+                            "data-instance": instance._id,
+                          }}
                           onChange={(e) => {
                             handleOpsDetailsChange(e, {
                               instance: instance._id,
@@ -178,9 +198,7 @@ const EndShiftForm = (props) => {
                           </MenuItem>
                         </Select>
                       </FormControl>
-
-                      {formdatas[instance._id] !== undefined &&
-                      formdatas[instance._id].opsType === "navire" ? (
+                      {formdatas[instance._id]?.opsType === "navire" ? (
                         <TextField
                           id="vesselname"
                           label="Vessel"

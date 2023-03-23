@@ -62,7 +62,6 @@ const WorkerDetails = (props) => {
       .then((datas) => {
         setworker(datas[0]);
         setshiftsinstances(datas[1]);
-        setsearchresults(datas[1]);
         setisLoading(false);
       })
       .catch((e) => {
@@ -172,7 +171,7 @@ const WorkerDetails = (props) => {
 
   useEffect(() => {
     handleSearchAndFilter(filterby);
-  }, [filterby]);
+  }, [filterby, shiftsinstances]);
 
   const handleChange = (e) => {
     let name = e.target.name;
@@ -383,27 +382,18 @@ const WorkerDetails = (props) => {
                           />
                         )}
                       </div>
-                      {instance.operation && instance.operation.type && (
-                        <div>Operation Type {instance.operation.type}</div>
-                      )}
-                      {instance.operation && instance.operation.vessel && (
-                        <div>Operation Vessel {instance.operation.vessel}</div>
-                      )}
-                      {instance.operation && instance.operation.position && (
-                        <div>
-                          Operation Position {instance.operation.position}
-                        </div>
-                      )}
-                      {instance.operation && instance.operation.description && (
-                        <div>
-                          Operation Description <br />{" "}
-                          {instance.operation.description}
-                        </div>
-                      )}
+                      <div>Operation Type {instance.operation?.type}</div>
+                      <div>Operation Vessel {instance.operation?.vessel}</div>
+                      <div>
+                        Operation Position {instance.operation?.position}
+                      </div>
+                      <div>
+                        Operation Description <br />{" "}
+                        {instance.operation?.description}
+                      </div>
                     </div>
-                    {instance.startedshift &&
-                      instance.endedshift &&
-                      instance.interruptions && (
+                    {instance.endedshift ? (
+                      instance.interruptions ? (
                         <div className="timeworked">
                           Time Worked{" "}
                           {instance.shift.duration -
@@ -413,20 +403,17 @@ const WorkerDetails = (props) => {
                             )}{" "}
                           mins
                         </div>
-                      )}
-                    {instance.startedshift &&
-                      instance.endedshift &&
-                      !instance.interruptions && (
+                      ) : (
                         <div className="timeworked">
                           Time Worked {instance.shift.duration} mins
                         </div>
-                      )}
-                    {instance.startedshift && !instance.endedshift && (
+                      )
+                    ) : (
                       <div className="timeworked">Shift Not Ended</div>
                     )}
-                    {instance.interruptions !== undefined &&
-                    instance.interruptions.length ? (
-                      <div>
+
+                    {instance.interruptions?.length > 0 ? (
+                      <>
                         <div style={{ marginTop: "5px", fontWeight: "bold" }}>
                           INTERRUPTIONS - INCIDENTS
                         </div>
@@ -445,7 +432,7 @@ const WorkerDetails = (props) => {
                             );
                           })}
                         </ul>
-                      </div>
+                      </>
                     ) : (
                       <div
                         className="noDatasInfos"

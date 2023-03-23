@@ -30,11 +30,11 @@ export default function SignIn(props) {
       .then((res) => res.json())
       .then((datas) => {
         if (!datas.user) {
+          console.log(datas);
           toast.error(datas.message);
           setisLoading(false);
           return;
         }
-        toast.success("Logged In Successfully");
         auth.setuser({
           id: datas.user._id,
           username: datas.user.username,

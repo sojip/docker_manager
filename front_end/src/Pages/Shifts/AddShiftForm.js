@@ -116,10 +116,9 @@ const AddShiftForm = (props) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.message) {
+        if (data.error) {
           setisLoading(false);
-          toast.error(data.message);
-          return;
+          throw Error(data.error.message);
         }
         setshifts((shifts) => [data, ...shifts]);
         return Promise.all(
@@ -129,22 +128,20 @@ const AddShiftForm = (props) => {
         );
       })
       .then((result) => {
-        if (result !== null && result !== undefined) {
-          e.target.reset();
-          setdatas({ type: "", startdate: "" });
-          settime("");
-          setisLoading(false);
-          toast.success("New Shift Added Successfully");
-          setworkers(
-            workers.map((worker) => {
-              return { ...worker, checked: false };
-            })
-          );
-        }
+        e.target.reset();
+        setdatas({ type: "", startdate: "" });
+        settime("");
+        setisLoading(false);
+        toast.success("New Shift Added Successfully");
+        setworkers(
+          workers.map((worker) => {
+            return { ...worker, checked: false };
+          })
+        );
       })
       .catch((e) => {
         setisLoading(false);
-        toast.error("An Error Occured");
+        toast.error(e.message);
         console.log(e);
       });
   }

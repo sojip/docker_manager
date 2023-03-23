@@ -1,7 +1,7 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
-import { mdiCloseThick } from "@mdi/js";
+import { mdiCloseThick, mdiInboxOutline } from "@mdi/js";
 import {
   TextField,
   FormControl,
@@ -16,14 +16,15 @@ import { SelectedShiftContext } from "./Shifts";
 
 const AddInterruptionForm = (props) => {
   const { selected_shift } = useContext(SelectedShiftContext);
-  const { closeForms } = props;
-  const { handleCheckboxChange } = props;
-  const { shiftinstances } = props;
-  const { setshiftinstances } = props;
-  const { setinterruptions } = props;
+  const { GLOBAL_STATE, dispatch } = props;
   const { setisLoading } = props;
+  const [shiftinstances, setshiftinstances] = useState(
+    GLOBAL_STATE.shiftinstances.map((instance) => {
+      return { ...instance, checked: false };
+    })
+  );
   const [datas, setdatas] = useState({});
-  const [selectall, setselectall] = useState(false);
+  const selectall = useRef();
   const shifttime =
     selected_shift.type === "jour"
       ? { startat: "07:00", endat: "19:00" }
@@ -36,6 +37,16 @@ const AddInterruptionForm = (props) => {
     let name = e.target.name;
     let value = e.target.value;
     setdatas({ ...datas, [name]: value });
+  };
+
+  const handleCheckboxChange = (e) => {
+    setshiftinstances(
+      shiftinstances.map((instance) => {
+        if (instance.docker._id === e.target.id)
+          instance.checked = !instance.checked;
+        return instance;
+      })
+    );
   };
 
   async function updateInstancesInterruptions(instance, interruption) {
@@ -57,20 +68,18 @@ const AddInterruptionForm = (props) => {
   }
 
   const handleSelectAll = (e) => {
-    const checked = !selectall;
-    setselectall(!selectall);
+    let checked = e.target.checked;
     if (checked) {
-      return setshiftinstances(
+      setshiftinstances(
         shiftinstances.map((instance) => {
-          instance.checked = true;
-          return instance;
+          return { ...instance, checked: true };
         })
       );
+      return;
     }
     setshiftinstances(
       shiftinstances.map((instance) => {
-        instance.checked = false;
-        return instance;
+        return { ...instance, checked: false };
       })
     );
   };
@@ -156,16 +165,15 @@ const AddInterruptionForm = (props) => {
       .then((result) => {
         let interruption = result[result.length - 1];
         interruption.instances = result.slice(0, -1);
-        setinterruptions((interruptions) => [...interruptions, interruption]);
-        e.target.reset();
+        dispatch({ type: "PUSH_INTERRUPTION", payload: interruption });
         toast.success("New Interruption Added Succesffully");
+        setisLoading(false);
+        e.target.reset();
         setshiftinstances(
           shiftinstances.map((instance) => {
             return { ...instance, checked: false };
           })
         );
-        setselectall(false);
-        setisLoading(false);
       })
       .catch((e) => {
         setisLoading(false);
@@ -183,7 +191,12 @@ const AddInterruptionForm = (props) => {
         onSubmit={handleSubmit}
         className="shiftDetailsForm"
       >
-        <div className="closeForm" onClick={closeForms}>
+        <div
+          className="closeForm"
+          onClick={() => {
+            dispatch({ type: "TOGGLE_INTERRUPTION_FORM", payload: false });
+          }}
+        >
           <Icon path={mdiCloseThick} size={1} />
         </div>
         <h2>Add Interruption</h2>
@@ -246,9 +259,9 @@ const AddInterruptionForm = (props) => {
             <FormControlLabel
               control={
                 <Checkbox
-                  id={"selectall"}
-                  checked={selectall}
+                  id="selectall"
                   onChange={handleSelectAll}
+                  ref={selectall}
                 />
               }
               label={`Everybody`}

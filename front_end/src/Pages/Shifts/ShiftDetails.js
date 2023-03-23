@@ -1,7 +1,7 @@
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import Box from "@mui/material/Box";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useReducer } from "react";
 import { DateTime } from "luxon";
 import "../../styles/ShiftDetails.css";
 import { mdiPauseOctagonOutline, mdiAccountHardHatOutline } from "@mdi/js";
@@ -18,6 +18,7 @@ import { mdiCheckboxMultipleBlank } from "@mdi/js";
 import { Settings } from "luxon";
 import { toast } from "react-toastify";
 import { SelectedShiftContext } from "./Shifts";
+import { INITIAL_STATE, detailsReducer } from "./shiftDetailsReducer";
 
 Settings.defaultZone = "UTC+1";
 
@@ -25,12 +26,9 @@ const ShiftsDetails = (props) => {
   const { handleClose } = props;
   const { setisLoading } = props;
   const { selected_shift } = useContext(SelectedShiftContext);
-  const [shiftinstances, setshiftinstances] = useState([]);
-  const [instancesSearchResults, setinstancesSearchResults] = useState([]);
-  const [interruptions, setinterruptions] = useState([]);
+  const [GLOBAL_STATE, dispatch] = useReducer(detailsReducer, INITIAL_STATE);
   const [filterby, setfilterby] = useState("all");
-  const [addInterruption, setaddInterruption] = useState(false);
-  const [endShift, setendShift] = useState(false);
+  const [instancesSearchResults, setinstancesSearchResults] = useState([]);
 
   async function getShiftInstances(signal) {
     const res = await fetch(`/api/shifts/${selected_shift._id}/workers`, {
@@ -59,47 +57,11 @@ const ShiftsDetails = (props) => {
   }
 
   const handleAddInterruptionClick = () => {
-    setendShift(false);
-    setaddInterruption(true);
-    setshiftinstances(
-      shiftinstances.map((instance) => {
-        return { ...instance, checked: false };
-      })
-    );
+    dispatch({ type: "TOGGLE_INTERRUPTION_FORM", payload: true });
   };
 
   const handleEndShiftClick = () => {
-    setendShift(true);
-    setaddInterruption(false);
-    setshiftinstances(
-      shiftinstances.map((instance) => {
-        return { ...instance, checked: false };
-      })
-    );
-  };
-
-  const closeForms = () => {
-    let forms = document.querySelectorAll(".shiftDetailsForm");
-    forms.forEach((form) => {
-      form.reset();
-    });
-    setshiftinstances(
-      shiftinstances.map((instance) => {
-        return { ...instance, checked: false };
-      })
-    );
-    setendShift(false);
-    setaddInterruption(false);
-  };
-
-  const handleCheckboxChange = (e) => {
-    setshiftinstances(
-      shiftinstances.map((instance) => {
-        if (instance.docker._id === e.target.id)
-          instance.checked = !instance.checked;
-        return instance;
-      })
-    );
+    dispatch({ type: "TOGGLE_ENDSHIFT_FORM", payload: true });
   };
 
   const showInterruptionDetails = (e) => {
@@ -141,12 +103,11 @@ const ShiftsDetails = (props) => {
 
     Promise.all([getShiftInstances(signal), getInterruptions(signal)])
       .then((datas) => {
-        setshiftinstances(
-          datas[0].map((instance) => {
-            return { ...instance, checked: false };
-          })
-        );
-        setinterruptions(datas[1]);
+        dispatch({
+          type: "SET_INSTANCES",
+          payload: datas[0],
+        });
+        dispatch({ type: "SET_INTERRUPTIONS", payload: datas[1] });
         setisLoading(false);
       })
       .catch((e) => {
@@ -164,22 +125,27 @@ const ShiftsDetails = (props) => {
   }, []);
 
   useEffect(() => {
+    console.log("changing the search instances value");
     switch (filterby) {
       case "ended":
         setinstancesSearchResults(
-          shiftinstances.filter((instance) => instance.endedshift === true)
+          GLOBAL_STATE.shiftinstances.filter(
+            (instance) => instance.endedshift === true
+          )
         );
         break;
       case "notended":
         setinstancesSearchResults(
-          shiftinstances.filter((instance) => instance.endedshift !== true)
+          GLOBAL_STATE.shiftinstances.filter(
+            (instance) => instance.endedshift !== true
+          )
         );
         break;
       default:
-        setinstancesSearchResults(shiftinstances);
+        setinstancesSearchResults(GLOBAL_STATE.shiftinstances);
         break;
     }
-  }, [filterby, shiftinstances]);
+  }, [filterby, GLOBAL_STATE.shiftinstances]);
 
   return (
     <Box
@@ -214,23 +180,18 @@ const ShiftsDetails = (props) => {
           </div>
         </div>
       )}
-      {selected_shift.status === "opened" && addInterruption && (
+      {selected_shift.status === "opened" && GLOBAL_STATE.addInterruption && (
         <AddInterruptionForm
-          handleCheckboxChange={handleCheckboxChange}
-          shiftinstances={shiftinstances}
-          setshiftinstances={setshiftinstances}
-          setinterruptions={setinterruptions}
+          GLOBAL_STATE={GLOBAL_STATE}
+          dispatch={dispatch}
           setisLoading={setisLoading}
-          closeForms={closeForms}
         />
       )}
-      {selected_shift.status === "opened" && endShift && (
+      {selected_shift.status === "opened" && GLOBAL_STATE.endShift && (
         <EndShiftForm
-          handleCheckboxChange={handleCheckboxChange}
-          shiftinstances={shiftinstances}
-          setshiftinstances={setshiftinstances}
+          GLOBAL_STATE={GLOBAL_STATE}
+          dispatch={dispatch}
           setisLoading={setisLoading}
-          closeForms={closeForms}
         />
       )}
 
@@ -341,32 +302,23 @@ const ShiftsDetails = (props) => {
                       />
                     )}
                   </div>
-
-                  {instance.operation?.type && (
-                    <div className="operationdetails">
-                      <div>Operation Type</div>
-                      <div> {instance.operation.type}</div>
-                    </div>
-                  )}
-                  {instance.operation?.vessel && (
-                    <div className="operationdetails">
-                      <div>Operation Vessel</div>
-                      <div>{instance.operation.vessel}</div>
-                    </div>
-                  )}
-                  {instance.operation?.position && (
-                    <div className="operationdetails">
-                      <div>Operation Position</div>
-                      <div>{instance.operation.position}</div>
-                    </div>
-                  )}
-                </div>
-                {instance.operation?.description && (
                   <div className="operationdetails">
-                    <div>Operation description</div>
-                    <div>{instance.operation.description}</div>
+                    <div>Operation Type</div>
+                    <div> {instance.operation?.type}</div>
                   </div>
-                )}
+                  <div className="operationdetails">
+                    <div>Operation Vessel</div>
+                    <div>{instance.operation?.vessel}</div>
+                  </div>
+                  <div className="operationdetails">
+                    <div>Operation Position</div>
+                    <div>{instance.operation?.position}</div>
+                  </div>
+                </div>
+                <div className="operationdetails">
+                  <div>Operation description</div>
+                  <div>{instance.operation?.description}</div>
+                </div>
               </div>
             );
           })}
@@ -378,9 +330,9 @@ const ShiftsDetails = (props) => {
         Total workers {instancesSearchResults.length}
       </div>
       <h3>Interruptions / Incidents</h3>
-      {interruptions.length > 0 ? (
+      {GLOBAL_STATE.interruptions.length > 0 ? (
         <div className="interruptionsgrid">
-          {interruptions.map((interruption) => {
+          {GLOBAL_STATE.interruptions.map((interruption) => {
             return (
               <div
                 key={interruption._id}
