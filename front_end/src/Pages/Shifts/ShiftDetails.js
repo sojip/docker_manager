@@ -30,8 +30,6 @@ const ShiftsDetails = (props) => {
   const [filterby, setfilterby] = useState("all");
   const [instancesSearchResults, setinstancesSearchResults] = useState([]);
 
-  console.log(GLOBAL_STATE.interruptions);
-
   async function getShiftInstances(signal) {
     const res = await fetch(`/api/shifts/${selected_shift._id}/workers`, {
       signal: signal,
@@ -85,12 +83,20 @@ const ShiftsDetails = (props) => {
     const interruptionWorkers = document.querySelector(
       ".interruptionWorkers.show"
     );
-    if (
-      !target.classList.contains("interruptionItem") &&
-      !target.closest(".interruptionItem")
-    ) {
-      if (interruptionWorkers) interruptionWorkers.classList.remove("show");
+    if (interruptionWorkers) {
+      if (
+        !target.classList.contains("interruptionItem") &&
+        !target.closest(".interruptionItem")
+      ) {
+        interruptionWorkers.classList.remove("show");
+      }
     }
+    // if (
+    //   !target.classList.contains("interruptionItem") &&
+    //   !target.closest(".interruptionItem")
+    // ) {
+    //   if (interruptionWorkers) interruptionWorkers.classList.remove("show");
+    // }
   };
 
   const handleFilterChange = (e) => {

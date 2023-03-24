@@ -14,6 +14,7 @@ module.exports.createDocker = async function (req, res, next) {
     crypto.randomUUID() + "-" + filename.replace(extension, "jpeg");
   console.table(filenameCompressed);
   await sharp(req.file.path)
+    .rotate()
     .toFormat("jpeg", { mozjpeg: true })
     .toFile(path.resolve(req.file.destination, filenameCompressed));
   //save docker in database
