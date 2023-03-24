@@ -6,17 +6,17 @@ import "../styles/AppHeader.css";
 import { useEffect } from "react";
 import useAuthContext from "../auth/useAuthContext";
 
-const AppHeader = (props) => {
+const AppHeader = () => {
   const auth = useAuthContext();
-  const closeprofileOptions = (e) => {
-    let isopened = document.querySelector(".profileOptions.isopened");
-    let optionsButton = document.querySelector(".toggleOptions");
-    if (e.target !== optionsButton && !optionsButton.contains(e.target)) {
-      if (isopened !== null)
-        document.querySelector(".profileOptions").classList.remove("isopened");
-    }
-  };
+
   useEffect(() => {
+    function closeprofileOptions(e) {
+      let isopened = document.querySelector(".profileOptions.isopened");
+      let optionsButton = document.querySelector(".toggleOptions");
+      if (e.target !== optionsButton && !optionsButton.contains(e.target)) {
+        isopened?.classList.remove("isopened");
+      }
+    }
     window.addEventListener("click", closeprofileOptions);
     return () => {
       window.removeEventListener("click", closeprofileOptions);

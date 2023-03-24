@@ -41,9 +41,9 @@ let ProtectedSignIn = ({ children }) => {
 function App() {
   const [isLoading, setisLoading] = useState(false);
   return (
-    <AuthProvider>
-      <div className="App">
-        {isLoading && <Loader />}
+    <div className="App">
+      {isLoading && <Loader />}
+      <AuthProvider>
         <Router>
           <Routes>
             <Route
@@ -76,8 +76,8 @@ function App() {
             <Route path="*" element={<>test</>} />
           </Routes>
         </Router>
-      </div>
-    </AuthProvider>
+      </AuthProvider>
+    </div>
   );
 }
 

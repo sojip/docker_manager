@@ -1,9 +1,11 @@
 .App {
-  min-height: 100vh;
+  height: 100%;
+  position: relative;
+  /* border: solid 1px red; */
 }
 
 .main {
-  min-height: 100vh;
+  height: 100%;
   padding-top: 10.5vh;
   padding-left: calc(24px + 3vw);
   padding-right: 1vw;

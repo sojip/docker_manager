@@ -7,7 +7,7 @@
   height: 87.5vh;
   background-color: white;
   background-blend-mode: darken;
-  position: relative;
+  /* position: relative; */
 }
 
 .statsContainer h3 {

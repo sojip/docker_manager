@@ -9,9 +9,11 @@ module.exports.createShift = function (req, res, next) {
   Shift.find({ startdate: startdate }, function (err, shift) {
     if (err) return next(err);
     if (shift.length) {
-      return res
-        .status(400)
-        .json({ message: "Shift Already Exist, Please verify Date and Time" });
+      return res.status(400).json({
+        error: {
+          message: "Shift Already Exist, Please verify Date and Time",
+        },
+      });
     }
 
     var shift = new Shift({
@@ -19,9 +21,9 @@ module.exports.createShift = function (req, res, next) {
       startdate: startdate,
     });
 
-    shift.save(function (err, shift_) {
+    shift.save(function (err, shift) {
       if (err) return next(err);
-      return res.json(shift_);
+      return res.json(shift);
     });
   });
 };

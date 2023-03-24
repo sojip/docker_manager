@@ -31,14 +31,7 @@ module.exports.getShiftDockers = function (req, res, next) {
 
 module.exports.getDockerShifts = function (req, res, next) {
   var id = req.params.id;
-  ShiftInstance.find(
-    { docker: mongoose.Types.ObjectId(id) },
-    {
-      sort: {
-        "shift.startdate": 1,
-      },
-    }
-  )
+  ShiftInstance.find({ docker: mongoose.Types.ObjectId(id) })
     .populate("shift interruptions")
     .exec(function (err, shifts) {
       if (err) return next(err);
