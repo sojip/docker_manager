@@ -73,7 +73,7 @@ function App() {
                 </ProtectedSignIn>
               }
             />
-            <Route path="*" element={<>test</>} />
+            <Route path="*" element={<>ERROR</>} />
           </Routes>
         </Router>
       </AuthProvider>

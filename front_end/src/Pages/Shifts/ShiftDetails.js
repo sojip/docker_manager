@@ -30,6 +30,8 @@ const ShiftsDetails = (props) => {
   const [filterby, setfilterby] = useState("all");
   const [instancesSearchResults, setinstancesSearchResults] = useState([]);
 
+  console.log(GLOBAL_STATE.interruptions);
+
   async function getShiftInstances(signal) {
     const res = await fetch(`/api/shifts/${selected_shift._id}/workers`, {
       signal: signal,
@@ -354,12 +356,11 @@ const ShiftsDetails = (props) => {
                   </div>
 
                   <ul>
-                    {interruption.instances &&
-                      interruption.instances.map((instance) => (
-                        <li
-                          key={instance._id}
-                        >{`${instance.docker.firstname} ${instance.docker.lastname}`}</li>
-                      ))}
+                    {interruption.instances?.map((instance) => (
+                      <li
+                        key={instance._id}
+                      >{`${instance.docker.firstname} ${instance.docker.lastname}`}</li>
+                    ))}
                   </ul>
                 </div>
               </div>
