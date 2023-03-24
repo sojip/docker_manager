@@ -31,7 +31,7 @@ app.use(cookieParser());
 app.use("/api", apiRouter);
 
 //indicate react app folder
-// app.use(express.static(path.join(__dirname, "./front_end/build")));
+app.use(express.static(path.join(__dirname, "./front_end/build")));
 app.use(express.static(path.join(__dirname, "./public")));
 
 // catch 404 and forward to error handler
@@ -51,9 +51,9 @@ app.use(function (err, req, res, next) {
   res.send("error");
 });
 
-//serve react
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "front_end", "build", "index.html"));
-// });
+// serve react
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "front_end", "build", "index.html"));
+});
 
 module.exports = app;
