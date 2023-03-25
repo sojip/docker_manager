@@ -63,6 +63,7 @@ const WorkerDetails = (props) => {
     Promise.all([getWorker(id, signal), getshiftsinstances(id, signal)])
       .then((datas) => {
         setworker(datas[0]);
+        console.log(datas[0]);
         setshiftsinstances(datas[1]);
         setisLoading(false);
       })

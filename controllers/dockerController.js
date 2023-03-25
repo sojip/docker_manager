@@ -24,7 +24,7 @@ module.exports.createDocker = async function (req, res, next) {
   var position = req.body.position;
   var cni = req.body.cni;
   var fingerprint = req.body.fingerprint || undefined;
-  var photo = req.file.destination.replace("/public", "") + filenameCompressed;
+  var photo = req.file.destination.replace("./public", "") + filenameCompressed;
   console.table(photo);
 
   var docker = new Docker({

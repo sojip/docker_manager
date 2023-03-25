@@ -71,6 +71,6 @@
   /* overflow-y: hidden; */
 }
 
-.modal-content.content-wrapper {
+.content-wrapper {
   background-color: transparent !important;
 }
