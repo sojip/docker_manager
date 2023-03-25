@@ -10,6 +10,9 @@ import { DateTime } from "luxon";
 import useAuthContext from "../../auth/useAuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Button } from "react-bootstrap";
+// import "bootstrap/dist/css/bootstrap.min.css";
+import Modal from "react-bootstrap/Modal";
 
 const Workers = (props) => {
   const { setisLoading } = props;
@@ -23,14 +26,14 @@ const Workers = (props) => {
 
   const handleOpen = () => {
     setOpen(true);
-    document.querySelector("body").style.overflowY = "hidden";
+    // document.querySelector("body").style.overflowY = "hidden";
   };
 
   const handleClose = () => {
     setOpen(false);
     setaddWorker(false);
     setshowWorker(false);
-    document.querySelector("body").style.overflowY = "auto";
+    // document.querySelector("body").style.overflowY = "auto";
     setselectedid("");
   };
 
@@ -155,7 +158,7 @@ const Workers = (props) => {
       ) : (
         <div className="noDatasInfos">No Workers ...</div>
       )}
-      {open && (
+      {/* {open && (
         <div className="modal">
           {addWorker && (
             <AddWorkerForm
@@ -172,6 +175,34 @@ const Workers = (props) => {
             />
           )}
         </div>
+      )} */}
+      {open && (
+        <>
+          <Modal
+            backdrop="static"
+            show={addWorker}
+            onHide={handleClose}
+            // dialogAs={AddWorkerForm}
+            // manager={modalManager}
+            // scrollable={true}
+          >
+            {/* <Modal.Dialog> */}
+            <AddWorkerForm
+              handleClose={handleClose}
+              setisLoading={setisLoading}
+              setworkers={setworkers}
+            />
+            {/* </Modal.Dialog> */}
+          </Modal>
+          {/* </Modal> */}
+          <Modal show={showWorker} onHide={handleClose}>
+            <WorkerDetails
+              handleClose={handleClose}
+              setisLoading={setisLoading}
+              selected_id={selected_id}
+            />
+          </Modal>
+        </>
       )}
     </div>
   );
