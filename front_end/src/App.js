@@ -11,6 +11,7 @@ import { Navigate } from "react-router-dom";
 import Loader from "./components/Loader";
 import AuthProvider from "./auth/AuthProvider";
 import useAuthContext from "./auth/useAuthContext";
+import WorkerDetails from "./Pages/Workers/WorkerDetails";
 
 let ProtectedRoute = ({ children }) => {
   const auth = useAuthContext();
@@ -58,6 +59,10 @@ function App() {
               <Route
                 path="/workers"
                 element={<Workers setisLoading={setisLoading} />}
+              />
+              <Route
+                path="/workers/:id"
+                element={<WorkerDetails setisLoading={setisLoading} />}
               />
               <Route
                 path="/shifts"

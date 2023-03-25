@@ -13,40 +13,22 @@ import "react-toastify/dist/ReactToastify.css";
 import { Button } from "react-bootstrap";
 // import "bootstrap/dist/css/bootstrap.min.css";
 import Modal from "react-bootstrap/Modal";
+import { Link } from "react-router-dom";
 
 const Workers = (props) => {
   const { setisLoading } = props;
   const auth = useAuthContext();
   let [workers, setworkers] = useState([]);
-  const [selected_id, setselectedid] = useState("");
   const [searchWorkersResults, setsearchWorkersResults] = useState([]);
   const [open, setOpen] = useState(false);
-  const [addWorker, setaddWorker] = useState(false);
-  const [showWorker, setshowWorker] = useState(false);
 
   const handleOpen = () => {
     setOpen(true);
-    // document.querySelector("body").style.overflowY = "hidden";
   };
 
   const handleClose = () => {
     setOpen(false);
-    setaddWorker(false);
-    setshowWorker(false);
-    // document.querySelector("body").style.overflowY = "auto";
-    setselectedid("");
   };
-
-  function handleAddWorkerClick() {
-    handleOpen();
-    setaddWorker(true);
-  }
-
-  function handleShowWorkerClick(e) {
-    handleOpen();
-    setshowWorker(true);
-    setselectedid(e.currentTarget.id);
-  }
 
   let search = (arr, str) => {
     return arr.filter((el) =>
@@ -102,7 +84,7 @@ const Workers = (props) => {
     <div className="workerscontainer">
       <ToastContainer />
       <h3>Workers</h3>
-      <div className="oulinedButtonWrapper" onClick={handleAddWorkerClick}>
+      <div className="oulinedButtonWrapper" onClick={handleOpen}>
         <Icon path={mdiAccountPlusOutline} size={1} />
         Add Worker
       </div>
@@ -122,35 +104,32 @@ const Workers = (props) => {
         <div className="workersGrid">
           {searchWorkersResults.map((worker) => {
             return (
-              <div
-                className="workerCard"
-                key={worker._id}
-                id={worker._id}
-                onClick={handleShowWorkerClick}
-              >
-                <div className="profileContainer">
-                  <Icon
-                    className="workerIcon"
-                    path={mdiAccountHardHatOutline}
-                    size={2.5}
-                  />
-                  <div className="name">
-                    <div>{worker.firstname}</div>
-                    <div>{worker.lastname}</div>
+              <div className="workerCard" key={worker._id} id={worker._id}>
+                <Link className="workerItem" to={`/workers/${worker._id}`}>
+                  <div className="profileContainer">
+                    <Icon
+                      className="workerIcon"
+                      path={mdiAccountHardHatOutline}
+                      size={2.5}
+                    />
+                    <div className="name">
+                      <div>{worker.firstname}</div>
+                      <div>{worker.lastname}</div>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  Born On{" "}
-                  {DateTime.fromISO(worker.dateofbirth)
-                    .setLocale("fr")
-                    .toLocaleString({
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                </div>
-                {worker.cni && <div>CNI N° {worker.cni}</div>}
-                <div className="seemore">See More</div>
+                  <div>
+                    Born On{" "}
+                    {DateTime.fromISO(worker.dateofbirth)
+                      .setLocale("fr")
+                      .toLocaleString({
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                  </div>
+                  {worker.cni && <div>CNI N° {worker.cni}</div>}
+                  <div className="seemore">See More</div>
+                </Link>
               </div>
             );
           })}
@@ -176,34 +155,16 @@ const Workers = (props) => {
           )}
         </div>
       )} */}
-      {open && (
-        <>
-          <Modal
-            backdrop="static"
-            show={addWorker}
-            onHide={handleClose}
-            // dialogAs={AddWorkerForm}
-            // manager={modalManager}
-            // scrollable={true}
-          >
-            {/* <Modal.Dialog> */}
-            <AddWorkerForm
-              handleClose={handleClose}
-              setisLoading={setisLoading}
-              setworkers={setworkers}
-            />
-            {/* </Modal.Dialog> */}
-          </Modal>
-          {/* </Modal> */}
-          <Modal show={showWorker} onHide={handleClose}>
-            <WorkerDetails
-              handleClose={handleClose}
-              setisLoading={setisLoading}
-              selected_id={selected_id}
-            />
-          </Modal>
-        </>
-      )}
+      {/* {open && ( */}
+      <Modal
+        backdrop="static"
+        show={open}
+        onHide={handleClose}
+        contentClassName="content-wrapper"
+      >
+        <AddWorkerForm handleClose={handleClose} setworkers={setworkers} />
+      </Modal>
+      {/* )} */}
     </div>
   );
 };

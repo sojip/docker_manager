@@ -11,8 +11,11 @@ import { mdiCheckboxMultipleBlank } from "@mdi/js";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { RadioGroup, Radio } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
+import { useNavigate, useParams } from "react-router-dom";
 
 const WorkerDetails = (props) => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [worker, setworker] = useState({
     firstname: "",
     lastname: "",
@@ -30,8 +33,6 @@ const WorkerDetails = (props) => {
     to: "",
     option: "all",
   });
-  const { handleClose } = props;
-  const { selected_id } = props;
   const { setisLoading } = props;
 
   async function getWorker(id, signal) {
@@ -42,6 +43,10 @@ const WorkerDetails = (props) => {
 
     return worker;
   }
+
+  const handleClose = (e) => {
+    return navigate(-1);
+  };
 
   async function getshiftsinstances(id, signal) {
     const res = await fetch(`/api/workers/${id}/shiftsinstances`, {
@@ -55,10 +60,7 @@ const WorkerDetails = (props) => {
     setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
-    Promise.all([
-      getWorker(selected_id, signal),
-      getshiftsinstances(selected_id, signal),
-    ])
+    Promise.all([getWorker(id, signal), getshiftsinstances(id, signal)])
       .then((datas) => {
         setworker(datas[0]);
         setshiftsinstances(datas[1]);

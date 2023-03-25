@@ -9,6 +9,11 @@
   padding: 25px 0;
 }
 
+.workerscontainer .workersGrid .workerItem {
+  text-decoration: none;
+  color: black;
+}
+
 .workerscontainer .workerCard {
   background-color: rgba(255, 255, 255, 0.85);
   padding: 2vh 1vw;
@@ -66,6 +71,6 @@
   /* overflow-y: hidden; */
 }
 
-.modal-content {
+.modal-content.content-wrapper {
   background-color: transparent !important;
 }

@@ -9,8 +9,6 @@ import { toast } from "react-toastify";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
-import Modal from "react-bootstrap/Modal";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 const AddWorkerForm = (props) => {
   const [datas, setdatas] = useState({
@@ -19,7 +17,7 @@ const AddWorkerForm = (props) => {
   const [photoSrc, setphotoSrc] = useState(DefaultPhoto);
   let { handleClose } = props;
   let { setworkers } = props;
-  let { setisLoading } = props;
+  const [isLoading, setisLoading] = useState(false);
 
   let style = {
     marginBottom: "15px",
@@ -176,7 +174,11 @@ const AddWorkerForm = (props) => {
         style={style}
       />
       <br />
-      <input type="submit" value="save" />
+      <input
+        type="submit"
+        value={isLoading ? "Loading..." : "save"}
+        disabled={isLoading ? true : false}
+      />
       <br />
     </Box>
   );
