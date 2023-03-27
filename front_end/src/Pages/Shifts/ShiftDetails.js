@@ -309,17 +309,17 @@ const ShiftsDetails = (props) => {
                         <>
                           <div className="operationdetails">
                             <div>Operation Type</div>
-                            <div>{instance.operation?.type}</div>
+                            <div>{instance.operation.type}</div>
                           </div>
                           {instance.operation.type === "navire" && (
                             <div className="operationdetails">
                               <div>Operation Vessel</div>
-                              <div>{instance.operation?.vessel}</div>
+                              <div>{instance.operation.vessel}</div>
                             </div>
                           )}
                           <div className="operationdetails">
                             <div>Operation Position</div>
-                            <div>{instance.operation?.position}</div>
+                            <div>{instance.operation.position}</div>
                           </div>
                         </>
                       ) : null}

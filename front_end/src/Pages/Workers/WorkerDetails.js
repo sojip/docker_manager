@@ -389,17 +389,24 @@ const WorkerDetails = (props) => {
                               />
                             )}
                           </div>
-                          <div>Operation Type {instance.operation?.type}</div>
-                          <div>
-                            Operation Vessel {instance.operation?.vessel}
-                          </div>
-                          <div>
-                            Operation Position {instance.operation?.position}
-                          </div>
-                          <div>
-                            Operation Description <br />{" "}
-                            {instance.operation?.description}
-                          </div>
+                          {instance.operation ? (
+                            <>
+                              <div>
+                                Operation Type {instance.operation?.type}
+                              </div>
+                              <div>
+                                Operation Vessel {instance.operation?.vessel}
+                              </div>
+                              <div>
+                                Operation Position{" "}
+                                {instance.operation?.position}
+                              </div>
+                              <div>
+                                Operation Description <br />{" "}
+                                {instance.operation?.description}
+                              </div>
+                            </>
+                          ) : null}
                         </div>
                         {instance.endedshift ? (
                           instance.interruptions ? (
