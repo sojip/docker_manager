@@ -1,7 +1,7 @@
-import { useState, useContext, useRef } from "react";
+import { useState, useContext, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Icon from "@mdi/react";
-import { mdiCloseThick, mdiInboxOutline } from "@mdi/js";
+import { mdiCloseThick } from "@mdi/js";
 import {
   TextField,
   FormControl,
@@ -17,14 +17,14 @@ import { SelectedShiftContext } from "./Shifts";
 const AddInterruptionForm = (props) => {
   const { selected_shift } = useContext(SelectedShiftContext);
   const { GLOBAL_STATE, dispatch } = props;
-  const { setisLoading } = props;
   const [shiftinstances, setshiftinstances] = useState(
     GLOBAL_STATE.shiftinstances.map((instance) => {
       return { ...instance, checked: false };
     })
   );
   const [datas, setdatas] = useState({});
-  const selectall = useRef();
+  const [selectallchecked, setselectallchecked] = useState(false);
+  const [issubmitting, setissubmitting] = useState(false);
   const shifttime =
     selected_shift.type === "jour"
       ? { startat: "07:00", endat: "19:00" }
@@ -68,8 +68,11 @@ const AddInterruptionForm = (props) => {
   }
 
   const handleSelectAll = (e) => {
-    let checked = e.target.checked;
-    if (checked) {
+    setselectallchecked(!selectallchecked);
+  };
+
+  useEffect(() => {
+    if (selectallchecked) {
       setshiftinstances(
         shiftinstances.map((instance) => {
           return { ...instance, checked: true };
@@ -82,7 +85,7 @@ const AddInterruptionForm = (props) => {
         return { ...instance, checked: false };
       })
     );
-  };
+  }, [selectallchecked]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -94,7 +97,7 @@ const AddInterruptionForm = (props) => {
       alert("select user please");
       return;
     }
-    setisLoading(true);
+    setissubmitting(true);
     let interruptionStartDate;
     let interruptionEndDate;
     if (selected_shift.type === "jour") {
@@ -128,7 +131,7 @@ const AddInterruptionForm = (props) => {
     );
 
     if (interruptionEndDate <= interruptionStartDate) {
-      setisLoading(false);
+      setissubmitting(false);
       alert("End Time should be after the Start Time");
       return;
     }
@@ -167,16 +170,17 @@ const AddInterruptionForm = (props) => {
         interruption.instances = result.slice(0, -1);
         dispatch({ type: "PUSH_INTERRUPTION", payload: interruption });
         toast.success("New Interruption Added Succesffully");
-        setisLoading(false);
+        setissubmitting(false);
         e.target.reset();
         setshiftinstances(
           shiftinstances.map((instance) => {
             return { ...instance, checked: false };
           })
         );
+        setselectallchecked(false);
       })
       .catch((e) => {
-        setisLoading(false);
+        setissubmitting(false);
         toast.error("An Error Occured");
         console.log(e);
       });
@@ -260,8 +264,8 @@ const AddInterruptionForm = (props) => {
               control={
                 <Checkbox
                   id="selectall"
+                  checked={selectallchecked}
                   onChange={handleSelectAll}
-                  ref={selectall}
                 />
               }
               label={`Everybody`}
@@ -284,7 +288,11 @@ const AddInterruptionForm = (props) => {
             );
           })}
         </FormControl>
-        <input type="submit" value="Save" />
+        <input
+          type="submit"
+          value={issubmitting ? "saving..." : "save"}
+          disabled={issubmitting ? "disabled" : null}
+        />
       </Box>
     </div>
   );

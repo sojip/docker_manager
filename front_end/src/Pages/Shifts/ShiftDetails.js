@@ -19,22 +19,26 @@ import { Settings } from "luxon";
 import { toast } from "react-toastify";
 import { SelectedShiftContext } from "./Shifts";
 import { INITIAL_STATE, detailsReducer } from "./shiftDetailsReducer";
+import { Spinner } from "../../components/Spinner";
 
 Settings.defaultZone = "UTC+1";
 
 const ShiftsDetails = (props) => {
   const { handleClose } = props;
-  const { setisLoading } = props;
   const { selected_shift } = useContext(SelectedShiftContext);
   const [GLOBAL_STATE, dispatch] = useReducer(detailsReducer, INITIAL_STATE);
   const [filterby, setfilterby] = useState("all");
   const [instancesSearchResults, setinstancesSearchResults] = useState([]);
+  const [isLoading, setisLoading] = useState(true);
 
   async function getShiftInstances(signal) {
+    console.log(selected_shift._id);
     const res = await fetch(`/api/shifts/${selected_shift._id}/workers`, {
       signal: signal,
     });
     const datas = await res.json();
+    // console.log(`/api/shifts/${selected_shift._id}/workers`);
+    console.log(datas);
     return datas;
   }
 
@@ -91,12 +95,6 @@ const ShiftsDetails = (props) => {
         interruptionWorkers.classList.remove("show");
       }
     }
-    // if (
-    //   !target.classList.contains("interruptionItem") &&
-    //   !target.closest(".interruptionItem")
-    // ) {
-    //   if (interruptionWorkers) interruptionWorkers.classList.remove("show");
-    // }
   };
 
   const handleFilterChange = (e) => {
@@ -105,7 +103,6 @@ const ShiftsDetails = (props) => {
   };
 
   useEffect(() => {
-    setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
 
@@ -117,6 +114,7 @@ const ShiftsDetails = (props) => {
         });
         dispatch({ type: "SET_INTERRUPTIONS", payload: datas[1] });
         setisLoading(false);
+        console.log(datas[0]);
       })
       .catch((e) => {
         if (e.name !== "AbortError") {
@@ -189,18 +187,10 @@ const ShiftsDetails = (props) => {
         </div>
       )}
       {selected_shift.status === "opened" && GLOBAL_STATE.addInterruption && (
-        <AddInterruptionForm
-          GLOBAL_STATE={GLOBAL_STATE}
-          dispatch={dispatch}
-          setisLoading={setisLoading}
-        />
+        <AddInterruptionForm GLOBAL_STATE={GLOBAL_STATE} dispatch={dispatch} />
       )}
       {selected_shift.status === "opened" && GLOBAL_STATE.endShift && (
-        <EndShiftForm
-          GLOBAL_STATE={GLOBAL_STATE}
-          dispatch={dispatch}
-          setisLoading={setisLoading}
-        />
+        <EndShiftForm GLOBAL_STATE={GLOBAL_STATE} dispatch={dispatch} />
       )}
 
       <div className="generalInfos">
@@ -230,151 +220,178 @@ const ShiftsDetails = (props) => {
             })}
         </div>
       </div>
-      <h3>Workers</h3>
-      {selected_shift.status === "closed" && (
-        <FormControl>
-          <RadioGroup
-            row
-            aria-labelledby="radio-buttons-group-label"
-            name="row-radio-buttons-group"
-            value={filterby}
-            onChange={handleFilterChange}
-          >
-            <FormControlLabel
-              value="all"
-              control={<Radio />}
-              label="All"
-              labelPlacement="start"
-            />
-            <FormControlLabel
-              value="ended"
-              control={<Radio />}
-              label="Shift Ended"
-              labelPlacement="start"
-            />
-            <FormControlLabel
-              value="notended"
-              control={<Radio />}
-              label="Shift Not Ended"
-              labelPlacement="start"
-            />
-          </RadioGroup>
-        </FormControl>
-      )}
-      {instancesSearchResults.length > 0 ? (
-        <div className="workersgrid">
-          {instancesSearchResults.map((instance) => {
-            return (
-              <div key={instance.docker._id} className="workerItem">
-                <div className="profileContainer">
-                  <Icon
-                    id="workerIcon"
-                    path={mdiAccountHardHatOutline}
-                    size={2.5}
-                  />
-                  <div className="name">
-                    <div>{instance.docker.firstname}</div>
-                    <div>{instance.docker.lastname}</div>
-                  </div>
-                </div>
-                <div className="workerItemSubgrid">
-                  <div className="startedshift">
-                    Started shift{" "}
-                    {instance.startedshift ? (
-                      <Icon
-                        className="checkboxdone"
-                        path={mdiCheckboxMultipleMarked}
-                        size={1}
-                      />
-                    ) : (
-                      <Icon
-                        className="checkboxdone"
-                        path={mdiCheckboxMultipleBlank}
-                        size={1}
-                      />
-                    )}
-                  </div>
-                  <div className="endedshift">
-                    Ended shift
-                    {instance.endedshift ? (
-                      <Icon
-                        className="checkboxdone"
-                        path={mdiCheckboxMultipleMarked}
-                        size={1}
-                      />
-                    ) : (
-                      <Icon
-                        className="checkboxdone"
-                        path={mdiCheckboxMultipleBlank}
-                        size={1}
-                      />
-                    )}
-                  </div>
-                  <div className="operationdetails">
-                    <div>Operation Type</div>
-                    <div> {instance.operation?.type}</div>
-                  </div>
-                  <div className="operationdetails">
-                    <div>Operation Vessel</div>
-                    <div>{instance.operation?.vessel}</div>
-                  </div>
-                  <div className="operationdetails">
-                    <div>Operation Position</div>
-                    <div>{instance.operation?.position}</div>
-                  </div>
-                </div>
-                <div className="operationdetails">
-                  <div>Operation description</div>
-                  <div>{instance.operation?.description}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {isLoading ? (
+        <Spinner />
       ) : (
-        <div className="noDatasInfos">No Workers...</div>
-      )}
-      <div style={{ marginTop: "15px" }}>
-        Total workers {instancesSearchResults.length}
-      </div>
-      <h3>Interruptions / Incidents</h3>
-      {GLOBAL_STATE.interruptions.length > 0 ? (
-        <div className="interruptionsgrid">
-          {GLOBAL_STATE.interruptions.map((interruption) => {
-            return (
-              <div
-                key={interruption._id}
-                className="interruptionItem"
-                onClick={showInterruptionDetails}
-                id={interruption._id}
+        <>
+          <h3>Workers</h3>
+          {selected_shift.status === "closed" && (
+            <FormControl>
+              <RadioGroup
+                row
+                aria-labelledby="radio-buttons-group-label"
+                name="row-radio-buttons-group"
+                value={filterby}
+                onChange={handleFilterChange}
               >
-                <Icon path={mdiPauseOctagon} size={1} />
-                <div>
-                  <div>{interruption.duration} mins</div>
-                  <div>{interruption.description}</div>
-                </div>
-                <div
-                  className="interruptionWorkers"
-                  data-interruption={interruption._id}
-                >
-                  <div className="interruptionTime">
-                    {interruption.starttime} - {interruption.endtime}
-                  </div>
+                <FormControlLabel
+                  value="all"
+                  control={<Radio />}
+                  label="All"
+                  labelPlacement="start"
+                />
+                <FormControlLabel
+                  value="ended"
+                  control={<Radio />}
+                  label="Shift Ended"
+                  labelPlacement="start"
+                />
+                <FormControlLabel
+                  value="notended"
+                  control={<Radio />}
+                  label="Shift Not Ended"
+                  labelPlacement="start"
+                />
+              </RadioGroup>
+            </FormControl>
+          )}
+          {instancesSearchResults.length > 0 ? (
+            <div className="workersgrid">
+              {instancesSearchResults.map((instance) => {
+                return (
+                  <div key={instance.docker._id} className="workerItem">
+                    <div className="profileContainer">
+                      <Icon
+                        id="workerIcon"
+                        path={mdiAccountHardHatOutline}
+                        size={2.5}
+                      />
+                      <div className="name">
+                        <div>{instance.docker.firstname}</div>
+                        <div>{instance.docker.lastname}</div>
+                      </div>
+                    </div>
+                    <div className="workerItemSubgrid">
+                      <div className="startedshift">
+                        Started shift{" "}
+                        {instance.startedshift ? (
+                          <Icon
+                            className="checkboxdone"
+                            path={mdiCheckboxMultipleMarked}
+                            size={1}
+                          />
+                        ) : (
+                          <Icon
+                            className="checkboxdone"
+                            path={mdiCheckboxMultipleBlank}
+                            size={1}
+                          />
+                        )}
+                      </div>
+                      <div className="endedshift">
+                        Ended shift
+                        {instance.endedshift ? (
+                          <Icon
+                            className="checkboxdone"
+                            path={mdiCheckboxMultipleMarked}
+                            size={1}
+                          />
+                        ) : (
+                          <Icon
+                            className="checkboxdone"
+                            path={mdiCheckboxMultipleBlank}
+                            size={1}
+                          />
+                        )}
+                      </div>
 
-                  <ul>
-                    {interruption.instances?.map((instance) => (
-                      <li
-                        key={instance._id}
-                      >{`${instance.docker.firstname} ${instance.docker.lastname}`}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="noDatasInfos">No Interruptions / Incidents...</div>
+                      {instance.operation ? (
+                        <>
+                          <div className="operationdetails">
+                            <div>Operation Type</div>
+                            <div>{instance.operation?.type}</div>
+                          </div>
+                          {instance.operation.type === "navire" && (
+                            <div className="operationdetails">
+                              <div>Operation Vessel</div>
+                              <div>{instance.operation?.vessel}</div>
+                            </div>
+                          )}
+                          <div className="operationdetails">
+                            <div>Operation Position</div>
+                            <div>{instance.operation?.position}</div>
+                          </div>
+                        </>
+                      ) : null}
+                      {/* <div className="operationdetails">
+                        <div>Operation Type</div>
+                        <div> {instance.operation?.type}</div>
+                      </div>
+                      <div className="operationdetails">
+                        <div>Operation Vessel</div>
+                        <div>{instance.operation?.vessel}</div>
+                      </div>
+                      <div className="operationdetails">
+                        <div>Operation Position</div>
+                        <div>{instance.operation?.position}</div>
+                      </div> */}
+                    </div>
+                    {instance.operation && (
+                      <div className="operationdetails">
+                        <div>Operation description</div>
+                        <div>{instance.operation?.description}</div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="noDatasInfos">No Workers...</div>
+          )}
+          <div style={{ marginTop: "15px" }}>
+            Total workers {instancesSearchResults.length}
+          </div>
+          <h3>Interruptions / Incidents</h3>
+          {GLOBAL_STATE.interruptions.length > 0 ? (
+            <div className="interruptionsgrid">
+              {GLOBAL_STATE.interruptions.map((interruption) => {
+                return (
+                  <div
+                    key={interruption._id}
+                    className="interruptionItem"
+                    onClick={showInterruptionDetails}
+                    id={interruption._id}
+                  >
+                    <Icon path={mdiPauseOctagon} size={1} />
+                    <div>
+                      <div>{interruption.duration} mins</div>
+                      <div>{interruption.description}</div>
+                    </div>
+                    <div
+                      className="interruptionWorkers"
+                      data-interruption={interruption._id}
+                    >
+                      <div className="interruptionTime">
+                        {interruption.starttime} - {interruption.endtime}
+                      </div>
+
+                      <ul>
+                        {interruption.instances?.map((instance) => (
+                          <li
+                            key={instance._id}
+                          >{`${instance.docker.firstname} ${instance.docker.lastname}`}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="noDatasInfos">No Interruptions / Incidents...</div>
+          )}
+        </>
       )}
     </Box>
   );

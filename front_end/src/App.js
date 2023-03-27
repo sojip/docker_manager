@@ -60,10 +60,10 @@ function App() {
                 path="/workers"
                 element={<Workers setisLoading={setisLoading} />}
               />
-              <Route
+              {/* <Route
                 path="/workers/:id"
                 element={<WorkerDetails setisLoading={setisLoading} />}
-              />
+              /> */}
               <Route
                 path="/shifts"
                 element={<Shifts setisLoading={setisLoading} />}

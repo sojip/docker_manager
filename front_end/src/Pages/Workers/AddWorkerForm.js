@@ -43,6 +43,7 @@ const AddWorkerForm = (props) => {
       toast.error("Please Add A Photo");
       return;
     }
+    console.log("clicked");
     setisLoading(true);
     //create mutltipart form data
     let formData = new FormData();
@@ -176,8 +177,8 @@ const AddWorkerForm = (props) => {
       <br />
       <input
         type="submit"
-        value={isLoading ? "Loading..." : "save"}
-        disabled={isLoading ? true : false}
+        value={isLoading ? "saving..." : "save"}
+        disabled={isLoading ? "disabled" : null}
       />
       <br />
     </Box>

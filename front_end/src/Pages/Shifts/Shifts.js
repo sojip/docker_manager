@@ -7,6 +7,7 @@ import StickyHeadTable from "./Table";
 import AddShiftForm from "./AddShiftForm";
 import ShiftDetails from "./ShiftDetails";
 import { toast, ToastContainer } from "react-toastify";
+import Modal from "react-bootstrap/Modal";
 
 export const ShiftsContext = createContext();
 export const SelectedShiftContext = createContext();
@@ -16,22 +17,18 @@ const Shifts = (props) => {
   const [shifts, setshifts] = useState([]);
   const [searchShiftsResults, setsearchShiftsResults] = useState([]);
   const [selected_shift, setselectedshift] = useState({});
-  const [open, setOpen] = useState(false);
   const [addShift, setaddShift] = useState(false);
   const [showShift, setshowShift] = useState(false);
-  let handleOpen = () => {
-    setOpen(true);
-    document.querySelector("body").style.overflowY = "hidden";
+
+  let handleShowShiftClick = () => {
+    setshowShift(true);
   };
   const handleClose = () => {
-    setOpen(false);
     setaddShift(false);
     setshowShift(false);
-    document.querySelector("body").style.overflowY = "auto";
   };
 
   function handleAddShiftClick(e) {
-    handleOpen();
     setaddShift(true);
   }
 
@@ -100,6 +97,7 @@ const Shifts = (props) => {
       <SelectedShiftContext.Provider
         value={{ selected_shift, setselectedshift }}
       >
+        <ToastContainer />
         <div className="shiftsContainer">
           <h3>Shifts</h3>
           <div className="oulinedButtonWrapper" onClick={handleAddShiftClick}>
@@ -121,30 +119,36 @@ const Shifts = (props) => {
             <div className="table">
               <StickyHeadTable
                 shifts={searchShiftsResults}
-                handleOpen={handleOpen}
-                setshowShift={setshowShift}
+                handleOpen={handleShowShiftClick}
               />
             </div>
           ) : (
             <div className="noDatasInfos">No Shifts ...</div>
           )}
-          {open && (
-            <div className="modal">
-              <ToastContainer />
-              {addShift && (
-                <AddShiftForm
-                  setisLoading={setisLoading}
-                  handleClose={handleClose}
-                />
-              )}
-              {showShift && (
-                <ShiftDetails
-                  setisLoading={setisLoading}
-                  handleClose={handleClose}
-                />
-              )}
-            </div>
-          )}
+          <Modal
+            backdrop="static"
+            show={addShift}
+            onHide={handleClose}
+            contentClassName="content-wrapper addShift"
+            fullscreen={true}
+            scrollable
+          >
+            <Modal.Body>
+              <AddShiftForm handleClose={handleClose} />
+            </Modal.Body>
+          </Modal>
+          <Modal
+            backdrop="static"
+            show={showShift}
+            onHide={handleClose}
+            contentClassName="content-wrapper showShift"
+            fullscreen={true}
+            scrollable
+          >
+            <Modal.Body>
+              <ShiftDetails handleClose={handleClose} />
+            </Modal.Body>
+          </Modal>
         </div>
       </SelectedShiftContext.Provider>
     </ShiftsContext.Provider>

@@ -16,6 +16,7 @@ import useAuthContext from "../../auth/useAuthContext";
 import { toast } from "react-toastify";
 import { useContext } from "react";
 import { ShiftsContext } from "./Shifts";
+import { Spinner } from "../../components/Spinner";
 
 const AddShiftForm = (props) => {
   const auth = useAuthContext();
@@ -23,8 +24,9 @@ const AddShiftForm = (props) => {
   const [time, settime] = useState("");
   const [workers, setworkers] = useState([]);
   const { setshifts } = useContext(ShiftsContext);
+  const [isLoading, setisLoading] = useState(true);
+  const [submitting, setsubmitting] = useState(false);
   let { handleClose } = props;
-  let { setisLoading } = props;
 
   let style = {
     marginBottom: "15px",
@@ -42,10 +44,8 @@ const AddShiftForm = (props) => {
   }
 
   useEffect(() => {
-    setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
-
     getWorkers(signal)
       .then((workers) => {
         setworkers(
@@ -99,12 +99,12 @@ const AddShiftForm = (props) => {
   }
 
   function handleSubmit(e) {
-    setisLoading(true);
+    setsubmitting(true);
     e.preventDefault();
     let selectedworkers = workers.filter((worker) => worker.checked === true);
     if (selectedworkers.length === 0) {
       toast.error("Select Workers Please");
-      setisLoading(false);
+      setsubmitting(false);
       return;
     }
     fetch("/api/shifts", {
@@ -117,7 +117,7 @@ const AddShiftForm = (props) => {
       .then((res) => res.json())
       .then((data) => {
         if (data.error) {
-          setisLoading(false);
+          setsubmitting(false);
           throw Error(data.error.message);
         }
         setshifts((shifts) => [data, ...shifts]);
@@ -131,7 +131,7 @@ const AddShiftForm = (props) => {
         e.target.reset();
         setdatas({ type: "", startdate: "" });
         settime("");
-        setisLoading(false);
+        setsubmitting(false);
         toast.success("New Shift Added Successfully");
         setworkers(
           workers.map((worker) => {
@@ -140,7 +140,7 @@ const AddShiftForm = (props) => {
         );
       })
       .catch((e) => {
-        setisLoading(false);
+        setsubmitting(false);
         toast.error(e.message);
         console.log(e);
       });
@@ -163,78 +163,91 @@ const AddShiftForm = (props) => {
       onSubmit={handleSubmit}
       autoComplete="off"
     >
-      <div className="closeModalWrapper" id="closeModal" onClick={handleClose}>
-        <Icon path={mdiCloseThick} size={1} />
-      </div>
-
-      <h3>Start A Shift</h3>
-      <div className="typeandtimeWrapper">
-        <FormControl>
-          <InputLabel id="typeLabel">Type</InputLabel>
-          <Select
-            labelId="typeLabel"
-            id="type"
-            value={datas.type}
-            label="type"
-            name="type"
-            onChange={handleChange}
-            required
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <>
+          <div
+            className="closeModalWrapper"
+            id="closeModal"
+            onClick={handleClose}
           >
-            <MenuItem value={"jour"}>jour</MenuItem>
-            <MenuItem value={"nuit"}>nuit</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          id="time"
-          label="time"
-          name="time"
-          variant="outlined"
-          style={style}
-          value={time}
-          required
-          type="time"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-      </div>
-      <TextField
-        id="startdate"
-        name="startdate"
-        variant="outlined"
-        style={style}
-        type="date"
-        margin="normal"
-        helperText="Select The Start Date"
-        required
-        onChange={handleChange}
-      />
-      <FormControl component="fieldset" variant="standard">
-        <FormLabel component="legend">Select Workers</FormLabel>
-        {workers.length > 0 &&
-          workers.map((worker) => {
-            return (
-              <FormGroup key={worker._id}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      id={worker._id}
-                      onChange={handleCheckboxChange}
-                      checked={worker.checked}
+            <Icon path={mdiCloseThick} size={1} />
+          </div>
+          <h3>Start A Shift</h3>
+          <div className="typeandtimeWrapper">
+            <FormControl>
+              <InputLabel id="typeLabel">Type</InputLabel>
+              <Select
+                labelId="typeLabel"
+                id="type"
+                value={datas.type}
+                label="type"
+                name="type"
+                onChange={handleChange}
+                required
+              >
+                <MenuItem value={"jour"}>jour</MenuItem>
+                <MenuItem value={"nuit"}>nuit</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              id="time"
+              label="time"
+              name="time"
+              variant="outlined"
+              style={style}
+              value={time}
+              required
+              type="time"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          </div>
+          <TextField
+            id="startdate"
+            name="startdate"
+            variant="outlined"
+            style={style}
+            type="date"
+            margin="normal"
+            helperText="Select The Start Date"
+            required
+            onChange={handleChange}
+          />
+          <FormControl component="fieldset" variant="standard">
+            <FormLabel component="legend">Select Workers</FormLabel>
+            {workers.length > 0 &&
+              workers.map((worker) => {
+                return (
+                  <FormGroup key={worker._id}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          id={worker._id}
+                          onChange={handleCheckboxChange}
+                          checked={worker.checked}
+                        />
+                      }
+                      label={`${worker.firstname} ${worker.lastname}`}
                     />
-                  }
-                  label={`${worker.firstname} ${worker.lastname}`}
-                />
-              </FormGroup>
-            );
-          })}
-      </FormControl>
+                  </FormGroup>
+                );
+              })}
+          </FormControl>
 
-      <input type="submit" value="save" />
-      <br />
+          <input
+            type="submit"
+            value={submitting ? "saving..." : "save"}
+            disabled={submitting ? "disabled" : null}
+          />
+          <br />
+        </>
+      )}
     </Box>
   );
 };

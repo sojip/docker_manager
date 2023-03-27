@@ -11,11 +11,11 @@ import { mdiCheckboxMultipleBlank } from "@mdi/js";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { RadioGroup, Radio } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
+import { Spinner } from "../../components/Spinner";
 
 const WorkerDetails = (props) => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { id, handleClose } = props;
+  const [isLoading, setisLoading] = useState(true);
   const [worker, setworker] = useState({
     firstname: "",
     lastname: "",
@@ -33,7 +33,6 @@ const WorkerDetails = (props) => {
     to: "",
     option: "all",
   });
-  const { setisLoading } = props;
 
   async function getWorker(id, signal) {
     const res = await fetch(`/api/workers/${id}`, {
@@ -44,10 +43,6 @@ const WorkerDetails = (props) => {
     return worker;
   }
 
-  const handleClose = (e) => {
-    return navigate(-1);
-  };
-
   async function getshiftsinstances(id, signal) {
     const res = await fetch(`/api/workers/${id}/shiftsinstances`, {
       signal: signal,
@@ -57,13 +52,12 @@ const WorkerDetails = (props) => {
   }
 
   useEffect(() => {
-    setisLoading(true);
+    // setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
     Promise.all([getWorker(id, signal), getshiftsinstances(id, signal)])
       .then((datas) => {
         setworker(datas[0]);
-        console.log(datas[0]);
         setshiftsinstances(datas[1]);
         setisLoading(false);
       })
@@ -198,259 +192,275 @@ const WorkerDetails = (props) => {
           p: 4,
         }}
       >
-        <div
-          className="closeModalWrapper"
-          id="closeModal"
-          onClick={handleClose}
-        >
-          <Icon path={mdiCloseThick} size={1} />
-        </div>
-        <h3>General</h3>
-
-        <div className="workerGeneralInfos">
-          <div>
-            <div className="photoContainer">
-              <img src={worker.photo} alt="" />
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <>
+            <div
+              className="closeModalWrapper"
+              id="closeModal"
+              onClick={handleClose}
+            >
+              <Icon path={mdiCloseThick} size={1} />
             </div>
-            <div>
-              <div>{worker.firstname}</div>
-              <div>{worker.lastname}</div>
+            <h3>General</h3>
+
+            <div className="workerGeneralInfos">
               <div>
-                Born on{" "}
-                {DateTime.fromISO(worker.dateofbirth)
+                <div className="photoContainer">
+                  <img src={worker.photo} alt="" />
+                </div>
+                <div>
+                  <div>{worker.firstname}</div>
+                  <div>{worker.lastname}</div>
+                  <div>
+                    Born on{" "}
+                    {DateTime.fromISO(worker.dateofbirth)
+                      .setLocale("fr")
+                      .toLocaleString({
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                  </div>
+                  <div>CNI N° {worker.cni}</div>
+                  <div style={{ fontStyle: "italic" }}>{worker.position}</div>
+                </div>
+              </div>
+              <div className="fingerprintcontainer">FINGERPRINT</div>
+
+              <div
+                style={{
+                  fontStyle: "italic",
+                  position: "absolute",
+                  bottom: "0",
+                }}
+              >
+                Created On{" "}
+                {DateTime.fromISO(worker.createdOn)
                   .setLocale("fr")
                   .toLocaleString({
                     year: "numeric",
                     month: "long",
                     day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
                   })}
               </div>
-              <div>CNI N° {worker.cni}</div>
-              <div style={{ fontStyle: "italic" }}>{worker.position}</div>
             </div>
-          </div>
-          <div className="fingerprintcontainer">FINGERPRINT</div>
-
-          <div
-            style={{ fontStyle: "italic", position: "absolute", bottom: "0" }}
-          >
-            Created On{" "}
-            {DateTime.fromISO(worker.createdOn).setLocale("fr").toLocaleString({
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            })}
-          </div>
-        </div>
-        <h3>Shifts</h3>
-        <div className="findshifts">
-          <div>
-            <div>From</div>
-            <TextField
-              type="date"
-              id="searchshiftstart"
-              helperText="Select A Date"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              name="from"
+            <h3>Shifts</h3>
+            <div className="findshifts">
+              <div>
+                <div>From</div>
+                <TextField
+                  type="date"
+                  id="searchshiftstart"
+                  helperText="Select A Date"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  name="from"
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <div>To</div>
+                <TextField
+                  type="date"
+                  id="searchshiftend"
+                  helperText="Select A Date"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  name="to"
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <RadioGroup
+              row
+              aria-labelledby="radio-buttons-group-label"
+              name="option"
               onChange={handleChange}
-            />
-          </div>
-          <div>
-            <div>To</div>
-            <TextField
-              type="date"
-              id="searchshiftend"
-              helperText="Select A Date"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              name="to"
-              onChange={handleChange}
-            />
-          </div>
-        </div>
-        <RadioGroup
-          row
-          aria-labelledby="radio-buttons-group-label"
-          name="option"
-          onChange={handleChange}
-          value={filterby.option}
-        >
-          <FormControlLabel
-            value="all"
-            control={<Radio />}
-            label="All"
-            labelPlacement="start"
-          />
-          <FormControlLabel
-            value="ended"
-            control={<Radio />}
-            label="Ended"
-            labelPlacement="start"
-          />
-          <FormControlLabel
-            value="notended"
-            control={<Radio />}
-            label="Not Ended"
-            labelPlacement="start"
-          />
-        </RadioGroup>
-        {searchresults.length > 0 ? (
-          <div>
-            <div className="workerstats">
-              Total Shifts {searchresults.length}
-            </div>
-            <div className="workerstats">
-              Total Time Worked{" "}
-              {searchresults
-                .filter((instance) => instance.endedshift === true)
-                .reduce((total, instance) => {
-                  if (!instance.interruptions)
-                    return total + instance.shift.duration;
-                  return (
-                    total +
-                    instance.shift.duration -
-                    instance.interruptions.reduce(
-                      (total_, current) => total_ + current.duration,
-                      0
-                    )
-                  );
-                }, 0)}{" "}
-              mins
-            </div>
-            <div className="shiftsgrid">
-              {searchresults.map((instance) => {
-                return (
-                  <div className="shiftItem" key={instance._id}>
-                    <div>Shift {instance.shift.type}</div>
-                    <div className="shiftItemgrid">
-                      <div>
-                        Shift Start Date{" "}
-                        {DateTime.fromISO(instance.shift.startdate)
-                          .setLocale("fr")
-                          .toLocaleString({
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                          })}
-                      </div>
+              value={filterby.option}
+            >
+              <FormControlLabel
+                value="all"
+                control={<Radio />}
+                label="All"
+                labelPlacement="start"
+              />
+              <FormControlLabel
+                value="ended"
+                control={<Radio />}
+                label="Ended"
+                labelPlacement="start"
+              />
+              <FormControlLabel
+                value="notended"
+                control={<Radio />}
+                label="Not Ended"
+                labelPlacement="start"
+              />
+            </RadioGroup>
+            {searchresults.length > 0 ? (
+              <div>
+                <div className="workerstats">
+                  Total Shifts {searchresults.length}
+                </div>
+                <div className="workerstats">
+                  Total Time Worked{" "}
+                  {searchresults
+                    .filter((instance) => instance.endedshift === true)
+                    .reduce((total, instance) => {
+                      if (!instance.interruptions)
+                        return total + instance.shift.duration;
+                      return (
+                        total +
+                        instance.shift.duration -
+                        instance.interruptions.reduce(
+                          (total_, current) => total_ + current.duration,
+                          0
+                        )
+                      );
+                    }, 0)}{" "}
+                  mins
+                </div>
+                <div className="shiftsgrid">
+                  {searchresults.map((instance) => {
+                    return (
+                      <div className="shiftItem" key={instance._id}>
+                        <div>Shift {instance.shift.type}</div>
+                        <div className="shiftItemgrid">
+                          <div>
+                            Shift Start Date{" "}
+                            {DateTime.fromISO(instance.shift.startdate)
+                              .setLocale("fr")
+                              .toLocaleString({
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}
+                          </div>
 
-                      <div>
-                        Shift End Date{" "}
-                        {DateTime.fromISO(instance.shift.enddate)
-                          .setLocale("fr")
-                          .toLocaleString({
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                          })}
-                      </div>
-                      <div className="startedshift">
-                        Started shift{" "}
-                        {instance.startedshift ? (
-                          <Icon
-                            className="checkboxdone"
-                            path={mdiCheckboxMultipleMarked}
-                            size={1}
-                          />
-                        ) : (
-                          <Icon
-                            className="checkboxdone"
-                            path={mdiCheckboxMultipleBlank}
-                            size={1}
-                          />
-                        )}
-                      </div>
-                      <div className="endedshift">
-                        Ended shift
+                          <div>
+                            Shift End Date{" "}
+                            {DateTime.fromISO(instance.shift.enddate)
+                              .setLocale("fr")
+                              .toLocaleString({
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}
+                          </div>
+                          <div className="startedshift">
+                            Started shift{" "}
+                            {instance.startedshift ? (
+                              <Icon
+                                className="checkboxdone"
+                                path={mdiCheckboxMultipleMarked}
+                                size={1}
+                              />
+                            ) : (
+                              <Icon
+                                className="checkboxdone"
+                                path={mdiCheckboxMultipleBlank}
+                                size={1}
+                              />
+                            )}
+                          </div>
+                          <div className="endedshift">
+                            Ended shift
+                            {instance.endedshift ? (
+                              <Icon
+                                className="checkboxdone"
+                                path={mdiCheckboxMultipleMarked}
+                                size={1}
+                              />
+                            ) : (
+                              <Icon
+                                className="checkboxdone"
+                                path={mdiCheckboxMultipleBlank}
+                                size={1}
+                              />
+                            )}
+                          </div>
+                          <div>Operation Type {instance.operation?.type}</div>
+                          <div>
+                            Operation Vessel {instance.operation?.vessel}
+                          </div>
+                          <div>
+                            Operation Position {instance.operation?.position}
+                          </div>
+                          <div>
+                            Operation Description <br />{" "}
+                            {instance.operation?.description}
+                          </div>
+                        </div>
                         {instance.endedshift ? (
-                          <Icon
-                            className="checkboxdone"
-                            path={mdiCheckboxMultipleMarked}
-                            size={1}
-                          />
+                          instance.interruptions ? (
+                            <div className="timeworked">
+                              Time Worked{" "}
+                              {instance.shift.duration -
+                                instance.interruptions.reduce(
+                                  (total, current) => total + current.duration,
+                                  0
+                                )}{" "}
+                              mins
+                            </div>
+                          ) : (
+                            <div className="timeworked">
+                              Time Worked {instance.shift.duration} mins
+                            </div>
+                          )
                         ) : (
-                          <Icon
-                            className="checkboxdone"
-                            path={mdiCheckboxMultipleBlank}
-                            size={1}
-                          />
+                          <div className="timeworked">Shift Not Ended</div>
+                        )}
+
+                        {instance.interruptions?.length > 0 ? (
+                          <>
+                            <div
+                              style={{ marginTop: "5px", fontWeight: "bold" }}
+                            >
+                              INTERRUPTIONS - INCIDENTS
+                            </div>
+                            <ul className="shiftinterruptionsList">
+                              {instance.interruptions.map((interruption) => {
+                                return (
+                                  <li key={interruption._id}>
+                                    <Icon path={mdiPauseOctagon} size={1} />
+                                    <div>
+                                      <div>{interruption.duration} mins</div>
+                                      <div style={{ marginTop: "5px" }}>
+                                        {interruption.description}
+                                      </div>
+                                    </div>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </>
+                        ) : (
+                          <div
+                            className="noDatasInfos"
+                            style={{ textAlign: "right" }}
+                          >
+                            No Interruptions - Incidents ...
+                          </div>
                         )}
                       </div>
-                      <div>Operation Type {instance.operation?.type}</div>
-                      <div>Operation Vessel {instance.operation?.vessel}</div>
-                      <div>
-                        Operation Position {instance.operation?.position}
-                      </div>
-                      <div>
-                        Operation Description <br />{" "}
-                        {instance.operation?.description}
-                      </div>
-                    </div>
-                    {instance.endedshift ? (
-                      instance.interruptions ? (
-                        <div className="timeworked">
-                          Time Worked{" "}
-                          {instance.shift.duration -
-                            instance.interruptions.reduce(
-                              (total, current) => total + current.duration,
-                              0
-                            )}{" "}
-                          mins
-                        </div>
-                      ) : (
-                        <div className="timeworked">
-                          Time Worked {instance.shift.duration} mins
-                        </div>
-                      )
-                    ) : (
-                      <div className="timeworked">Shift Not Ended</div>
-                    )}
-
-                    {instance.interruptions?.length > 0 ? (
-                      <>
-                        <div style={{ marginTop: "5px", fontWeight: "bold" }}>
-                          INTERRUPTIONS - INCIDENTS
-                        </div>
-                        <ul className="shiftinterruptionsList">
-                          {instance.interruptions.map((interruption) => {
-                            return (
-                              <li key={interruption._id}>
-                                <Icon path={mdiPauseOctagon} size={1} />
-                                <div>
-                                  <div>{interruption.duration} mins</div>
-                                  <div style={{ marginTop: "5px" }}>
-                                    {interruption.description}
-                                  </div>
-                                </div>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      </>
-                    ) : (
-                      <div
-                        className="noDatasInfos"
-                        style={{ textAlign: "right" }}
-                      >
-                        No Interruptions - Incidents ...
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          <div className="noDatasInfos">No Shifts ...</div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="noDatasInfos">No Shifts ...</div>
+            )}
+          </>
         )}
       </Box>
     </>

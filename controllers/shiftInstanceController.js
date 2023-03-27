@@ -63,6 +63,7 @@ module.exports.endShift = function (req, res, next) {
     vessel: req.body.opsType === "navire" ? req.body.opsvessel : undefined,
     description: req.body.opsdescription,
   };
+  console.log(operation);
   ShiftInstance.findByIdAndUpdate(
     id,
     {

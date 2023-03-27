@@ -18,7 +18,7 @@ import { SelectedShiftContext } from "./Shifts";
 import { toast } from "react-toastify";
 
 const EndShiftForm = (props) => {
-  const { GLOBAL_STATE, dispatch, setisLoading } = props;
+  const { GLOBAL_STATE, dispatch } = props;
   const { shifts, setshifts } = useContext(ShiftsContext);
   const { selected_shift, setselectedshift } = useContext(SelectedShiftContext);
   const [formdatas, setformdatas] = useState({});
@@ -27,6 +27,7 @@ const EndShiftForm = (props) => {
       return { ...instance, checked: false };
     })
   );
+  const [issubmitting, setissubmitting] = useState(false);
 
   useEffect(() => {
     console.log(formdatas);
@@ -77,7 +78,7 @@ const EndShiftForm = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setisLoading(true);
+    setissubmitting(true);
     let selectedInstances = shiftinstances.filter(
       (instance) => instance.checked === true
     );
@@ -109,11 +110,11 @@ const EndShiftForm = (props) => {
         );
         toast.success("Shift Closed Successfully");
         setformdatas({});
-        setisLoading(false);
+        setissubmitting(false);
         e.target.reset();
       })
       .catch((e) => {
-        setisLoading(false);
+        setissubmitting(false);
         toast.error("An Error Occured");
         console.log(e);
       });
@@ -242,7 +243,11 @@ const EndShiftForm = (props) => {
             })}
         </FormControl>
         <br />
-        <input type="submit" value="Submit" />
+        <input
+          type="submit"
+          value={issubmitting ? "saving..." : "submit"}
+          disabled={issubmitting ? "disabled" : null}
+        />
       </Box>
     </div>
   );

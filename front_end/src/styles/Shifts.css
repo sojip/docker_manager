@@ -5,3 +5,8 @@
 .shiftsContainer h3 {
   margin-top: 0;
 }
+
+.content-wrapper.addShift,
+.content-wrapper.showShift {
+  background-color: transparent;
+}
