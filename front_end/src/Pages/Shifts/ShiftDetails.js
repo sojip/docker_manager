@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import { SelectedShiftContext } from "./Shifts";
 import { INITIAL_STATE, detailsReducer } from "./shiftDetailsReducer";
 import { Spinner } from "../../components/Spinner";
+import Masonry from "react-masonry-css";
 
 Settings.defaultZone = "UTC+1";
 
@@ -150,6 +151,11 @@ const ShiftsDetails = (props) => {
     }
   }, [filterby, GLOBAL_STATE.shiftinstances]);
 
+  const breakpointColumnsObj = {
+    default: 2,
+    745: 1,
+  };
+
   return (
     <Box
       id="showshiftbox"
@@ -253,7 +259,12 @@ const ShiftsDetails = (props) => {
             </FormControl>
           )}
           {instancesSearchResults.length > 0 ? (
-            <div className="workersgrid">
+            <Masonry
+              breakpointCols={breakpointColumnsObj}
+              className="my-masonry-grid"
+              columnClassName="my-masonry-grid_column"
+            >
+              {/* <div className="workersgrid"> */}
               {instancesSearchResults.map((instance) => {
                 return (
                   <div key={instance.docker._id} className="workerItem">
@@ -334,7 +345,8 @@ const ShiftsDetails = (props) => {
                   </div>
                 );
               })}
-            </div>
+              {/* </div> */}
+            </Masonry>
           ) : (
             <div className="noDatasInfos">No Workers...</div>
           )}

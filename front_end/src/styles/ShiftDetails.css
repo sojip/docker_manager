@@ -80,12 +80,12 @@
   border: solid 2px var(--orange-color);
 }
 
-#showshiftbox .workersgrid {
+/* #showshiftbox .workersgrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   align-items: flex-start;
   gap: 20px;
-}
+} */
 
 #showshiftbox .workerItemSubgrid {
   display: grid;
@@ -110,7 +110,7 @@
   gap: 17.5px;
 }
 
-#showshiftbox .workersgrid .workerItem,
+#showshiftbox .workerItem,
 #showshiftbox .interruptionsgrid .interruptionItem {
   box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
     rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
@@ -123,7 +123,7 @@
   border-radius: 10px;
 }
 
-#showshiftbox .workersgrid .workerItem {
+#showshiftbox .workerItem {
   text-transform: capitalize;
 }
 
@@ -136,8 +136,8 @@
   }
 }
 
-#showshiftbox .workersgrid .workerItem .startedshift,
-#showshiftbox .workersgrid .workerItem .endedshift {
+#showshiftbox .workerItem .startedshift,
+#showshiftbox .workerItem .endedshift {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -153,6 +153,8 @@
   grid-template-columns: min-content 1fr;
   gap: 5px;
   cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
 }
 
 #showshiftbox .interruptionsgrid .interruptionItem .interruptionWorkers {
@@ -236,4 +238,20 @@
     padding-left: 10px;
     padding-right: 10px;
   }
+}
+
+.my-masonry-grid {
+  display: -webkit-box; /* Not needed if autoprefixing */
+  display: -ms-flexbox; /* Not needed if autoprefixing */
+  display: flex;
+  width: auto;
+  gap: 20px;
+}
+.my-masonry-grid_column {
+  background-clip: padding-box;
+}
+
+.my-masonry-grid_column > div {
+  margin-bottom: 20px;
+  /* backdrop-filter: blur(5px); */
 }
