@@ -1,12 +1,13 @@
 .statsContainer {
-  background-image: url(../img/undraw_under_construction_-46-pa.svg);
+  background: url(../img/undraw_under_construction_-46-pa.svg);
+  background-blend-mode: multiply;
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
-  /* border: solid 2px red; */
-  height: 87.5vh;
-  background-color: white;
-  background-blend-mode: darken;
+  border: solid 2px red;
+  height: 100%;
+  /* height: 87.5vh; */
+  /* background-color: white; */
   /* position: relative; */
 }
 
@@ -15,11 +16,14 @@
 }
 
 .marquee {
-  height: 2rem;
+  height: 3rem;
   overflow: hidden;
   position: relative;
-  font-weight: bold;
+  background-color: var(--orange-color);
+  color: white;
   text-transform: capitalize;
+  font-weight: bold;
+  font-style: italic;
 }
 
 .marquee div {
@@ -28,7 +32,7 @@
   position: absolute;
   overflow: hidden;
   animation: marquee 7s linear infinite;
-  height: 30px;
+  height: 60px;
   text-align: right;
 }
 .marquee span {

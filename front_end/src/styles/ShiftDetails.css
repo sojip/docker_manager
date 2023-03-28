@@ -93,6 +93,10 @@
   gap: 5px;
 }
 
+#showshiftbox .operationdetailsTitle {
+  font-weight: 600;
+}
+
 #showshiftbox .workerItem .operationdetails {
   display: flex;
   flex-direction: column;

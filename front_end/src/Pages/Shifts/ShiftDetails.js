@@ -32,12 +32,10 @@ const ShiftsDetails = (props) => {
   const [isLoading, setisLoading] = useState(true);
 
   async function getShiftInstances(signal) {
-    console.log(selected_shift._id);
     const res = await fetch(`/api/shifts/${selected_shift._id}/workers`, {
       signal: signal,
     });
     const datas = await res.json();
-    // console.log(`/api/shifts/${selected_shift._id}/workers`);
     console.log(datas);
     return datas;
   }
@@ -131,7 +129,6 @@ const ShiftsDetails = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log("changing the search instances value");
     switch (filterby) {
       case "ended":
         setinstancesSearchResults(
@@ -272,7 +269,7 @@ const ShiftsDetails = (props) => {
                       </div>
                     </div>
                     <div className="workerItemSubgrid">
-                      <div className="startedshift">
+                      <div className="startedshift operationdetailsTitle">
                         Started shift{" "}
                         {instance.startedshift ? (
                           <Icon
@@ -288,7 +285,7 @@ const ShiftsDetails = (props) => {
                           />
                         )}
                       </div>
-                      <div className="endedshift">
+                      <div className="endedshift operationdetailsTitle">
                         Ended shift
                         {instance.endedshift ? (
                           <Icon
@@ -307,38 +304,30 @@ const ShiftsDetails = (props) => {
 
                       {instance.operation ? (
                         <>
-                          <div className="operationdetails">
-                            <div>Operation Type</div>
-                            <div>{instance.operation.type}</div>
+                          <div className="operationdetailsTitle">
+                            Operation Type
                           </div>
+                          <div>{instance.operation.type}</div>
                           {instance.operation.type === "navire" && (
-                            <div className="operationdetails">
-                              <div>Operation Vessel</div>
+                            <>
+                              <div className="operationdetailsTitle">
+                                Operation Vessel
+                              </div>
                               <div>{instance.operation.vessel}</div>
-                            </div>
+                            </>
                           )}
-                          <div className="operationdetails">
-                            <div>Operation Position</div>
-                            <div>{instance.operation.position}</div>
+                          <div className="operationdetailsTitle">
+                            Operation Position
                           </div>
+                          <div>{instance.operation.position}</div>
                         </>
                       ) : null}
-                      {/* <div className="operationdetails">
-                        <div>Operation Type</div>
-                        <div> {instance.operation?.type}</div>
-                      </div>
-                      <div className="operationdetails">
-                        <div>Operation Vessel</div>
-                        <div>{instance.operation?.vessel}</div>
-                      </div>
-                      <div className="operationdetails">
-                        <div>Operation Position</div>
-                        <div>{instance.operation?.position}</div>
-                      </div> */}
                     </div>
                     {instance.operation && (
                       <div className="operationdetails">
-                        <div>Operation description</div>
+                        <div className="operationdetailsTitle">
+                          Operation description
+                        </div>
                         <div>{instance.operation?.description}</div>
                       </div>
                     )}

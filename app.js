@@ -34,10 +34,10 @@ app.use("/api", apiRouter);
 app.use(express.static(path.join(__dirname, "./front_end/build")));
 app.use(express.static(path.join(__dirname, "./public")));
 
-// // serve react
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "front_end", "build", "index.html"));
-// });
+// serve react
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "front_end", "build", "index.html"));
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
