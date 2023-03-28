@@ -73,7 +73,7 @@ const AppHeader = () => {
       </div>
       <ul className="profileOptions">
         <li onClick={handleLogOut}>Log Out</li>
-        <li>Profile</li>
+        {/* <li>Profile</li> */}
       </ul>
     </header>
   );
