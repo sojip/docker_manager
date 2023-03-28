@@ -1,4 +1,4 @@
-# docker_manager
+# Docker Manager
 
 This project was created to help the company in the management of the dockers' personnel. It allows the registration, the access control and the follow-up of the work done daily on the terminal.
 
