@@ -57,3 +57,27 @@ module.exports.refreshToken = function (req, res, next) {
   );
   res.json({ access_token, user: user });
 };
+
+module.exports.logguest = function (req, res, next) {
+  const user = {
+    _id: "123456",
+    username: "guest",
+    profile: "supervisor",
+  };
+  const access_token = jwt.sign(
+    { user: user },
+    process.env.access_token_secret
+  );
+  const refresh_token = jwt.sign(
+    { user: user },
+    process.env.refresh_token_secret,
+    { expiresIn: 300 }
+  );
+  //add refresh token to each request cookie
+  res.cookie("refresh_token", refresh_token, {
+    httpOnly: true,
+    sameSite: true,
+  });
+
+  return res.json({ access_token, user: user });
+};

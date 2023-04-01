@@ -43,7 +43,6 @@ const AddWorkerForm = (props) => {
       toast.error("Please Add A Photo");
       return;
     }
-    console.log("clicked");
     setisLoading(true);
     //create mutltipart form data
     let formData = new FormData();

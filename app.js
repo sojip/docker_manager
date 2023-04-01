@@ -32,8 +32,8 @@ app.use("/api", apiRouter);
 
 //indicate react app folder
 app.use(express.static(path.join(__dirname, "./front_end/build")));
+//indicate public images folder
 app.use(express.static(path.join(__dirname, "./public")));
-
 // serve react
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "front_end", "build", "index.html"));

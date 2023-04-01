@@ -149,7 +149,6 @@ const Workers = (props) => {
       <Modal
         backdrop="static"
         show={addWorker}
-        onHide={handleClose}
         contentClassName="content-wrapper addWorker"
       >
         <AddWorkerForm handleClose={handleClose} setworkers={setworkers} />
@@ -157,7 +156,6 @@ const Workers = (props) => {
       <Modal
         backdrop="static"
         show={showWorker}
-        onHide={handleClose}
         contentClassName="content-wrapper showWorker"
         fullscreen={true}
         scrollable

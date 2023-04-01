@@ -60,4 +60,6 @@ router.get(
   authController.refreshToken
 );
 
+router.get("/logguest", authController.logguest);
+
 module.exports = router;

@@ -52,7 +52,6 @@ const WorkerDetails = (props) => {
   }
 
   useEffect(() => {
-    // setisLoading(true);
     let controller = new AbortController();
     let signal = controller.signal;
     Promise.all([getWorker(id, signal), getshiftsinstances(id, signal)])

@@ -22,7 +22,8 @@
   /* color: var(--orange-color); */
 }
 
-#signinform input[type="submit"] {
+#signinform input[type="submit"],
+#signinform input[type="button"] {
   padding: 6px 1vw;
   background-color: transparent;
   border: solid 2px black;
@@ -34,11 +35,13 @@
   color: black;
 }
 
-#signinform input[type="submit"]:active {
+#signinform input[type="submit"]:active,
+#signinform input[type="button"]:active {
   transform: scale(1.1);
 }
 
-#signinform input[type="submit"]:hover {
+#signinform input[type="submit"]:hover,
+#signinform input[type="button"]:hover {
   color: var(--orange-color);
   border: solid 2px var(--orange-color);
 }

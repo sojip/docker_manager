@@ -49,6 +49,26 @@ export default function SignIn(props) {
       });
   };
 
+  const handleGuestLogin = (e) => {
+    setisLoading(true);
+    fetch("/api/logguest")
+      .then((res) => res.json())
+      .then((datas) => {
+        auth.setuser({
+          id: datas.user._id,
+          username: datas.user.username,
+          profile: datas.user.profile,
+          access_token: datas.access_token,
+        });
+      })
+      .catch((e) => {
+        alert(e);
+      })
+      .finally(() => {
+        setisLoading(false);
+      });
+  };
+
   return (
     <div className="full-screen-container">
       <ToastContainer />
@@ -90,6 +110,11 @@ export default function SignIn(props) {
           onChange={handleChange}
         />
         <input type="submit" value="Log In" />
+        <input
+          type="button"
+          onClick={handleGuestLogin}
+          value="Visit As A Guest"
+        />
       </Box>
     </div>
   );
