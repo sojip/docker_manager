@@ -10,7 +10,7 @@ import { DateTime } from "luxon";
 import useAuthContext from "../../auth/useAuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import Modal from "react-bootstrap/Modal";
 
 const Workers = (props) => {
@@ -149,7 +149,6 @@ const Workers = (props) => {
       <Modal
         backdrop="static"
         show={addWorker}
-        onHide={handleClose}
         contentClassName="content-wrapper addWorker"
       >
         <AddWorkerForm handleClose={handleClose} setworkers={setworkers} />
@@ -157,7 +156,6 @@ const Workers = (props) => {
       <Modal
         backdrop="static"
         show={showWorker}
-        onHide={handleClose}
         contentClassName="content-wrapper showWorker"
         fullscreen={true}
         scrollable

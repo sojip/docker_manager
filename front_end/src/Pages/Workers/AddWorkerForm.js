@@ -9,15 +9,26 @@ import { toast } from "react-toastify";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import {
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import TouchAppIcon from "@mui/icons-material/TouchApp";
+// import AxiosDigestAuth from "@mhoc/axios-digest-auth";
+// import { DigestClient } from "digest-fetch";
+import * as DigestClient from "digest-fetch";
 
 const AddWorkerForm = (props) => {
+  const [isLoading, setisLoading] = useState(false);
   const [datas, setdatas] = useState({
     dateofbirth: null,
   });
   const [photoSrc, setphotoSrc] = useState(DefaultPhoto);
   let { handleClose } = props;
   let { setworkers } = props;
-  const [isLoading, setisLoading] = useState(false);
 
   let style = {
     marginBottom: "15px",
@@ -34,6 +45,51 @@ const AddWorkerForm = (props) => {
     if (target.files.length === 0) return;
     if (!target.files[0].type.includes("image")) return;
     setphotoSrc(URL.createObjectURL(target.files[0]));
+  };
+
+  const handleCaptureFingerprint = () => {
+    console.log("clicked");
+    // fetch("/ISAPI/AccessControl/CaptureFingerPrint")
+    //   .then((resp) => console.log(resp))
+    //   .catch((e) => {
+    //     console.log(e);
+    //   });
+    const url = "/ISAPI/AccessControl/capabilities";
+    const username = "admin";
+    const password = "08Aug#@!2020";
+    const url_ = "/digest-auth/auth/test/pass";
+    const username_ = "test";
+    const password_ = "pass";
+
+    const client = new DigestClient(username_, password_, { statusCode: 400 });
+    // const fingerPrintCond = `<CaptureFingerPrintCond version="2.0" xmlns="http://www.isapi.org/ver20/XMLSchema">
+    //     <fingerNo>1</fingerNo>
+    // </CaptureFingerPrintCond>`;
+    client
+      .fetch(url_, {
+        method: "GET",
+        // headers: {
+        //   "Content-Type": "application/json",
+        // },
+        // body: JSON.stringify({
+        //   UserInfoSearchCond: {
+        //     searchID: "1",
+        //     searchResultPosition: 0,
+        //     maxResults: 2000,
+        //   },
+        // }),
+      })
+      .then((resp) => {
+        try {
+          console.log(resp);
+          return resp.json();
+        } catch (e) {
+          console.log(resp);
+          alert(e);
+          return;
+        }
+      })
+      .then((data) => console.log(data));
   };
 
   const handleSubmit = (e) => {
@@ -116,7 +172,10 @@ const AddWorkerForm = (props) => {
           placeholder="mm/dd/yyyy"
           value={datas.dateofbirth}
           onChange={(newValue) => {
-            setdatas({ ...datas, dateofbirth: newValue.toJSDate() });
+            setdatas({
+              ...datas,
+              dateofbirth: newValue ? newValue.toJSDate() : null,
+            });
           }}
           renderInput={(params) => (
             <TextField
@@ -167,13 +226,36 @@ const AddWorkerForm = (props) => {
         required
       />
       <br />
-      <TextField
+      {/* <TextField
         id="outlined-multiline-static"
         label="Finger Print"
         multiline
         rows={4}
         style={style}
-      />
+      /> */}
+      <FormControl variant="outlined">
+        <InputLabel htmlFor="outlined-adornment-fingerprint">
+          Fingerprint
+        </InputLabel>
+        <OutlinedInput
+          id="outlined-adornment-fingerprint"
+          type="text"
+          style={style}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleCaptureFingerprint}
+                // onMouseDown={handleMouseDownPassword}
+                edge="end"
+              >
+                <TouchAppIcon />
+              </IconButton>
+            </InputAdornment>
+          }
+          label="Password"
+        />
+      </FormControl>
       <br />
       <input
         type="submit"
