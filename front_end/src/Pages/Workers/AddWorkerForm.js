@@ -5,26 +5,20 @@ import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import { useState, useEffect } from "react";
 import DefaultPhoto from "../../img/workerdefault.png";
+import FingerPrint from "../../img/fingerprint.jpg";
 import { toast } from "react-toastify";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
-import {
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
-  IconButton,
-} from "@mui/material";
+import { InputAdornment, IconButton } from "@mui/material";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
-// import AxiosDigestAuth from "@mhoc/axios-digest-auth";
-// import { DigestClient } from "digest-fetch";
-import * as DigestClient from "digest-fetch";
 
 const AddWorkerForm = (props) => {
   const [isLoading, setisLoading] = useState(false);
+  // const [fingerprintcapture, setfingerprintcapture] = useState("");
   const [datas, setdatas] = useState({
     dateofbirth: null,
+    fingerprintcapture: "",
   });
   const [photoSrc, setphotoSrc] = useState(DefaultPhoto);
   let { handleClose } = props;
@@ -48,58 +42,34 @@ const AddWorkerForm = (props) => {
   };
 
   const handleCaptureFingerprint = () => {
-    console.log("clicked");
-    // fetch("/ISAPI/AccessControl/CaptureFingerPrint")
-    //   .then((resp) => console.log(resp))
-    //   .catch((e) => {
-    //     console.log(e);
-    //   });
-    const url = "/ISAPI/AccessControl/capabilities";
-    const username = "admin";
-    const password = "08Aug#@!2020";
-    const url_ = "/digest-auth/auth/test/pass";
-    const username_ = "test";
-    const password_ = "pass";
-
-    const client = new DigestClient(username_, password_, { statusCode: 400 });
-    // const fingerPrintCond = `<CaptureFingerPrintCond version="2.0" xmlns="http://www.isapi.org/ver20/XMLSchema">
-    //     <fingerNo>1</fingerNo>
-    // </CaptureFingerPrintCond>`;
-    client
-      .fetch(url_, {
-        method: "GET",
-        // headers: {
-        //   "Content-Type": "application/json",
-        // },
-        // body: JSON.stringify({
-        //   UserInfoSearchCond: {
-        //     searchID: "1",
-        //     searchResultPosition: 0,
-        //     maxResults: 2000,
-        //   },
-        // }),
+    fetch("/api/capture_fingerprint")
+      .then((resp) => resp.json())
+      .then((data) => {
+        console.log(data);
+        if (data.ResponseStatus !== undefined)
+          return toast.error("An Error Occured, Please Try Again");
+        //tcheck fingerprint quality
+        const fingercapture = data.CaptureFingerPrint;
+        const fingercaptureQuality = Number(
+          fingercapture.fingerPrintQuality[0]
+        );
+        if (fingercaptureQuality < 80)
+          return toast.info("Bad Fingerprint Quality, Please Try Again");
+        setdatas({ ...datas, fingerprintcapture: fingercapture.fingerData[0] });
+        // setfingerprintcapture(fingercapture.fingerData[0]);
       })
-      .then((resp) => {
-        try {
-          console.log(resp);
-          return resp.json();
-        } catch (e) {
-          console.log(resp);
-          alert(e);
-          return;
-        }
-      })
-      .then((data) => console.log(data));
+      .catch((e) => alert(e));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const photo = document.querySelector("#photo");
     if (photo.files.length === 0) {
-      toast.error("Please Add A Photo");
-      return;
+      return toast.error("Please Add A Photo");
     }
-    console.log("clicked");
+    if (datas.fingerprintcapture === "") {
+      return toast.error("Please Add A Fingerprint");
+    }
     setisLoading(true);
     //create mutltipart form data
     let formData = new FormData();
@@ -117,6 +87,7 @@ const AddWorkerForm = (props) => {
         setworkers((workers) => [...workers, worker]);
         setdatas({
           dateofbirth: null,
+          fingerprintcapture: "",
         });
         setphotoSrc(DefaultPhoto);
         setisLoading(false);
@@ -226,22 +197,19 @@ const AddWorkerForm = (props) => {
         required
       />
       <br />
-      {/* <TextField
-        id="outlined-multiline-static"
-        label="Finger Print"
-        multiline
-        rows={4}
+      <TextField
+        id="fingerpirnt"
+        label="Fingerprint"
+        name="fingerprint"
+        variant="outlined"
         style={style}
-      /> */}
-      <FormControl variant="outlined">
-        <InputLabel htmlFor="outlined-adornment-fingerprint">
-          Fingerprint
-        </InputLabel>
-        <OutlinedInput
-          id="outlined-adornment-fingerprint"
-          type="text"
-          style={style}
-          endAdornment={
+        InputProps={{
+          readOnly: true,
+          startAdornment:
+            datas.fingerprintcapture === "" ? null : (
+              <img src={FingerPrint} id="fingerprintImg" alt="" />
+            ),
+          endAdornment: (
             <InputAdornment position="end">
               <IconButton
                 aria-label="toggle password visibility"
@@ -252,10 +220,9 @@ const AddWorkerForm = (props) => {
                 <TouchAppIcon />
               </IconButton>
             </InputAdornment>
-          }
-          label="Password"
-        />
-      </FormControl>
+          ),
+        }}
+      />
       <br />
       <input
         type="submit"

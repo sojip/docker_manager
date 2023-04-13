@@ -4,8 +4,9 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
-require("dotenv").config();
+var xmlparser = require("express-xml-bodyparser");
 var mongoose = require("mongoose");
+require("dotenv").config();
 require("./auth/auth");
 
 //mongodb connection
@@ -26,6 +27,7 @@ app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(xmlparser());
 app.use(cookieParser());
 
 app.use("/api", apiRouter);
@@ -52,8 +54,8 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  console.table(err);
-  res.send("error");
+  console.log(err);
+  res.send(err.message);
 });
 
 module.exports = app;

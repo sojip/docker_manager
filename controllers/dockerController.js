@@ -9,10 +9,8 @@ module.exports.createDocker = async function (req, res, next) {
   //compress photo
   const filename = req.file.filename;
   const extension = req.file.mimetype.replace("image/", "");
-  console.table(extension);
   const filenameCompressed =
     crypto.randomUUID() + "-" + filename.replace(extension, "jpeg");
-  console.table(filenameCompressed);
   await sharp(req.file.path)
     .rotate()
     .toFormat("jpeg", { mozjpeg: true })
@@ -23,9 +21,8 @@ module.exports.createDocker = async function (req, res, next) {
   var dateofbirth = req.body.dateofbirth;
   var position = req.body.position;
   var cni = req.body.cni;
-  var fingerprint = req.body.fingerprint || undefined;
+  var fingerprint = req.body.fingerprintcapture || undefined;
   var photo = req.file.destination.replace("./public", "") + filenameCompressed;
-  console.table(photo);
 
   var docker = new Docker({
     firstname: firstname,
@@ -41,7 +38,8 @@ module.exports.createDocker = async function (req, res, next) {
 
   docker.save(function (err, docker) {
     if (err) return next(err);
-    return res.json(docker);
+    req.docker = docker;
+    return next();
   });
 };
 

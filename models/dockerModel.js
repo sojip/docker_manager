@@ -28,6 +28,7 @@ let dockerSchema = new Schema(
     cni: {
       type: String,
       default: undefined,
+      required: true,
     },
     dateofbirth: {
       type: Date,

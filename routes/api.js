@@ -5,6 +5,7 @@ var interruptionController = require("../controllers/interruptionController");
 var shiftInstanceController = require("../controllers/shiftInstanceController");
 var authController = require("../controllers/authController");
 var passport = require("passport");
+var accessControlController = require("../controllers/accessControlController");
 require("dotenv").config();
 const multer = require("multer");
 
@@ -18,7 +19,13 @@ var storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.post("/workers", upload.single("photo"), dockerController.createDocker);
+router.post(
+  "/workers",
+  upload.single("photo"),
+  dockerController.createDocker,
+  accessControlController.createUser,
+  accessControlController.saveFingerPrintCapture
+);
 router.get(
   "/workers",
   passport.authenticate("access_token", { session: false }),
@@ -59,5 +66,5 @@ router.get(
   passport.authenticate("refresh_token", { session: false }),
   authController.refreshToken
 );
-
+router.get("/capture_fingerprint", accessControlController.captureFingerPrint);
 module.exports = router;
