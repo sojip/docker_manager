@@ -4,6 +4,7 @@ const path = require("path");
 var sharp = require("sharp");
 var fs = require("fs");
 var crypto = require("crypto");
+const DigestClient = require("digest-fetch");
 
 module.exports.createDocker = async function (req, res, next) {
   //compress photo
@@ -24,6 +25,8 @@ module.exports.createDocker = async function (req, res, next) {
   var fingerprint = req.body.fingerprintcapture || undefined;
   var photo = req.file.destination.replace("./public", "") + filenameCompressed;
 
+  fs.unlinkSync(req.file.path);
+  // create docker and save
   var docker = new Docker({
     firstname: firstname,
     lastname: lastname,
@@ -32,14 +35,12 @@ module.exports.createDocker = async function (req, res, next) {
     position: position,
     photo: photo,
     cni: cni,
+    personID: req.personID,
   });
-
-  fs.unlinkSync(req.file.path);
 
   docker.save(function (err, docker) {
     if (err) return next(err);
-    req.docker = docker;
-    return next();
+    res.json(docker);
   });
 };
 

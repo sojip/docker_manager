@@ -22,9 +22,9 @@ const upload = multer({ storage: storage });
 router.post(
   "/workers",
   upload.single("photo"),
-  dockerController.createDocker,
   accessControlController.createUser,
-  accessControlController.saveFingerPrintCapture
+  accessControlController.saveFingerPrintCapture,
+  dockerController.createDocker
 );
 router.get(
   "/workers",
@@ -67,4 +67,5 @@ router.get(
   authController.refreshToken
 );
 router.get("/capture_fingerprint", accessControlController.captureFingerPrint);
+
 module.exports = router;

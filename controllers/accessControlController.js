@@ -34,12 +34,15 @@ module.exports.captureFingerPrint = function (req, res, next) {
     .catch((e) => next(e));
 };
 
-module.exports.createUser = function (req, res, next) {
-  const docker = req.docker;
+module.exports.createUser = async function (req, res, next) {
+  var firstname = req.body.firstname;
+  var lastname = req.body.lastname;
+  var personID = await getPersonID();
+
   const userInfo = {
     UserInfo: {
-      employeeNo: docker._id,
-      name: `${docker.firstname} ${docker.lastname}`,
+      employeeNo: await personID.toString(),
+      name: `${firstname} ${lastname}`,
       userType: "normal",
       Valid: {
         enable: true,
@@ -71,27 +74,26 @@ module.exports.createUser = function (req, res, next) {
     .fetch(url, options)
     .then((resp) => resp.json())
     .then((datas) => {
-      console.log(datas);
-      if (datas.statusCode !== 1)
-        throw new Error("Failed To Record User On Access Control");
-      console.log("here");
+      if (datas.statusCode !== 1) {
+        console.log(datas);
+        return next(new Error(datas.subStatusCode));
+      }
+      req.personID = personID;
       next();
     })
     .catch((e) => next(e));
 };
 
 module.exports.saveFingerPrintCapture = function (req, res, next) {
-  console.log(req.docker);
-  var docker = req.docker;
   const username = process.env.access_control_username;
   const password = process.env.access_control_password;
   const fingerPrintInfo = {
     FingerPrintCfg: {
-      employeeNo: docker._id,
+      employeeNo: req.personID.toString(),
       enableCardReader: [1],
       fingerPrintID: 1,
       fingerType: "normalFP",
-      fingerData: docker.fingerprint,
+      fingerData: req.body.fingerprintcapture,
       leaderFP: [1],
     },
   };
@@ -108,9 +110,42 @@ module.exports.saveFingerPrintCapture = function (req, res, next) {
     .fetch(url, options)
     .then((resp) => resp.json())
     .then((datas) => {
-      if (datas.statusCode !== 1)
-        throw new Error("Failed To Record FingerPrint On Access Control");
-      res.json(docker);
+      if (datas.statusCode !== 1) {
+        console.log(datas);
+        throw new Error(datas.subStatusCode);
+      }
+      next();
     })
     .catch((e) => next(e));
 };
+
+async function getPersonID() {
+  const username = process.env.access_control_username;
+  const password = process.env.access_control_password;
+  const url = `http://${process.env.access_control_terminal_ip}/ISAPI/AccessControl/UserInfo/Search?format=json`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      UserInfoSearchCond: {
+        searchID: "1",
+        searchResultPosition: 0,
+        maxResults: 3000,
+      },
+    }),
+  };
+  const client = new DigestClient(username, password, { algorithm: "MD5" });
+  try {
+    const resp = await client.fetch(url, options);
+    const datas = await resp.json();
+    const lastIDused = await datas.UserInfoSearch.UserInfo[
+      datas.UserInfoSearch.UserInfo.length - 1
+    ]["employeeNo"];
+    const personID = Number(await lastIDused) + 1;
+    return personID;
+  } catch (e) {
+    throw new Error("Failed To Get PersonID");
+  }
+}

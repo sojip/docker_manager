@@ -15,6 +15,7 @@ import { Spinner } from "../../components/Spinner";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import FingerPrint from "../../img/fingerprint.jpg";
 
 const WorkerDetails = (props) => {
   const { id, handleClose } = props;
@@ -231,7 +232,9 @@ const WorkerDetails = (props) => {
                   <div style={{ fontStyle: "italic" }}>{worker.position}</div>
                 </div>
               </div>
-              <div className="fingerprintcontainer">FINGERPRINT</div>
+              <div className="fingerprintcontainer">
+                <img src={FingerPrint} alt="" />
+              </div>
 
               <div
                 style={{

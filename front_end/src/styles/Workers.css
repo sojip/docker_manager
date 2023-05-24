@@ -24,6 +24,10 @@
   animation: fadeIn 500ms;
 }
 
+.workerscontainer .workerCard .name {
+  text-transform: capitalize;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -39,6 +39,10 @@ let dockerSchema = new Schema(
       required: true,
       default: "fingerprint",
     },
+    personID: {
+      type: Number,
+      required: true,
+    },
     createdOn: {
       type: Date,
       required: true,

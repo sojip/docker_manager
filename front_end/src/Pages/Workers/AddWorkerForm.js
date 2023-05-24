@@ -15,7 +15,7 @@ import TouchAppIcon from "@mui/icons-material/TouchApp";
 
 const AddWorkerForm = (props) => {
   const [isLoading, setisLoading] = useState(false);
-  // const [fingerprintcapture, setfingerprintcapture] = useState("");
+  const [iscapturing, setiscapturing] = useState(false);
   const [datas, setdatas] = useState({
     dateofbirth: null,
     fingerprintcapture: "",
@@ -42,33 +42,37 @@ const AddWorkerForm = (props) => {
   };
 
   const handleCaptureFingerprint = () => {
+    setiscapturing(true);
+    setdatas({ ...datas, fingerprintcapture: "" });
     fetch("/api/capture_fingerprint")
       .then((resp) => resp.json())
       .then((data) => {
         console.log(data);
         if (data.ResponseStatus !== undefined)
-          return toast.error("An Error Occured, Please Try Again");
+          throw new Error(data.ResponseStatus.statusString[0]);
         //tcheck fingerprint quality
         const fingercapture = data.CaptureFingerPrint;
         const fingercaptureQuality = Number(
           fingercapture.fingerPrintQuality[0]
         );
         if (fingercaptureQuality < 80)
-          return toast.info("Bad Fingerprint Quality, Please Try Again");
+          throw new Error("Bad FingerPrint Quality, Please Try Again");
         setdatas({ ...datas, fingerprintcapture: fingercapture.fingerData[0] });
-        // setfingerprintcapture(fingercapture.fingerData[0]);
       })
-      .catch((e) => alert(e));
+      .finally(() => {
+        setiscapturing(false);
+      })
+      .catch((e) => toast.error(e.message));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const photo = document.querySelector("#photo");
     if (photo.files.length === 0) {
-      return toast.error("Please Add A Photo");
+      return toast.info("Please Add A Photo");
     }
     if (datas.fingerprintcapture === "") {
-      return toast.error("Please Add A Fingerprint");
+      return toast.info("Please Add A Fingerprint");
     }
     setisLoading(true);
     //create mutltipart form data
@@ -82,7 +86,10 @@ const AddWorkerForm = (props) => {
       method: "POST",
       body: formData,
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+      })
       .then((worker) => {
         setworkers((workers) => [...workers, worker]);
         setdatas({
@@ -90,13 +97,14 @@ const AddWorkerForm = (props) => {
           fingerprintcapture: "",
         });
         setphotoSrc(DefaultPhoto);
-        setisLoading(false);
         toast.success("Worker Added Successfully");
         e.target.reset();
       })
       .catch((e) => {
-        setisLoading(false);
         toast.error(e.message);
+      })
+      .finally(() => {
+        setisLoading(false);
       });
   };
 
@@ -217,7 +225,11 @@ const AddWorkerForm = (props) => {
                 // onMouseDown={handleMouseDownPassword}
                 edge="end"
               >
-                <TouchAppIcon />
+                {iscapturing ? (
+                  <i className="fa-solid fa-spinner fa-spin-pulse"></i>
+                ) : (
+                  <TouchAppIcon />
+                )}
               </IconButton>
             </InputAdornment>
           ),
