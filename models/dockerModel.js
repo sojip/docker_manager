@@ -28,6 +28,7 @@ let dockerSchema = new Schema(
     cni: {
       type: String,
       default: undefined,
+      required: true,
     },
     dateofbirth: {
       type: Date,
@@ -37,6 +38,10 @@ let dockerSchema = new Schema(
       type: String,
       required: true,
       default: "fingerprint",
+    },
+    personID: {
+      type: Number,
+      required: true,
     },
     createdOn: {
       type: Date,

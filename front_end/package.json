@@ -8,6 +8,7 @@
     "@emotion/styled": "^11.10.0",
     "@mdi/js": "^7.0.96",
     "@mdi/react": "^1.6.1",
+    "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.9.3",
     "@mui/x-date-pickers": "^5.0.20",
     "@testing-library/jest-dom": "^5.16.4",
@@ -32,7 +33,6 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://localhost:3000",
   "eslintConfig": {
     "extends": [
       "react-app",

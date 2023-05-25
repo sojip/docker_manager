@@ -1,9 +1,8 @@
+import { useEffect, useState } from "react";
+import { DateTime, Interval } from "luxon";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import Box from "@mui/material/Box";
-import { useEffect, useState } from "react";
-import "../../styles/WorkerDetails.css";
-import { DateTime, Interval } from "luxon";
 import TextField from "@mui/material/TextField";
 import { mdiPauseOctagon } from "@mdi/js";
 import { mdiCheckboxMultipleMarked } from "@mdi/js";
@@ -12,6 +11,11 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { RadioGroup, Radio } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import { Spinner } from "../../components/Spinner";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import FingerPrint from "../../img/fingerprint.jpg";
+import "../../styles/WorkerDetails.css";
 
 const WorkerDetails = (props) => {
   const { id, handleClose } = props;
@@ -29,8 +33,8 @@ const WorkerDetails = (props) => {
   const [shiftsinstances, setshiftsinstances] = useState([]);
   const [searchresults, setsearchresults] = useState([]);
   const [filterby, setfilterby] = useState({
-    from: "",
-    to: "",
+    from: null,
+    to: null,
     option: "all",
   });
 
@@ -76,7 +80,7 @@ const WorkerDetails = (props) => {
     let dateTo = filter.to;
     let option = filter.option;
     //handle dateFrom is set - dateTo is set && dateFrom is set - dateTo is not set
-    if (dateFrom !== "") {
+    if (dateFrom !== null) {
       let shiftsinstancesIds = shiftsinstances
         .map((instance) => {
           return {
@@ -89,10 +93,10 @@ const WorkerDetails = (props) => {
           };
         })
         .filter((instance) => {
-          if (dateTo !== "") {
+          if (dateTo !== null) {
             let interval = Interval.fromDateTimes(
-              DateTime.fromISO(dateFrom),
-              DateTime.fromISO(dateTo).plus({ days: 1 })
+              DateTime.fromJSDate(dateFrom),
+              DateTime.fromJSDate(dateTo).plus({ days: 1 })
             );
             return (
               interval.contains(DateTime.fromISO(instance.shift.startdate)) ||
@@ -101,9 +105,9 @@ const WorkerDetails = (props) => {
           }
           return (
             DateTime.fromISO(instance.shift.startdate) >=
-              DateTime.fromISO(dateFrom) ||
+              DateTime.fromJSDate(dateFrom) ||
             DateTime.fromISO(instance.shift.enddate) >=
-              DateTime.fromISO(dateFrom)
+              DateTime.fromJSDate(dateFrom)
           );
         }) //filter by option ["all", "ended", "notended"]
         .filter((instance) => {
@@ -118,7 +122,7 @@ const WorkerDetails = (props) => {
           return shiftsinstancesIds.includes(instance._id);
         })
       ); // handle dateTo only is set
-    } else if (dateTo !== "") {
+    } else if (dateTo !== null) {
       let shiftsinstancesIds = shiftsinstances
         .map((instance) => {
           return {
@@ -133,8 +137,9 @@ const WorkerDetails = (props) => {
         .filter((instance) => {
           return (
             DateTime.fromISO(instance.shift.startdate) <=
-              DateTime.fromISO(dateTo) ||
-            DateTime.fromISO(instance.shift.enddate) <= DateTime.fromISO(dateTo)
+              DateTime.fromJSDate(dateTo) ||
+            DateTime.fromISO(instance.shift.enddate) <=
+              DateTime.fromJSDate(dateTo)
           );
         }) //filter by option ["all", "ended", "notended"]
         .filter((instance) => {
@@ -167,6 +172,7 @@ const WorkerDetails = (props) => {
 
   useEffect(() => {
     handleSearchAndFilter(filterby);
+    console.log(filterby);
   }, [filterby, shiftsinstances]);
 
   const handleChange = (e) => {
@@ -226,7 +232,9 @@ const WorkerDetails = (props) => {
                   <div style={{ fontStyle: "italic" }}>{worker.position}</div>
                 </div>
               </div>
-              <div className="fingerprintcontainer">FINGERPRINT</div>
+              <div className="fingerprintcontainer">
+                <img src={FingerPrint} alt="" />
+              </div>
 
               <div
                 style={{
@@ -251,29 +259,52 @@ const WorkerDetails = (props) => {
             <div className="findshifts">
               <div>
                 <div>From</div>
-                <TextField
-                  type="date"
-                  id="searchshiftstart"
-                  helperText="Select A Date"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  name="from"
-                  onChange={handleChange}
-                />
+                <LocalizationProvider dateAdapter={AdapterLuxon}>
+                  <DatePicker
+                    label="Start Date"
+                    placeholder="mm/dd/yyyy"
+                    value={filterby.from}
+                    onChange={(newValue) => {
+                      setfilterby({
+                        ...filterby,
+                        from: newValue ? newValue.toJSDate() : null,
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        margin="normal"
+                        fullWidth
+                        {...params}
+                        helperText={"mm/dd/yyyy"}
+                      />
+                    )}
+                  />
+                </LocalizationProvider>
               </div>
               <div>
                 <div>To</div>
-                <TextField
-                  type="date"
-                  id="searchshiftend"
-                  helperText="Select A Date"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  name="to"
-                  onChange={handleChange}
-                />
+                <LocalizationProvider dateAdapter={AdapterLuxon}>
+                  <DatePicker
+                    label="End Date"
+                    placeholder="mm/dd/yyyy"
+                    value={filterby.to}
+                    onChange={(newValue) => {
+                      setfilterby({
+                        ...filterby,
+                        to: newValue ? newValue.toJSDate() : null,
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        margin="normal"
+                        fullWidth
+                        {...params}
+                        helperText={"mm/dd/yyyy"}
+                        required
+                      />
+                    )}
+                  />
+                </LocalizationProvider>
               </div>
             </div>
             <RadioGroup
@@ -393,9 +424,11 @@ const WorkerDetails = (props) => {
                               <div>
                                 Operation Type {instance.operation?.type}
                               </div>
-                              <div>
-                                Operation Vessel {instance.operation?.vessel}
-                              </div>
+                              {instance.operation.type === "navire" && (
+                                <div>
+                                  Operation Vessel {instance.operation?.vessel}
+                                </div>
+                              )}
                               <div>
                                 Operation Position{" "}
                                 {instance.operation?.position}

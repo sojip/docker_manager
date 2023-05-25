@@ -20,6 +20,13 @@
   clip: rect(1px, 1px, 1px, 1px);
 }
 
+#addworkerform #fingerprintImg {
+  width: 150px;
+  height: 150px;
+  animation: fadeIn 5s;
+  object-fit: cover;
+}
+
 /* #addworkerform #photo:is(:focus, :focus-within) label {
   border: solid 8px red;
 } */

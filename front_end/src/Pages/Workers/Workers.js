@@ -1,8 +1,7 @@
+import { useState, useEffect } from "react";
 import Icon from "@mdi/react";
 import { mdiAccountPlusOutline } from "@mdi/js";
 import { mdiAccountHardHatOutline } from "@mdi/js";
-import "../../styles/Workers.css";
-import { useState, useEffect } from "react";
 import AddWorkerForm from "./AddWorkerForm";
 import WorkerDetails from "./WorkerDetails";
 import TextField from "@mui/material/TextField";
@@ -10,8 +9,9 @@ import { DateTime } from "luxon";
 import useAuthContext from "../../auth/useAuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import Modal from "react-bootstrap/Modal";
+import "../../styles/Workers.css";
 
 const Workers = (props) => {
   const { setisLoading } = props;
@@ -68,13 +68,14 @@ const Workers = (props) => {
       .then((res) => res.json())
       .then((workers) => {
         setworkers(workers);
-        setisLoading(false);
       })
       .catch((e) => {
         if (e.name !== "AbortError") {
-          setisLoading(false);
           toast.error(e.message);
         }
+      })
+      .finally(() => {
+        setisLoading(false);
       });
 
     return () => {

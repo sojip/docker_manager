@@ -3,7 +3,6 @@ nav {
   top: 0;
   left: 0;
   bottom: 0;
-  /* padding: 0 1vw; */
   padding-top: 10.5vh;
   height: 100vh;
   width: calc(24px + 2vw);
@@ -14,7 +13,7 @@ nav {
   z-index: 2;
 }
 
-nav.isfull {
+nav.grow {
   width: 200px;
 }
 
@@ -23,15 +22,10 @@ nav ul {
   padding: 0;
   list-style-type: none;
   text-align: center;
-  /* border: solid 1px red; */
 }
 
 nav ul li {
-  /* width: 100%; */
-  /* background-color: green; */
-  /* margin-bottom: 1vh; */
   padding: 1vh 0;
-  /* border: solid 1px red; */
 }
 
 nav .navLink {
@@ -56,10 +50,6 @@ nav .navLink .navitemDesc {
 
 nav .navLink .navitemDesc.show {
   display: block;
-}
-
-nav .navIcon {
-  /* border: solid 1px red; */
 }
 
 @media screen and (max-width: 780px) {

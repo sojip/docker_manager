@@ -4,12 +4,13 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
-require("dotenv").config();
+var xmlparser = require("express-xml-bodyparser");
 var mongoose = require("mongoose");
+require("dotenv").config();
 require("./auth/auth");
 
 //mongodb connection
-var mongodburi = `mongodb+srv://${process.env.username}:${process.env.password}@cluster0.gfhtwet.mongodb.net/?retryWrites=true&w=majority`;
+var mongodburi = `mongodb+srv://${process.env.username}:${process.env.password}@cluster0.tmdgvq0.mongodb.net/?retryWrites=true&w=majority`;
 
 mongoose.connect(mongodburi, {
   useNewUrlParser: true,
@@ -26,6 +27,7 @@ app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(xmlparser());
 app.use(cookieParser());
 
 app.use("/api", apiRouter);
@@ -52,8 +54,9 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  console.table(err);
-  res.send("error");
+  console.log(err);
+  // throw new Error(err.message);
+  res.send(err.message);
 });
 
 module.exports = app;

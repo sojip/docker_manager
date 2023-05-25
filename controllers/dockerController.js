@@ -4,15 +4,14 @@ const path = require("path");
 var sharp = require("sharp");
 var fs = require("fs");
 var crypto = require("crypto");
+const DigestClient = require("digest-fetch");
 
 module.exports.createDocker = async function (req, res, next) {
   //compress photo
   const filename = req.file.filename;
   const extension = req.file.mimetype.replace("image/", "");
-  console.table(extension);
   const filenameCompressed =
     crypto.randomUUID() + "-" + filename.replace(extension, "jpeg");
-  console.table(filenameCompressed);
   await sharp(req.file.path)
     .rotate()
     .toFormat("jpeg", { mozjpeg: true })
@@ -23,10 +22,11 @@ module.exports.createDocker = async function (req, res, next) {
   var dateofbirth = req.body.dateofbirth;
   var position = req.body.position;
   var cni = req.body.cni;
-  var fingerprint = req.body.fingerprint || undefined;
+  var fingerprint = req.body.fingerprintcapture || undefined;
   var photo = req.file.destination.replace("./public", "") + filenameCompressed;
-  console.table(photo);
 
+  fs.unlinkSync(req.file.path);
+  // create docker and save
   var docker = new Docker({
     firstname: firstname,
     lastname: lastname,
@@ -35,13 +35,12 @@ module.exports.createDocker = async function (req, res, next) {
     position: position,
     photo: photo,
     cni: cni,
+    personID: req.personID,
   });
-
-  fs.unlinkSync(req.file.path);
 
   docker.save(function (err, docker) {
     if (err) return next(err);
-    return res.json(docker);
+    res.json(docker);
   });
 };
 
