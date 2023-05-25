@@ -3,8 +3,7 @@ var mongoose = require("mongoose");
 
 module.exports.createShift = function (req, res, next) {
   var type = req.body.type;
-  var startdate = new Date(req.body.startdate);
-  console.log(startdate);
+  var startdate = new Date(req.body.startdate.split("T")[0]);
   type === "jour" ? startdate.setUTCHours(6) : startdate.setUTCHours(18);
 
   Shift.find({ startdate: startdate }, function (err, shift) {

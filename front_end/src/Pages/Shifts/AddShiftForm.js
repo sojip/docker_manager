@@ -143,9 +143,7 @@ const AddShiftForm = (props) => {
         );
       })
       .catch((e) => {
-        setsubmitting(false);
         toast.error(e.message);
-        console.log(e);
       })
       .finally(() => {
         setsubmitting(false);
