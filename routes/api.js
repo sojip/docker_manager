@@ -19,13 +19,7 @@ var storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.post(
-  "/workers",
-  upload.single("photo"),
-  accessControlController.createUser,
-  accessControlController.saveFingerPrintCapture,
-  dockerController.createDocker
-);
+router.post("/workers", upload.single("photo"), dockerController.createDocker);
 router.get(
   "/workers",
   passport.authenticate("access_token", { session: false }),

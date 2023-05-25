@@ -10,7 +10,7 @@ require("dotenv").config();
 require("./auth/auth");
 
 //mongodb connection
-var mongodburi = `mongodb+srv://${process.env.username}:${process.env.password}@cluster0.tmdgvq0.mongodb.net/?retryWrites=true&w=majority`;
+var mongodburi = `mongodb+srv://${process.env.username}:${process.env.password}@cluster0.gfhtwet.mongodb.net/?retryWrites=true&w=majority`;
 
 mongoose.connect(mongodburi, {
   useNewUrlParser: true,

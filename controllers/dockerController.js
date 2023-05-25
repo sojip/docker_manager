@@ -35,7 +35,6 @@ module.exports.createDocker = async function (req, res, next) {
     position: position,
     photo: photo,
     cni: cni,
-    personID: req.personID,
   });
 
   docker.save(function (err, docker) {

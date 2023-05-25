@@ -235,17 +235,6 @@ const AddShiftForm = (props) => {
               )}
             />
           </LocalizationProvider>
-          {/* <TextField
-            id="startdate"
-            name="startdate"
-            variant="outlined"
-            style={style}
-            type="date"
-            margin="normal"
-            helperText="Select The Start Date"
-            required
-            onChange={handleChange}
-          /> */}
           <FormControl component="fieldset" variant="standard">
             <FormLabel component="legend">Select Workers</FormLabel>
             {workers.length > 0 &&
