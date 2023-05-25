@@ -1,9 +1,9 @@
-import "../../styles/Home.css";
 import { Link } from "react-router-dom";
 import Icon from "@mdi/react";
 import { mdiAccountMultiple } from "@mdi/js";
 import { mdiCarShiftPattern } from "@mdi/js";
 import { mdiMonitorDashboard } from "@mdi/js";
+import "../../styles/Home.css";
 
 const Home = () => {
   return (

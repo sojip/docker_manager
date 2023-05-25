@@ -17,10 +17,16 @@ import { toast } from "react-toastify";
 import { useContext } from "react";
 import { ShiftsContext } from "./Shifts";
 import { Spinner } from "../../components/Spinner";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import { Settings } from "luxon";
+
+Settings.defaultZone = "UTC+1";
 
 const AddShiftForm = (props) => {
   const auth = useAuthContext();
-  const [datas, setdatas] = useState({ type: "", startdate: "" });
+  const [datas, setdatas] = useState({ type: "", startdate: null });
   const [time, settime] = useState("");
   const [workers, setworkers] = useState([]);
   const { setshifts } = useContext(ShiftsContext);
@@ -98,15 +104,15 @@ const AddShiftForm = (props) => {
     return instance;
   }
 
-  function handleSubmit(e) {
-    setsubmitting(true);
+  async function handleSubmit(e) {
     e.preventDefault();
+    //cancel if nobody selected
     let selectedworkers = workers.filter((worker) => worker.checked === true);
     if (selectedworkers.length === 0) {
-      toast.error("Select Workers Please");
-      setsubmitting(false);
-      return;
+      throw new Error("Select Workers Please");
     }
+    //send datas
+    setsubmitting(true);
     fetch("/api/shifts", {
       method: "POST",
       headers: {
@@ -116,9 +122,8 @@ const AddShiftForm = (props) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.error) {
-          setsubmitting(false);
-          throw Error(data.error.message);
+        if (data.message) {
+          throw Error(data.message);
         }
         setshifts((shifts) => [data, ...shifts]);
         return Promise.all(
@@ -127,11 +132,9 @@ const AddShiftForm = (props) => {
           })
         );
       })
-      .then((result) => {
-        e.target.reset();
-        setdatas({ type: "", startdate: "" });
+      .then(() => {
+        setdatas({ type: "", startdate: null });
         settime("");
-        setsubmitting(false);
         toast.success("New Shift Added Successfully");
         setworkers(
           workers.map((worker) => {
@@ -143,6 +146,9 @@ const AddShiftForm = (props) => {
         setsubmitting(false);
         toast.error(e.message);
         console.log(e);
+      })
+      .finally(() => {
+        setsubmitting(false);
       });
   }
 
@@ -208,7 +214,28 @@ const AddShiftForm = (props) => {
               }}
             />
           </div>
-          <TextField
+          <LocalizationProvider dateAdapter={AdapterLuxon}>
+            <DatePicker
+              label="Select The Start Date"
+              placeholder="mm/dd/yyyy"
+              value={datas.startdate}
+              onChange={(newValue) => {
+                setdatas({
+                  ...datas,
+                  startdate: newValue ? newValue.toISO() : null,
+                });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  {...params}
+                  helperText={"mm/dd/yyyy"}
+                />
+              )}
+            />
+          </LocalizationProvider>
+          {/* <TextField
             id="startdate"
             name="startdate"
             variant="outlined"
@@ -218,7 +245,7 @@ const AddShiftForm = (props) => {
             helperText="Select The Start Date"
             required
             onChange={handleChange}
-          />
+          /> */}
           <FormControl component="fieldset" variant="standard">
             <FormLabel component="legend">Select Workers</FormLabel>
             {workers.length > 0 &&

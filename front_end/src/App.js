@@ -1,4 +1,5 @@
-import "./App.css";
+import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home/Home";
 import Shifts from "./Pages/Shifts/Shifts";
@@ -6,12 +7,10 @@ import Workers from "./Pages/Workers/Workers";
 import Stats from "./Pages/Stats/Stats";
 import SignIn from "./Pages/SignIn/SignIn";
 import DashboardLayout from "./components/DashboardLayout";
-import { useState } from "react";
-import { Navigate } from "react-router-dom";
 import Loader from "./components/Loader";
 import AuthProvider from "./auth/AuthProvider";
 import useAuthContext from "./auth/useAuthContext";
-import WorkerDetails from "./Pages/Workers/WorkerDetails";
+import "./App.css";
 
 let ProtectedRoute = ({ children }) => {
   const auth = useAuthContext();
@@ -60,10 +59,6 @@ function App() {
                 path="/workers"
                 element={<Workers setisLoading={setisLoading} />}
               />
-              {/* <Route
-                path="/workers/:id"
-                element={<WorkerDetails setisLoading={setisLoading} />}
-              /> */}
               <Route
                 path="/shifts"
                 element={<Shifts setisLoading={setisLoading} />}

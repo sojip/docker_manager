@@ -5,19 +5,24 @@ import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import { useState, useEffect } from "react";
 import DefaultPhoto from "../../img/workerdefault.png";
+import FingerPrint from "../../img/fingerprint.jpg";
 import { toast } from "react-toastify";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import { InputAdornment, IconButton } from "@mui/material";
+import TouchAppIcon from "@mui/icons-material/TouchApp";
 
 const AddWorkerForm = (props) => {
+  const [isLoading, setisLoading] = useState(false);
+  const [iscapturing, setiscapturing] = useState(false);
   const [datas, setdatas] = useState({
     dateofbirth: null,
+    fingerprintcapture: "",
   });
   const [photoSrc, setphotoSrc] = useState(DefaultPhoto);
   let { handleClose } = props;
   let { setworkers } = props;
-  const [isLoading, setisLoading] = useState(false);
 
   let style = {
     marginBottom: "15px",
@@ -36,14 +41,38 @@ const AddWorkerForm = (props) => {
     setphotoSrc(URL.createObjectURL(target.files[0]));
   };
 
+  const handleCaptureFingerprint = () => {
+    setiscapturing(true);
+    setdatas({ ...datas, fingerprintcapture: "" });
+    fetch("/api/capture_fingerprint")
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (data.ResponseStatus !== undefined)
+          throw new Error(data.ResponseStatus.statusString[0]);
+        //tcheck fingerprint quality
+        const fingercapture = data.CaptureFingerPrint;
+        const fingercaptureQuality = Number(
+          fingercapture.fingerPrintQuality[0]
+        );
+        if (fingercaptureQuality < 80)
+          throw new Error("Bad FingerPrint Quality, Please Try Again");
+        setdatas({ ...datas, fingerprintcapture: fingercapture.fingerData[0] });
+      })
+      .finally(() => {
+        setiscapturing(false);
+      })
+      .catch((e) => toast.error(e.message));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const photo = document.querySelector("#photo");
     if (photo.files.length === 0) {
-      toast.error("Please Add A Photo");
-      return;
+      return toast.info("Please Add A Photo");
     }
-    console.log("clicked");
+    if (datas.fingerprintcapture === "") {
+      // return toast.info("Please Add A Fingerprint");
+    }
     setisLoading(true);
     //create mutltipart form data
     let formData = new FormData();
@@ -56,20 +85,25 @@ const AddWorkerForm = (props) => {
       method: "POST",
       body: formData,
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+      })
       .then((worker) => {
         setworkers((workers) => [...workers, worker]);
         setdatas({
           dateofbirth: null,
+          fingerprintcapture: "",
         });
         setphotoSrc(DefaultPhoto);
-        setisLoading(false);
         toast.success("Worker Added Successfully");
         e.target.reset();
       })
       .catch((e) => {
-        setisLoading(false);
         toast.error(e.message);
+      })
+      .finally(() => {
+        setisLoading(false);
       });
   };
 
@@ -116,7 +150,10 @@ const AddWorkerForm = (props) => {
           placeholder="mm/dd/yyyy"
           value={datas.dateofbirth}
           onChange={(newValue) => {
-            setdatas({ ...datas, dateofbirth: newValue.toJSDate() });
+            setdatas({
+              ...datas,
+              dateofbirth: newValue ? newValue.toISO() : null,
+            });
           }}
           renderInput={(params) => (
             <TextField
@@ -168,11 +205,34 @@ const AddWorkerForm = (props) => {
       />
       <br />
       <TextField
-        id="outlined-multiline-static"
-        label="Finger Print"
-        multiline
-        rows={4}
+        id="fingerpirnt"
+        label="Fingerprint"
+        name="fingerprint"
+        variant="outlined"
         style={style}
+        InputProps={{
+          readOnly: true,
+          startAdornment:
+            datas.fingerprintcapture === "" ? null : (
+              <img src={FingerPrint} id="fingerprintImg" alt="" />
+            ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleCaptureFingerprint}
+                // onMouseDown={handleMouseDownPassword}
+                edge="end"
+              >
+                {iscapturing ? (
+                  <i className="fa-solid fa-spinner fa-spin-pulse"></i>
+                ) : (
+                  <TouchAppIcon />
+                )}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
       />
       <br />
       <input

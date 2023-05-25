@@ -4,15 +4,14 @@ var mongoose = require("mongoose");
 module.exports.createShift = function (req, res, next) {
   var type = req.body.type;
   var startdate = new Date(req.body.startdate);
+  console.log(startdate);
   type === "jour" ? startdate.setUTCHours(6) : startdate.setUTCHours(18);
 
   Shift.find({ startdate: startdate }, function (err, shift) {
     if (err) return next(err);
     if (shift.length) {
       return res.status(400).json({
-        error: {
-          message: "Shift Already Exist, Please verify Date and Time",
-        },
+        message: "Shift Already Exist, Please verify Date and Time",
       });
     }
 

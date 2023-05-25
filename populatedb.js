@@ -15,11 +15,11 @@ if (!userArgs[0].startsWith("mongodb")) {
 }
 
 var async = require("async");
-var Docker = require("./models/dockerModel");
-var Interruption = require("./models/interruptionModel.js");
-var Shift = require("./models/shiftModel");
+// var Docker = require("./models/dockerModel");
+// var Interruption = require("./models/interruptionModel.js");
+// var Shift = require("./models/shiftModel");
 var User = require("./models/userModel");
-var ShiftInstance = require("./models/shiftInstanceModel");
+// var ShiftInstance = require("./models/shiftInstanceModel");
 
 var bcrypt = require("bcryptjs");
 var mongoose = require("mongoose");
@@ -469,10 +469,10 @@ function createShiftInstances(cb) {
 async.series(
   [
     createUsers,
-    createDockers,
-    createShifts,
-    createInterruptions,
-    createShiftInstances,
+    // createDockers,
+    // createShifts,
+    // createInterruptions,
+    // createShiftInstances,
   ],
   // Optional callback
   function (err, results) {
