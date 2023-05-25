@@ -1,4 +1,3 @@
-import "../../styles/Shifts.css";
 import TextField from "@mui/material/TextField";
 import Icon from "@mdi/react";
 import { mdiPlusCircle } from "@mdi/js";
@@ -7,7 +6,12 @@ import StickyHeadTable from "./Table";
 import AddShiftForm from "./AddShiftForm";
 import ShiftDetails from "./ShiftDetails";
 import { toast, ToastContainer } from "react-toastify";
+import "bootstrap/dist/css/bootstrap.min.css";
 import Modal from "react-bootstrap/Modal";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import "../../styles/Shifts.css";
 
 export const ShiftsContext = createContext();
 export const SelectedShiftContext = createContext();
@@ -17,6 +21,7 @@ const Shifts = (props) => {
   const [shifts, setshifts] = useState([]);
   const [searchShiftsResults, setsearchShiftsResults] = useState([]);
   const [selected_shift, setselectedshift] = useState({});
+  const [searchdate, setsearchdate] = useState(null);
   const [addShift, setaddShift] = useState(false);
   const [showShift, setshowShift] = useState(false);
 
@@ -40,8 +45,7 @@ const Shifts = (props) => {
     return datas;
   }
 
-  function handleSearch(e) {
-    let date = e.target.value;
+  const handleSearch = (date) => {
     if (date !== "") {
       let searchShiftsIds = shifts
         .map((shift) => {
@@ -66,7 +70,7 @@ const Shifts = (props) => {
       );
     }
     setsearchShiftsResults(shifts);
-  }
+  };
 
   useEffect(() => {
     setisLoading(true);
@@ -92,6 +96,13 @@ const Shifts = (props) => {
     setsearchShiftsResults(shifts);
   }, [shifts]);
 
+  useEffect(() => {
+    if (searchdate !== null) {
+      return handleSearch(searchdate);
+    }
+    setsearchShiftsResults(shifts);
+  }, [searchdate]);
+
   return (
     <ShiftsContext.Provider value={{ shifts, setshifts }}>
       <SelectedShiftContext.Provider
@@ -105,15 +116,26 @@ const Shifts = (props) => {
             Start New Shift
           </div>
           <div className="searchWrapper">
-            <TextField
-              type="date"
-              id="searchshift"
-              helperText="Select A Date"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              onChange={handleSearch}
-            />
+            <LocalizationProvider dateAdapter={AdapterLuxon}>
+              <DatePicker
+                label="Select A Date"
+                placeholder="mm/dd/yyyy"
+                value={searchdate}
+                onChange={(newValue) => {
+                  setsearchdate((date) => {
+                    return newValue ? newValue.toJSDate() : null;
+                  });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    margin="normal"
+                    fullWidth
+                    {...params}
+                    helperText={"mm/dd/yyyy"}
+                  />
+                )}
+              />
+            </LocalizationProvider>
           </div>
           {searchShiftsResults.length > 0 ? (
             <div className="table">

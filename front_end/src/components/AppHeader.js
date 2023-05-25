@@ -23,17 +23,17 @@ const AppHeader = () => {
     };
   }, []);
 
-  function ToggleProfileOptions(e) {
+  function toggleProfileOptions(e) {
     let profileOptions = document.querySelector(".profileOptions");
     profileOptions.classList.toggle("isopened");
     return;
   }
 
-  function ToggleNav() {
+  function toggleNav() {
     let nav = document.querySelector("nav");
     let descriptions = document.querySelectorAll(".navitemDesc");
     let main = document.querySelector(".main");
-    nav.classList.toggle("isfull");
+    nav.classList.toggle("grow");
     main.classList.toggle("shrink");
     descriptions.forEach((description) => {
       description.classList.toggle("show");
@@ -55,7 +55,7 @@ const AppHeader = () => {
       <Icon
         path={mdiMenu}
         size={1}
-        onClick={ToggleNav}
+        onClick={toggleNav}
         style={{ cursor: "pointer" }}
       />
       <h3>Welcome {auth.user.username}</h3>
@@ -64,7 +64,7 @@ const AppHeader = () => {
           <Icon path={mdiAccountTie} size={1} />
         </div>
         <div
-          onClick={ToggleProfileOptions}
+          onClick={toggleProfileOptions}
           style={{ cursor: "pointer", display: "flex", alignitems: "center" }}
           className="toggleOptions"
         >

@@ -35,53 +35,49 @@ module.exports.captureFingerPrint = function (req, res, next) {
 };
 
 module.exports.createUser = async function (req, res, next) {
-  var firstname = req.body.firstname;
-  var lastname = req.body.lastname;
-  var personID = await getPersonID();
-
-  const userInfo = {
-    UserInfo: {
-      employeeNo: await personID.toString(),
-      name: `${firstname} ${lastname}`,
-      userType: "normal",
-      Valid: {
-        enable: true,
-        beginTime: new Date(Date.now()).toISOString(),
-        endTime: addYears(Date.now(), 10).toISOString(),
-        timeType: "local",
-      },
-      doorRight: "1",
-      RightPlan: [
-        {
-          doorNo: 1,
-          planTemplateNo: "1",
+  try {
+    var firstname = req.body.firstname;
+    var lastname = req.body.lastname;
+    var personID = await getPersonID();
+    const userInfo = {
+      UserInfo: {
+        employeeNo: personID.toString(),
+        name: `${firstname} ${lastname}`,
+        userType: "normal",
+        Valid: {
+          enable: true,
+          beginTime: new Date(Date.now()).toISOString(),
+          endTime: addYears(Date.now(), 10).toISOString(),
+          timeType: "local",
         },
-      ],
-    },
-  };
-  const username = process.env.access_control_username;
-  const password = process.env.access_control_password;
-  const url = `http://${process.env.access_control_terminal_ip}/ISAPI/AccessControl/UserInfo/Record?format=json`;
-  const options = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userInfo),
-  };
-  const client = new DigestClient(username, password, { algorithm: "MD5" });
-  client
-    .fetch(url, options)
-    .then((resp) => resp.json())
-    .then((datas) => {
-      if (datas.statusCode !== 1) {
-        console.log(datas);
-        return next(new Error(datas.subStatusCode));
-      }
-      req.personID = personID;
-      next();
-    })
-    .catch((e) => next(e));
+        doorRight: "1",
+        RightPlan: [
+          {
+            doorNo: 1,
+            planTemplateNo: "1",
+          },
+        ],
+      },
+    };
+    const username = process.env.access_control_username;
+    const password = process.env.access_control_password;
+    const url = `http://${process.env.access_control_terminal_ip}/ISAPI/AccessControl/UserInfo/Record?format=json`;
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userInfo),
+    };
+    const client = new DigestClient(username, password, { algorithm: "MD5" });
+    const resp = await client.fetch(url, options);
+    const datas = await resp.json();
+    if (datas.statusCode !== 1) throw new Error(datas.subStatusCode);
+    req.personID = personID;
+    next();
+  } catch (e) {
+    next(e);
+  }
 };
 
 module.exports.saveFingerPrintCapture = function (req, res, next) {
@@ -111,7 +107,6 @@ module.exports.saveFingerPrintCapture = function (req, res, next) {
     .then((resp) => resp.json())
     .then((datas) => {
       if (datas.statusCode !== 1) {
-        console.log(datas);
         throw new Error(datas.subStatusCode);
       }
       next();

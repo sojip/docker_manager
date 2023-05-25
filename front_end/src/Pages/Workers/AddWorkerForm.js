@@ -47,7 +47,6 @@ const AddWorkerForm = (props) => {
     fetch("/api/capture_fingerprint")
       .then((resp) => resp.json())
       .then((data) => {
-        console.log(data);
         if (data.ResponseStatus !== undefined)
           throw new Error(data.ResponseStatus.statusString[0]);
         //tcheck fingerprint quality
@@ -72,7 +71,7 @@ const AddWorkerForm = (props) => {
       return toast.info("Please Add A Photo");
     }
     if (datas.fingerprintcapture === "") {
-      return toast.info("Please Add A Fingerprint");
+      // return toast.info("Please Add A Fingerprint");
     }
     setisLoading(true);
     //create mutltipart form data
@@ -153,7 +152,7 @@ const AddWorkerForm = (props) => {
           onChange={(newValue) => {
             setdatas({
               ...datas,
-              dateofbirth: newValue ? newValue.toJSDate() : null,
+              dateofbirth: newValue ? newValue.toISO() : null,
             });
           }}
           renderInput={(params) => (

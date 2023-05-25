@@ -1,9 +1,8 @@
+import { useEffect, useState } from "react";
+import { DateTime, Interval } from "luxon";
 import Icon from "@mdi/react";
 import { mdiCloseThick } from "@mdi/js";
 import Box from "@mui/material/Box";
-import { useEffect, useState } from "react";
-import "../../styles/WorkerDetails.css";
-import { DateTime, Interval } from "luxon";
 import TextField from "@mui/material/TextField";
 import { mdiPauseOctagon } from "@mdi/js";
 import { mdiCheckboxMultipleMarked } from "@mdi/js";
@@ -16,6 +15,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import FingerPrint from "../../img/fingerprint.jpg";
+import "../../styles/WorkerDetails.css";
 
 const WorkerDetails = (props) => {
   const { id, handleClose } = props;

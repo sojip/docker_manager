@@ -29,11 +29,8 @@ export default function SignIn(props) {
     })
       .then((res) => res.json())
       .then((datas) => {
-        if (!datas.user) {
-          console.log(datas);
-          toast.error(datas.message);
-          setisLoading(false);
-          return;
+        if (datas.message) {
+          throw new Error(datas.message);
         }
         auth.setuser({
           id: datas.user._id,
@@ -45,7 +42,7 @@ export default function SignIn(props) {
       })
       .catch((e) => {
         setisLoading(false);
-        toast.error(e);
+        toast.error(e.message);
       });
   };
 
