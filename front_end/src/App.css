@@ -39,12 +39,12 @@
 }
 
 .oulinedButtonWrapper {
-  width: 80%;
+  width: 100%;
   max-width: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1vw;
+  gap: 10px;
   cursor: pointer;
   border: solid 2px black;
   padding: 5px 1vw;
