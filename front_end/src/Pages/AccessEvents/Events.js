@@ -9,7 +9,9 @@ export const Events = () => {
       const response = await fetch("/api/accesscontroller/events/subscribe", {
         signal: signal,
       });
-      const reader = response.body.getReader();
+      const reader = response.body
+        .pipeThrough(new window.TextDecoderStream())
+        .getReader();
       let chunks = []; // array of received binary chunks (comprises the body)
       while (true) {
         const { done, value } = await reader.read();
@@ -17,7 +19,7 @@ export const Events = () => {
           console.log("done is true");
           break;
         }
-        console.log(value);
+        console.log(JSON.parse(value));
         // chunks.push(value);
       }
     })();
