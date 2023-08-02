@@ -3,6 +3,7 @@ import Icon from "@mdi/react";
 import { mdiAccountMultiple } from "@mdi/js";
 import { mdiCarShiftPattern } from "@mdi/js";
 import { mdiMonitorDashboard } from "@mdi/js";
+import { mdiSecurity } from "@mdi/js";
 import "../../styles/Home.css";
 
 const Home = () => {
@@ -24,6 +25,12 @@ const Home = () => {
         <Link to="/stats" className="homeLink">
           <Icon path={mdiMonitorDashboard} size={1} />
           Stats
+        </Link>
+      </div>
+      <div className="homeItem">
+        <Link to="/access-events" className="homeLink">
+          <Icon path={mdiSecurity} size={1} />
+          Access Events
         </Link>
       </div>
     </div>

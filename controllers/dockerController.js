@@ -1,10 +1,9 @@
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const Docker = require("../models/dockerModel");
 const path = require("path");
 var sharp = require("sharp");
 var fs = require("fs");
 var crypto = require("crypto");
-const DigestClient = require("digest-fetch");
 
 module.exports.createDocker = async function (req, res, next) {
   //compress photo

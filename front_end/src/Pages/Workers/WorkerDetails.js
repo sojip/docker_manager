@@ -43,7 +43,6 @@ const WorkerDetails = (props) => {
       signal: signal,
     });
     const worker = await res.json();
-
     return worker;
   }
 

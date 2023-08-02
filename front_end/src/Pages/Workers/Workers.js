@@ -68,14 +68,13 @@ const Workers = (props) => {
       .then((res) => res.json())
       .then((workers) => {
         setworkers(workers);
+        setisLoading(false);
       })
       .catch((e) => {
         if (e.name !== "AbortError") {
           toast.error(e.message);
+          setisLoading(false);
         }
-      })
-      .finally(() => {
-        setisLoading(false);
       });
 
     return () => {

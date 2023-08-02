@@ -15,6 +15,12 @@ module.exports = function (app) {
   //   })
   // );
 
+  app.use("/socket.io/", createProxyMiddleware({
+    target: "http://localhost:3000",
+    ws: false,
+    changeOrigin: true
+  }))
+
   app.use(
     "/api",
     createProxyMiddleware({

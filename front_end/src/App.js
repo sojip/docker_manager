@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home/Home";
@@ -10,7 +10,9 @@ import DashboardLayout from "./components/DashboardLayout";
 import Loader from "./components/Loader";
 import AuthProvider from "./auth/AuthProvider";
 import useAuthContext from "./auth/useAuthContext";
+import { Events } from "./Pages/AccessEvents/Events";
 import "./App.css";
+// import { io } from "socket.io-client";
 
 let ProtectedRoute = ({ children }) => {
   const auth = useAuthContext();
@@ -40,6 +42,23 @@ let ProtectedSignIn = ({ children }) => {
 
 function App() {
   const [isLoading, setisLoading] = useState(false);
+
+  // useEffect(() => {
+  //   const socket = io("/");
+  //   socket.on("connect", () => {
+  //     console.log("socket connected");
+  //   });
+  //   socket.emit("message", { message: "test" });
+  //   socket.on("event", function (data) {
+  //     console.log(data);
+  //   });
+
+  //   return () => {
+  //     socket.off("connect");
+  //     socket.off("message");
+  //   };
+  // }, []);
+
   return (
     <div className="App">
       {isLoading && <Loader />}
@@ -64,6 +83,7 @@ function App() {
                 element={<Shifts setisLoading={setisLoading} />}
               />
               <Route path="/stats" element={<Stats />} />
+              <Route path="/access-events" element={<Events />} />
             </Route>
             <Route
               path="/signin"

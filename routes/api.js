@@ -1,16 +1,13 @@
-var express = require("express");
 var dockerController = require("../controllers/dockerController");
 var shiftController = require("../controllers/shiftController");
 var interruptionController = require("../controllers/interruptionController");
 var shiftInstanceController = require("../controllers/shiftInstanceController");
-var authController = require("../controllers/authController");
-var passport = require("passport");
 var accessControlController = require("../controllers/accessControlController");
-require("dotenv").config();
+var authController = require("../controllers/authController");
+// var eventsSubcription = require("../utils/EventsSubscriptions");
+var passport = require("passport");
+var router = require("express").Router();
 const multer = require("multer");
-
-var router = express.Router();
-
 var storage = multer.diskStorage({
   destination: "./public/uploads/",
   filename: function (req, file, cb) {
@@ -67,5 +64,11 @@ router.get(
   authController.refreshToken
 );
 router.get("/capture_fingerprint", accessControlController.captureFingerPrint);
+
+//online subscription
+router.get(
+  "/accesscontroller/events/subscribe",
+  accessControlController.subscribe
+);
 
 module.exports = router;

@@ -3,6 +3,7 @@ import { mdiAccountMultiple } from "@mdi/js";
 import { mdiCarShiftPattern } from "@mdi/js";
 import { mdiMonitorDashboard } from "@mdi/js";
 import { mdiHome } from "@mdi/js";
+import { mdiSecurity } from "@mdi/js";
 import { NavLink } from "react-router-dom";
 import "../styles/AppNav.css";
 
@@ -41,6 +42,16 @@ const AppNav = () => {
           >
             <Icon path={mdiCarShiftPattern} size={1} />
             <div className="navitemDesc">shifts</div>
+          </NavLink>
+        </li>
+        <li className="navitem">
+          <NavLink
+            to="/access-events"
+            className="navLink"
+            style={({ isActive }) => (isActive ? activeStyle : undefined)}
+          >
+            <Icon path={mdiSecurity} size={1} />
+            <div className="navitemDesc">Access Events</div>
           </NavLink>
         </li>
         <li className="navitem">

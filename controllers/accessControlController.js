@@ -1,5 +1,8 @@
 const DigestClient = require("digest-fetch");
 var xml = require("xml2js");
+const { Curl, CurlAuth } = require("node-libcurl");
+const curlTest = new Curl();
+require("dotenv").config();
 
 //helper function to add years on date
 function addYears(date, years) {
@@ -25,12 +28,12 @@ module.exports.captureFingerPrint = function (req, res, next) {
   client
     .fetch(url, options)
     .then((resp) => resp.text())
-    .then((text) =>
+    .then((text) => {
       xml.parseString(text, function (err, results) {
         if (err) return next(err);
         res.json(results);
-      })
-    )
+      });
+    })
     .catch((e) => next(e));
 };
 
@@ -106,9 +109,7 @@ module.exports.saveFingerPrintCapture = function (req, res, next) {
     .fetch(url, options)
     .then((resp) => resp.json())
     .then((datas) => {
-      if (datas.statusCode !== 1) {
-        throw new Error(datas.subStatusCode);
-      }
+      if (datas.statusCode !== 1) throw new Error(datas.subStatusCode);
       next();
     })
     .catch((e) => next(e));
@@ -144,3 +145,59 @@ async function getPersonID() {
     throw new Error("Failed To Get PersonID");
   }
 }
+
+module.exports.subscribe = function (req, res, next) {
+  const url = `http://${process.env.access_control_terminal_ip}/ISAPI/Event/notification/alertStream`;
+  curlTest.setOpt(Curl.option.URL, url);
+  curlTest.setOpt(Curl.option.HTTPAUTH, CurlAuth.Digest);
+  curlTest.setOpt(
+    Curl.option.USERPWD,
+    `${process.env.access_control_username}:${process.env.access_control_password}`
+  );
+  curlTest.setOpt(Curl.option.VERBOSE, true);
+
+  // Event listener for data
+  const headers = {
+    "Content-Type": "text/event-stream",
+    Connection: "keep-alive",
+    "Cache-Control": "no-cache",
+  };
+  res.writeHead(200, headers);
+  // res.flushHeaders();
+  curlTest.on("data", (chunk, curlInstance) => {
+    console.log("Receiving data with size: ", chunk.length);
+    console.log(chunk.toString());
+    // const io = req.app.get("io");
+    // io.emit("event", chunk.toString());
+    res.write(chunk.toString());
+    res.flush();
+  });
+
+  // Event listener for end
+  curlTest.on("end", (statusCode, body, headers, curlInstance) => {
+    console.info("Status Code: ", statusCode);
+    console.info("***");
+    console.info("Headers: ", headers);
+    console.info("***");
+    console.info("Body length: ", body.length);
+    console.info("***");
+    console.info("Body: ", body);
+    console.info("***");
+    console.info("Total time taken: " + this.getInfo("TOTAL_TIME"));
+    this.close();
+  });
+
+  // Error handler for cURL
+  curlTest.on("error", (error, errorCode) => {
+    console.error("Error: ", error);
+    console.error("Code: ", errorCode);
+    curlTest.close();
+  });
+
+  // Commits this request to the URL
+  curlTest.perform();
+
+  res.on("close", () => {
+    curlTest.close();
+  });
+};

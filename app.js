@@ -6,42 +6,72 @@ var logger = require("morgan");
 var cors = require("cors");
 var xmlparser = require("express-xml-bodyparser");
 var mongoose = require("mongoose");
+var apiRouter = require("./routes/api");
+const http = require("http");
+const socketio = require("socket.io");
+var compression = require("compression");
 require("dotenv").config();
 require("./auth/auth");
 
-//mongodb connection
+/**
+ * Mongodb connection.
+ */
 var mongodburi = `mongodb+srv://${process.env.username}:${process.env.password}@cluster0.tmdgvq0.mongodb.net/?retryWrites=true&w=majority`;
-
 mongoose.connect(mongodburi, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 var db = mongoose.connection;
-
 db.on("error", console.error.bind(console, "MongoDB Connection Error"));
 
-var apiRouter = require("./routes/api");
-
+/**
+ * Create Express App.
+ */
 var app = express();
+
+/**
+ * Create HTTP Server.
+ */
+const server = http.createServer(app);
+
+/**
+ * Create the Socket IO server on top of HTTP Server.
+ */
+const io = socketio(server);
+io.on("connection", (socket) => {
+  console.log("client connected");
+  socket.on("disconnect", (reason) => console.log(reason));
+});
+// app.set("io", io);
+
+/**
+ * Middlewares.
+ */
 app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(xmlparser());
 app.use(cookieParser());
-
+app.use(compression());
 app.use("/api", apiRouter);
 
-//indicate react app folder
+/**
+ * Indicate react app folder.
+ */
 app.use(express.static(path.join(__dirname, "./front_end/build")));
 app.use(express.static(path.join(__dirname, "./public")));
 
-// serve react
+/**
+ * Serve React.
+ */
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "front_end", "build", "index.html"));
 });
 
-// catch 404 and forward to error handler
+/**
+ * Catch 404 and forward to error handler.
+ */
 app.use(function (req, res, next) {
   next(createError(404));
 });
@@ -55,8 +85,7 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   console.log(err);
-  // throw new Error(err.message);
   res.send(err.message);
 });
 
-module.exports = app;
+module.exports = { app: app, server: server };
