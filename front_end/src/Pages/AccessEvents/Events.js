@@ -19,15 +19,25 @@ export const Events = () => {
           console.log("done is true");
           break;
         }
-        console.log(JSON.parse(value));
-        // chunks.push(value);
+        let _value = JSON.parse(parseChunk(value));
+        if (_value?.AccessControllerEvent?.employeeNoString) {
+          console.log(_value);
+        }
       }
     })();
     return () => {
       controller.abort();
     };
-    // const evtSource = new EventSource("/api/accesscontroller/events/subscribe");
-    // evtSource.onopen = (e) => console.log("connection opened");
+    // const evtSource = new EventSource(
+    //   "/api/accesscontroller/events/subscribe",
+    //   {
+    //     withCredentials: true,
+    //   }
+    // );
+    // evtSource.onopen = (e) => {
+    //   console.log("connection opened");
+    //   console.log(e);
+    // };
     // evtSource.onmessage = (e) => console.log(e);
 
     // return () => {
@@ -41,3 +51,11 @@ export const Events = () => {
     </div>
   );
 };
+
+function parseChunk(value) {
+  return value
+    .replace(/--boundary/g, "")
+    .replace(/Content-Length: [0-9]+/i, "")
+    .replace('Content-Type: application/json; charset="UTF-8"', "")
+    .trim();
+}

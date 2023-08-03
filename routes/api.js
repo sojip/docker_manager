@@ -71,4 +71,9 @@ router.get(
   accessControlController.subscribe
 );
 
+// router.get(
+//   "/accesscontroller/events/unsubscribe",
+//   accessControlController.unsubscribe
+// );
+
 module.exports = router;

@@ -10,6 +10,7 @@ var apiRouter = require("./routes/api");
 const http = require("http");
 const socketio = require("socket.io");
 var compression = require("compression");
+var accessControlController = require("./controllers/accessControlController");
 require("dotenv").config();
 require("./auth/auth");
 
@@ -84,7 +85,16 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  console.log(err);
+  //Access Control listenner is running
+  if (err.message === "Handle already running!") {
+    console.log("handle already running");
+    // accessControlController.terminateCurl();
+    // accessControlController.subscribe();
+    return;
+  }
+
+  // console.log(err.message);
+  // console.log(err);
   res.send(err.message);
 });
 

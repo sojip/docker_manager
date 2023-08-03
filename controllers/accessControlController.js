@@ -1,8 +1,10 @@
 const DigestClient = require("digest-fetch");
 var xml = require("xml2js");
 const { Curl, CurlAuth } = require("node-libcurl");
-const curlTest = new Curl();
 require("dotenv").config();
+
+var curlTest = new Curl();
+const terminateCurl = curlTest.close.bind(curlTest);
 
 //helper function to add years on date
 function addYears(date, years) {
@@ -157,18 +159,17 @@ module.exports.subscribe = function (req, res, next) {
   curlTest.setOpt(Curl.option.VERBOSE, true);
 
   // Event listener for data
-  const headers = {
-    "Content-Type": "text/event-stream",
-    Connection: "keep-alive",
-    "Cache-Control": "no-cache",
-  };
-  res.writeHead(200, headers);
-  // res.flushHeaders();
+  // const headers = {
+  //   "Content-Type": "text/event-stream",
+  //   Connection: "keep-alive",
+  //   "Cache-Control": "no-cache",
+  // };
+  // res.writeHead(200, headers);
   curlTest.on("data", (chunk, curlInstance) => {
     console.log("Receiving data with size: ", chunk.length);
-    console.log(chunk.toString());
     // const io = req.app.get("io");
     // io.emit("event", chunk.toString());
+    console.log(chunk.toString());
     res.write(chunk.toString());
     res.flush();
   });
@@ -189,15 +190,18 @@ module.exports.subscribe = function (req, res, next) {
 
   // Error handler for cURL
   curlTest.on("error", (error, errorCode) => {
-    console.error("Error: ", error);
-    console.error("Code: ", errorCode);
-    curlTest.close();
+    console.log("error on curltest");
+    terminateCurl();
   });
 
   // Commits this request to the URL
   curlTest.perform();
 
-  res.on("close", () => {
-    curlTest.close();
-  });
+  res.on("close", terminateCurl);
+};
+
+module.exports.terminateCurl = terminateCurl;
+
+module.exports.unsubscribe = async function (req, res, next) {
+  // curlTest.close();
 };
