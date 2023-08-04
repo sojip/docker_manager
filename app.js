@@ -88,13 +88,10 @@ app.use(function (err, req, res, next) {
   //Access Control listenner is running
   if (err.message === "Handle already running!") {
     console.log("handle already running");
-    // accessControlController.terminateCurl();
-    // accessControlController.subscribe();
     return;
   }
 
-  // console.log(err.message);
-  // console.log(err);
+  console.log(err);
   res.send(err.message);
 });
 

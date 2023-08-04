@@ -29,6 +29,7 @@ router.get(
   dockerController.getAllDockers
 );
 router.get("/workers/:id", dockerController.getDocker);
+router.get("/workers/event/:id", dockerController.getDockerWithPersonID);
 router.post("/shifts", shiftController.createShift);
 router.get("/shifts", shiftController.getAllShifts);
 router.get(
@@ -70,10 +71,5 @@ router.get(
   "/accesscontroller/events/subscribe",
   accessControlController.subscribe
 );
-
-// router.get(
-//   "/accesscontroller/events/unsubscribe",
-//   accessControlController.unsubscribe
-// );
 
 module.exports = router;

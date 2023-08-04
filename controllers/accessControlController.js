@@ -2,16 +2,8 @@ const DigestClient = require("digest-fetch");
 var xml = require("xml2js");
 const { Curl, CurlAuth } = require("node-libcurl");
 require("dotenv").config();
-
 var curlTest = new Curl();
 const terminateCurl = curlTest.close.bind(curlTest);
-
-//helper function to add years on date
-function addYears(date, years) {
-  const dateCopy = new Date(date);
-  dateCopy.setFullYear(dateCopy.getFullYear() + years);
-  return dateCopy;
-}
 
 module.exports.captureFingerPrint = function (req, res, next) {
   const username = process.env.access_control_username;
@@ -117,6 +109,45 @@ module.exports.saveFingerPrintCapture = function (req, res, next) {
     .catch((e) => next(e));
 };
 
+module.exports.subscribe = function (req, res, next) {
+  // var curlTest = new Curl();
+  // const terminateCurl = curlTest.close.bind(curlTest);
+  const url = `http://${process.env.access_control_terminal_ip}/ISAPI/Event/notification/alertStream`;
+  curlTest.setOpt(Curl.option.URL, url);
+  curlTest.setOpt(Curl.option.HTTPAUTH, CurlAuth.Digest);
+  curlTest.setOpt(
+    Curl.option.USERPWD,
+    `${process.env.access_control_username}:${process.env.access_control_password}`
+  );
+  curlTest.setOpt(Curl.option.VERBOSE, true);
+
+  curlTest.on("data", (chunk, curlInstance) => {
+    console.log("Receiving data with size: ", chunk.length);
+    console.log("********");
+    console.log(chunk.toString());
+    console.log("********");
+    res.write(chunk.toString());
+    // res.flush();
+  });
+
+  // Event listener for end
+  curlTest.on("end", (statusCode, body, headers, curlInstance) => {
+    console.log("request ending");
+    terminateCurl();
+    res.end();
+  });
+
+  // Error handler for cURL
+  curlTest.on("error", (error, errorCode) => {
+    console.log("error on access control listener");
+    terminateCurl();
+  });
+
+  // Commits this request to the URL
+  curlTest.perform();
+  res.on("close", terminateCurl);
+};
+
 async function getPersonID() {
   const username = process.env.access_control_username;
   const password = process.env.access_control_password;
@@ -148,60 +179,9 @@ async function getPersonID() {
   }
 }
 
-module.exports.subscribe = function (req, res, next) {
-  const url = `http://${process.env.access_control_terminal_ip}/ISAPI/Event/notification/alertStream`;
-  curlTest.setOpt(Curl.option.URL, url);
-  curlTest.setOpt(Curl.option.HTTPAUTH, CurlAuth.Digest);
-  curlTest.setOpt(
-    Curl.option.USERPWD,
-    `${process.env.access_control_username}:${process.env.access_control_password}`
-  );
-  curlTest.setOpt(Curl.option.VERBOSE, true);
-
-  // Event listener for data
-  // const headers = {
-  //   "Content-Type": "text/event-stream",
-  //   Connection: "keep-alive",
-  //   "Cache-Control": "no-cache",
-  // };
-  // res.writeHead(200, headers);
-  curlTest.on("data", (chunk, curlInstance) => {
-    console.log("Receiving data with size: ", chunk.length);
-    // const io = req.app.get("io");
-    // io.emit("event", chunk.toString());
-    console.log(chunk.toString());
-    res.write(chunk.toString());
-    res.flush();
-  });
-
-  // Event listener for end
-  curlTest.on("end", (statusCode, body, headers, curlInstance) => {
-    console.info("Status Code: ", statusCode);
-    console.info("***");
-    console.info("Headers: ", headers);
-    console.info("***");
-    console.info("Body length: ", body.length);
-    console.info("***");
-    console.info("Body: ", body);
-    console.info("***");
-    console.info("Total time taken: " + this.getInfo("TOTAL_TIME"));
-    this.close();
-  });
-
-  // Error handler for cURL
-  curlTest.on("error", (error, errorCode) => {
-    console.log("error on curltest");
-    terminateCurl();
-  });
-
-  // Commits this request to the URL
-  curlTest.perform();
-
-  res.on("close", terminateCurl);
-};
-
-module.exports.terminateCurl = terminateCurl;
-
-module.exports.unsubscribe = async function (req, res, next) {
-  // curlTest.close();
-};
+//helper function to add years on date
+function addYears(date, years) {
+  const dateCopy = new Date(date);
+  dateCopy.setFullYear(dateCopy.getFullYear() + years);
+  return dateCopy;
+}

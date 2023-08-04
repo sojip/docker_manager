@@ -57,3 +57,13 @@ module.exports.getDocker = function (req, res, next) {
     return res.json(docker);
   });
 };
+
+module.exports.getDockerWithPersonID = async function (req, res, next) {
+  var personID = req.params.id;
+  try {
+    var docker = await Docker.findOne({ personID: personID });
+    return res.json(docker);
+  } catch (e) {
+    return next(e);
+  }
+};
