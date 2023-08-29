@@ -4,7 +4,6 @@ import { DateTime } from "luxon";
 
 export const Event = (props) => {
   const { photo, userName, dateTime, AccessControllerEvent } = props;
-  console.log(props);
   const eventRef = useRef(null);
   return (
     <CSSTransition
@@ -18,23 +17,17 @@ export const Event = (props) => {
         <img src={photo} alt="" />
         <div>{userName}</div>
         <div>
-          {DateTime.fromISO(dateTime)
-            // .plus({ hours: 8 })
-            .setLocale("fr")
-            .toLocaleString({
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+          {DateTime.fromISO(dateTime).setLocale("fr").toLocaleString({
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
         </div>
         <div>
-          {DateTime.fromISO(dateTime)
-            // .plus({ hours: 7 })
-            .setLocale("fr")
-            .toLocaleString({
-              hour: "numeric",
-              minute: "2-digit",
-            })}
+          {DateTime.fromISO(dateTime).setLocale("fr").toLocaleString({
+            hour: "numeric",
+            minute: "2-digit",
+          })}
         </div>
         {AccessControllerEvent?.deviceName ===
         process.env.REACT_APP_CHECKINREADER ? (

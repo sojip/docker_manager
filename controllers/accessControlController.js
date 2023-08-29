@@ -101,7 +101,8 @@ module.exports.createUser = async function (req, res, next) {
     };
     const username = process.env.access_control_username;
     const password = process.env.access_control_password;
-    const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/UserInfo/Record?format=json`;
+    const checkinurl = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/UserInfo/Record?format=json`;
+    const checkouturl = `http://${process.env.access_control_checkout_terminal_ip}/ISAPI/AccessControl/UserInfo/Record?format=json`;
     const options = {
       method: "POST",
       headers: {
@@ -110,27 +111,32 @@ module.exports.createUser = async function (req, res, next) {
       body: JSON.stringify(userInfo),
     };
     const client = new DigestClient(username, password, { algorithm: "MD5" });
-    const resp = await client.fetch(url, options);
-    const datas = await resp.json();
-    if (datas.statusCode !== 1) throw new Error(datas.subStatusCode);
+    const responses = await Promise.all([
+      client.fetch(checkinurl, options),
+      client.fetch(checkouturl, options),
+    ]);
+
+    const resps = await Promise.all(
+      responses.map(async (response) => await response.json())
+    );
+    for (let resp of resps) {
+      if (resp.statusCode !== 1) throw new Error(resp.subStatusCode);
+    }
     req.personID = personID;
+    // const datas = await resp.json();
+    // if (datas.statusCode !== 1) throw new Error(datas.subStatusCode);
+    // req.personID = personID;
     next();
   } catch (e) {
     next(e);
   }
 };
 
-module.exports.saveCardInfo = function (req, res, next) {
+module.exports.saveCardInfo = async function (req, res, next) {
   const username = process.env.access_control_username;
   const password = process.env.access_control_password;
-  const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/CardInfo/Record?format=json`;
-  const options = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(cardInfo),
-  };
+  const checkinurl = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/CardInfo/Record?format=json`;
+  const checkouturl = `http://${process.env.access_control_checkout_terminal_ip}/ISAPI/AccessControl/CardInfo/Record?format=json`;
   const cardInfo = {
     CardInfo: {
       employeeNo: req.personID.toString(),
@@ -142,47 +148,106 @@ module.exports.saveCardInfo = function (req, res, next) {
       addCard: true,
     },
   };
-  const client = new DigestClient(username, password, { algorithm: "MD5" });
-  client
-    .fetch(url, options)
-    .then((resp) => resp.json())
-    .then((datas) => {
-      if (datas.statusCode !== 1) throw new Error(datas.subStatusCode);
-      next();
-    })
-    .catch((e) => next(e));
-};
-
-module.exports.saveFingerPrintCapture = function (req, res, next) {
-  const username = process.env.access_control_username;
-  const password = process.env.access_control_password;
-  const fingerPrintInfo = {
-    FingerPrintCfg: {
-      employeeNo: req.personID.toString(),
-      enableCardReader: [1],
-      fingerPrintID: 1,
-      fingerType: "normalFP",
-      fingerData: req.body.fingerprintcapture,
-      leaderFP: [1],
-    },
-  };
-  const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/FingerPrintDownload?format=json`;
   const options = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(fingerPrintInfo),
+    body: JSON.stringify(cardInfo),
+  };
+
+  const client = new DigestClient(username, password, { algorithm: "MD5" });
+
+  try {
+    const responses = await Promise.all([
+      client.fetch(checkinurl, options),
+      client.fetch(checkouturl, options),
+    ]);
+    const resps = await Promise.all(
+      responses.map(async (response) => await response.json())
+    );
+    for (let resp of resps) {
+      if (resp.statusCode !== 1) throw new Error(resp.subStatusCode);
+    }
+    next();
+  } catch (e) {
+    next(e);
+  }
+
+  // client
+  //   .fetch(url, options)
+  //   .then((resp) => resp.json())
+  //   .then((datas) => {
+  //     if (datas.statusCode !== 1) throw new Error(datas.subStatusCode);
+  //     next();
+  //   })
+  //   .catch((e) => next(e));
+};
+
+module.exports.saveFingerPrintCapture = async function (req, res, next) {
+  const username = process.env.access_control_username;
+  const password = process.env.access_control_password;
+  const fingerPrintInfoCheckIn = {
+    FingerPrintCfg: {
+      employeeNo: req.personID.toString(),
+      enableCardReader: [1],
+      fingerPrintID: 1,
+      fingerType: "normalFP",
+      fingerData: req.body.fingerprintcapturecheckIn,
+      leaderFP: [1],
+    },
+  };
+  const fingerPrintInfoCheckOut = {
+    FingerPrintCfg: {
+      employeeNo: req.personID.toString(),
+      enableCardReader: [1],
+      fingerPrintID: 1,
+      fingerType: "normalFP",
+      fingerData: req.body.fingerprintcapturecheckOut,
+      leaderFP: [1],
+    },
+  };
+  const checkinurl = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/FingerPrintDownload?format=json`;
+  const checkouturl = `http://${process.env.access_control_checkout_terminal_ip}/ISAPI/AccessControl/FingerPrintDownload?format=json`;
+
+  const checkinoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(fingerPrintInfoCheckIn),
+  };
+  const checkoutoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(fingerPrintInfoCheckOut),
   };
   const client = new DigestClient(username, password, { algorithm: "MD5" });
-  client
-    .fetch(url, options)
-    .then((resp) => resp.json())
-    .then((datas) => {
-      if (datas.statusCode !== 1) throw new Error(datas.subStatusCode);
-      next();
-    })
-    .catch((e) => next(e));
+  try {
+    const responses = await Promise.all([
+      client.fetch(checkinurl, checkinoptions),
+      client.fetch(checkouturl, checkoutoptions),
+    ]);
+    const resps = await Promise.all(
+      responses.map(async (response) => await response.json())
+    );
+    for (let resp of resps) {
+      if (resp.statusCode !== 1) throw new Error(resp.subStatusCode);
+    }
+    next();
+  } catch (e) {
+    next(e);
+  }
+  // client
+  //   .fetch(url, options)
+  //   .then((resp) => resp.json())
+  //   .then((datas) => {
+  //     if (datas.statusCode !== 1) throw new Error(datas.subStatusCode);
+  //     next();
+  //   })
+  //   .catch((e) => next(e));
 };
 
 module.exports.subscribe = function (req, res, next) {

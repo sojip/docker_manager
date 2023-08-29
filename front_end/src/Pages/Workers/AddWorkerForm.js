@@ -16,15 +16,16 @@ import BadgeIcon from "@mui/icons-material/Badge";
 
 const AddWorkerForm = (props) => {
   const [isSubmitting, setisSubmitting] = useState(false);
-  const [iscapturingfinger, setiscapturingfinger] = useState(false);
+  const [iscapturingfingerIn, setiscapturingfingerIn] = useState(false);
+  const [iscapturingfingerOut, setiscapturingfingerOut] = useState(false);
   const [iscapturingcard, setiscapturingcard] = useState(false);
   const [datas, setdatas] = useState({
+    photo: null,
     dateofbirth: null,
     fingerprintcapturecheckIn: "",
     fingerprintcapturecheckOut: "",
     cardInfo: "",
   });
-  const [photoSrc, setphotoSrc] = useState(DefaultPhoto);
   let { handleClose, setworkers } = props;
 
   let style = {
@@ -41,11 +42,11 @@ const AddWorkerForm = (props) => {
     let target = e.target;
     if (target.files.length === 0) return;
     if (!target.files[0].type.includes("image")) return;
-    setphotoSrc(URL.createObjectURL(target.files[0]));
+    setdatas({ ...datas, photo: target.files[0] });
   };
 
   const handleCaptureFingerprintCheckIn = () => {
-    setiscapturingfinger(true);
+    setiscapturingfingerIn(true);
     setdatas({ ...datas, fingerprintcapturecheckIn: "" });
     fetch("/api/capture_fingerprint_checkin")
       .then((resp) => resp.json())
@@ -65,13 +66,13 @@ const AddWorkerForm = (props) => {
         });
       })
       .finally(() => {
-        setiscapturingfinger(false);
+        setiscapturingfingerIn(false);
       })
       .catch((e) => toast.error(e.message));
   };
 
   const handleCaptureFingerprintCheckOut = () => {
-    setiscapturingfinger(true);
+    setiscapturingfingerOut(true);
     setdatas({ ...datas, fingerprintcapturecheckOut: "" });
     fetch("/api/capture_fingerprint_checkout")
       .then((resp) => resp.json())
@@ -91,7 +92,7 @@ const AddWorkerForm = (props) => {
         });
       })
       .finally(() => {
-        setiscapturingfinger(false);
+        setiscapturingfingerOut(false);
       })
       .catch((e) => toast.error(e.message));
   };
@@ -116,20 +117,14 @@ const AddWorkerForm = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const photo = document.querySelector("#photo");
-    if (photo.files.length === 0) {
-      return toast.info("Please Add A Photo");
-    }
-    if (datas.fingerprintcapture === "") {
-      return toast.info("Please Add A Fingerprint");
-    }
+    const { isValid, error } = checkValidity(datas);
+    if (!isValid) return toast.error(error);
     setisSubmitting(true);
     //create mutltipart form data
     let formData = new FormData();
-    formData.append("photo", photo.files[0]);
-    const keys = Object.keys(datas);
-    keys.forEach((key) => {
-      formData.append(key, datas[key]);
+    const properties = Object.keys(datas);
+    properties.forEach((property) => {
+      formData.append(property, datas[property]);
     });
     fetch(`/api/workers`, {
       method: "POST",
@@ -142,11 +137,12 @@ const AddWorkerForm = (props) => {
       .then((worker) => {
         setworkers((workers) => [...workers, worker]);
         setdatas({
+          photo: null,
           dateofbirth: null,
-          fingerprintcapture: "",
+          fingerprintcapturecheckIn: "",
+          fingerprintcapturecheckOut: "",
           cardInfo: "",
         });
-        setphotoSrc(DefaultPhoto);
         toast.success("Worker Added Successfully");
         e.target.reset();
       })
@@ -185,13 +181,21 @@ const AddWorkerForm = (props) => {
       <h3>Add Worker</h3>
       <div className="form-group">
         <label htmlFor="photo" id="photolabel">
-          <img src={photoSrc} alt="" />
+          <img
+            src={
+              datas.photo === null
+                ? DefaultPhoto
+                : URL.createObjectURL(datas.photo)
+            }
+            alt=""
+          />
         </label>
         <input
           type="file"
           name="photo"
           id="photo"
           onChange={handlePhoto}
+          required
           accept="image/*"
         />
       </div>
@@ -244,7 +248,6 @@ const AddWorkerForm = (props) => {
         onChange={handleChange}
         required
       />
-      <br />
       <TextField
         id="cni"
         label="N CNI"
@@ -254,7 +257,6 @@ const AddWorkerForm = (props) => {
         onChange={handleChange}
         required
       />
-      <br />
       <TextField
         id="accesscard"
         label="Access Card"
@@ -300,7 +302,7 @@ const AddWorkerForm = (props) => {
                 onClick={handleCaptureFingerprintCheckIn}
                 edge="end"
               >
-                {iscapturingfinger ? (
+                {iscapturingfingerIn ? (
                   <i className="fa-solid fa-spinner fa-spin-pulse"></i>
                 ) : (
                   <TouchAppIcon />
@@ -329,7 +331,7 @@ const AddWorkerForm = (props) => {
                 onClick={handleCaptureFingerprintCheckOut}
                 edge="end"
               >
-                {iscapturingfinger ? (
+                {iscapturingfingerOut ? (
                   <i className="fa-solid fa-spinner fa-spin-pulse"></i>
                 ) : (
                   <TouchAppIcon />
@@ -339,16 +341,26 @@ const AddWorkerForm = (props) => {
           ),
         }}
       />
-
-      <br />
       <input
         type="submit"
         value={isSubmitting ? "saving..." : "save"}
         disabled={isSubmitting ? "disabled" : null}
       />
-      <br />
     </Box>
   );
 };
+
+/** Helpers */
+
+function checkValidity(formdata) {
+  if (formdata.cardInfo === "")
+    return { isValid: false, error: "Access Card Is Required" };
+  if (
+    formdata.fingerprintcapturecheckIn === "" ||
+    formdata.fingerprintcapturecheckOut === ""
+  )
+    return { isValid: false, error: "FingerPrint Is Required" };
+  return { isValid: true };
+}
 
 export default AddWorkerForm;
