@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home/Home";
@@ -9,94 +8,68 @@ import SignIn from "./Pages/SignIn/SignIn";
 import DashboardLayout from "./components/DashboardLayout";
 import Loader from "./components/Loader";
 import AuthProvider from "./auth/AuthProvider";
-import useAuthContext from "./auth/useAuthContext";
+import { useAuthContext } from "./auth/useAuthContext";
 import { Events } from "./Pages/AccessEvents/Events";
 import "./App.css";
+import { createContext, useContext, useState } from "react";
 // import { io } from "socket.io-client";
 
 let ProtectedRoute = ({ children }) => {
-  const auth = useAuthContext();
-  if (auth === undefined) {
-    return <Loader />;
-  }
-  let user = auth?.user;
-
-  if (!user) {
-    return <Navigate to="/signin" replace={true} />;
-  }
-
+  const { ischecking, user } = useAuthContext();
+  if (ischecking) return <Loader />;
+  if (!user) return <Navigate to="/signin" replace={true} />;
   return children;
 };
 
 let ProtectedSignIn = ({ children }) => {
-  const auth = useAuthContext();
-  if (auth === undefined) {
-    return <Loader />;
-  }
-  let user = auth?.user;
-  if (user) {
-    return <Navigate to="/" replace={true} />;
-  }
+  const { ischecking, user } = useAuthContext();
+  if (ischecking) return <Loader />;
+  if (user) return <Navigate to="/" replace={true} />;
   return children;
+};
+
+let LoadingContext = createContext();
+export const useLoadingContext = () => {
+  const setisLoading = useContext(LoadingContext);
+  return setisLoading;
 };
 
 function App() {
   const [isLoading, setisLoading] = useState(false);
-
-  // useEffect(() => {
-  //   const socket = io("/");
-  //   socket.on("connect", () => {
-  //     console.log("socket connected");
-  //   });
-  //   socket.emit("message", { message: "test" });
-  //   socket.on("event", function (data) {
-  //     console.log(data);
-  //   });
-
-  //   return () => {
-  //     socket.off("connect");
-  //     socket.off("message");
-  //   };
-  // }, []);
-
   return (
     <div className="App">
       {isLoading && <Loader />}
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Home />} />
+      <LoadingContext.Provider value={setisLoading}>
+        <AuthProvider>
+          <Router>
+            <Routes>
               <Route
-                path="/workers"
-                element={<Workers setisLoading={setisLoading} />}
-              />
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Home />} />
+                <Route path="/workers" element={<Workers />} />
+                <Route path="/shifts" element={<Shifts />} />
+                <Route path="/stats" element={<Stats />} />
+                <Route path="/access-events" element={<Events />} />
+              </Route>
               <Route
-                path="/shifts"
-                element={<Shifts setisLoading={setisLoading} />}
+                path="/signin"
+                element={
+                  <ProtectedSignIn>
+                    <SignIn />
+                  </ProtectedSignIn>
+                }
               />
-              <Route path="/stats" element={<Stats />} />
-              <Route path="/access-events" element={<Events />} />
-            </Route>
-            <Route
-              path="/signin"
-              element={
-                <ProtectedSignIn>
-                  <SignIn setisLoading={setisLoading} />
-                </ProtectedSignIn>
-              }
-            />
-            <Route path="*" element={<>ERROR</>} />
-          </Routes>
-        </Router>
-      </AuthProvider>
+              <Route path="*" element={<>ERROR</>} />
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </LoadingContext.Provider>
     </div>
   );
 }

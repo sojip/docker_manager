@@ -60,6 +60,7 @@ module.exports.getDocker = function (req, res, next) {
 
 module.exports.getDockerWithPersonID = async function (req, res, next) {
   var personID = req.params.id;
+  console.log(typeof personID);
   try {
     var docker = await Docker.findOne({ personID: personID });
     return res.json(docker);

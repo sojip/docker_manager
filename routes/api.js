@@ -20,6 +20,7 @@ router.post(
   "/workers",
   upload.single("photo"),
   accessControlController.createUser,
+  accessControlController.saveCardInfo,
   accessControlController.saveFingerPrintCapture,
   dockerController.createDocker
 );
@@ -64,12 +65,31 @@ router.get(
   passport.authenticate("refresh_token", { session: false }),
   authController.refreshToken
 );
-router.get("/capture_fingerprint", accessControlController.captureFingerPrint);
+router.get(
+  "/capture_fingerprint_checkin",
+  accessControlController.captureFingerPrintCheckIn
+);
+router.get(
+  "/capture_fingerprint_checkout",
+  accessControlController.captureFingerPrintCheckOut
+);
+
+router.get("/capture_cardinfo", accessControlController.captureCardInfo);
 
 //online subscription
 router.get(
   "/accesscontroller/events/subscribe",
   accessControlController.subscribe
+);
+
+router.post(
+  "/accesscontroller/events/records",
+  accessControlController.getRecords
+);
+
+router.get(
+  "/accesscontroller/events/total",
+  accessControlController.getTotalEventsNum
 );
 
 module.exports = router;

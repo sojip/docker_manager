@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import Icon from "@mdi/react";
 import { mdiAccountPlusOutline } from "@mdi/js";
-import { mdiAccountHardHatOutline } from "@mdi/js";
 import AddWorkerForm from "./AddWorkerForm";
 import WorkerDetails from "./WorkerDetails";
 import TextField from "@mui/material/TextField";
-import { DateTime } from "luxon";
-import useAuthContext from "../../auth/useAuthContext";
+import { useAuthContext } from "../../auth/useAuthContext";
+import { useLoadingContext } from "../../App";
 import { ToastContainer, toast } from "react-toastify";
+import Modal from "react-bootstrap/Modal";
+import { WorkerItem } from "./WorkerItem";
+import "../../styles/Workers.css";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Modal from "react-bootstrap/Modal";
-import "../../styles/Workers.css";
 
-const Workers = (props) => {
-  const { setisLoading } = props;
-  const auth = useAuthContext();
+const Workers = () => {
+  const setisLoading = useLoadingContext();
+  const { user } = useAuthContext();
   let [workers, setworkers] = useState([]);
   const [searchWorkersResults, setsearchWorkersResults] = useState([]);
   const [addWorker, setaddWorker] = useState(false);
@@ -62,7 +62,7 @@ const Workers = (props) => {
     fetch("/api/workers", {
       signal: signal,
       headers: {
-        Authorization: `Bearer ${auth.user.access_token}`,
+        Authorization: `Bearer ${user.access_token}`,
       },
     })
       .then((res) => res.json())
@@ -110,36 +110,11 @@ const Workers = (props) => {
         <div className="workersGrid">
           {searchWorkersResults.map((worker) => {
             return (
-              <div
-                className="workerCard"
+              <WorkerItem
                 key={worker._id}
-                id={worker._id}
-                onClick={handleWorkerCardClick}
-              >
-                <div className="profileContainer">
-                  <Icon
-                    className="workerIcon"
-                    path={mdiAccountHardHatOutline}
-                    size={2.5}
-                  />
-                  <div className="name">
-                    <div>{worker.firstname}</div>
-                    <div>{worker.lastname}</div>
-                  </div>
-                </div>
-                <div>
-                  Born On{" "}
-                  {DateTime.fromISO(worker.dateofbirth)
-                    .setLocale("fr")
-                    .toLocaleString({
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                </div>
-                {worker.cni && <div>CNI N° {worker.cni}</div>}
-                <div className="seemore">See More</div>
-              </div>
+                worker={worker}
+                handleWorkerCardClick={handleWorkerCardClick}
+              />
             );
           })}
         </div>

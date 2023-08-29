@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { v4 } from "uuid";
 
 export const useSubscribe = () => {
   const [events, setevents] = useState([]);
@@ -19,13 +20,13 @@ export const useSubscribe = () => {
           break;
         }
         try {
-          let chunks = processChunkString(value);
-          let values = await Promise.all(
+          let chunks = extractChunks(value);
+          let datas = await Promise.all(
             chunks.map((chunk) => getJSON(chunk, { signal: signal }))
           );
-          let _events = values.filter((value) => value !== null);
+          let _events = datas.filter((data) => data !== null);
           if (_events.length > 0)
-            setevents((events) => [...events, ..._events]);
+            setevents((events) => [..._events, ...events]);
         } catch (e) {
           console.log(e.message);
         }
@@ -48,16 +49,15 @@ function parseChunk(value) {
 }
 
 // In case there are may events grouped in one string
-function processChunkString(chunk) {
-  let events = [];
-  let chunks = chunk.split("--boundary");
-  console.log(chunks);
-  for (let i = 0; i < chunks.length; i = i + 2) {
-    if (chunks[i + 1] !== undefined) {
-      events.push(chunks[i + 1]);
+function extractChunks(value) {
+  let chunks = [];
+  let values = value.split("--boundary");
+  for (let i = 0; i < values.length; i = i + 2) {
+    if (values[i + 1] !== undefined) {
+      chunks.push(values[i + 1]);
     }
   }
-  return events;
+  return chunks;
 }
 
 async function getJSON(chunk, { signal }) {
@@ -68,7 +68,10 @@ async function getJSON(chunk, { signal }) {
       signal: signal,
     });
     employee = await employee.json();
+    value.uid = employee._id;
+    value.photo = employee.photo;
     value.userName = `${employee.firstname} ${employee.lastname}`;
+    value.id = v4();
     return value;
   }
   return null;

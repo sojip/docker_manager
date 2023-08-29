@@ -2,13 +2,16 @@ const DigestClient = require("digest-fetch");
 var xml = require("xml2js");
 const { Curl, CurlAuth } = require("node-libcurl");
 require("dotenv").config();
+/**
+ * For Development as unmounting the component do not close the persistent connection
+ */
 var curlTest = new Curl();
 const terminateCurl = curlTest.close.bind(curlTest);
 
-module.exports.captureFingerPrint = function (req, res, next) {
+module.exports.captureFingerPrintCheckIn = function (req, res, next) {
   const username = process.env.access_control_username;
   const password = process.env.access_control_password;
-  const url = `http://${process.env.access_control_terminal_ip}/ISAPI/AccessControl/CaptureFingerPrint`;
+  const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/CaptureFingerPrint`;
   const options = {
     method: "POST",
     headers: {
@@ -29,6 +32,46 @@ module.exports.captureFingerPrint = function (req, res, next) {
       });
     })
     .catch((e) => next(e));
+};
+
+module.exports.captureFingerPrintCheckOut = function (req, res, next) {
+  const username = process.env.access_control_username;
+  const password = process.env.access_control_password;
+  const url = `http://${process.env.access_control_checkout_terminal_ip}/ISAPI/AccessControl/CaptureFingerPrint`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/xml",
+    },
+    body: `<CaptureFingerPrintCond version="2.0" xmlns="http://www.isapi.org/ver20/XMLSchema">
+    <fingerNo>1</fingerNo>
+</CaptureFingerPrintCond>`,
+  };
+  const client = new DigestClient(username, password, { algorithm: "MD5" });
+  client
+    .fetch(url, options)
+    .then((resp) => resp.text())
+    .then((text) => {
+      xml.parseString(text, function (err, results) {
+        if (err) return next(err);
+        res.json(results);
+      });
+    })
+    .catch((e) => next(e));
+};
+
+module.exports.captureCardInfo = async function (req, res, next) {
+  try {
+    const username = process.env.access_control_username;
+    const password = process.env.access_control_password;
+    const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/CaptureCardInfo?format=json`;
+    const client = new DigestClient(username, password, { algorithm: "MD5" });
+    const resp = await client.fetch(url);
+    const data = await resp.json();
+    return res.json(data);
+  } catch (e) {
+    next(e);
+  }
 };
 
 module.exports.createUser = async function (req, res, next) {
@@ -58,7 +101,7 @@ module.exports.createUser = async function (req, res, next) {
     };
     const username = process.env.access_control_username;
     const password = process.env.access_control_password;
-    const url = `http://${process.env.access_control_terminal_ip}/ISAPI/AccessControl/UserInfo/Record?format=json`;
+    const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/UserInfo/Record?format=json`;
     const options = {
       method: "POST",
       headers: {
@@ -77,6 +120,39 @@ module.exports.createUser = async function (req, res, next) {
   }
 };
 
+module.exports.saveCardInfo = function (req, res, next) {
+  const username = process.env.access_control_username;
+  const password = process.env.access_control_password;
+  const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/CardInfo/Record?format=json`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(cardInfo),
+  };
+  const cardInfo = {
+    CardInfo: {
+      employeeNo: req.personID.toString(),
+      cardNo: req.body.cardInfo,
+      deleteCard: false,
+      cardType: "normalCard",
+      leaderCard: "1",
+      checkEmployeeNo: true,
+      addCard: true,
+    },
+  };
+  const client = new DigestClient(username, password, { algorithm: "MD5" });
+  client
+    .fetch(url, options)
+    .then((resp) => resp.json())
+    .then((datas) => {
+      if (datas.statusCode !== 1) throw new Error(datas.subStatusCode);
+      next();
+    })
+    .catch((e) => next(e));
+};
+
 module.exports.saveFingerPrintCapture = function (req, res, next) {
   const username = process.env.access_control_username;
   const password = process.env.access_control_password;
@@ -90,7 +166,7 @@ module.exports.saveFingerPrintCapture = function (req, res, next) {
       leaderFP: [1],
     },
   };
-  const url = `http://${process.env.access_control_terminal_ip}/ISAPI/AccessControl/FingerPrintDownload?format=json`;
+  const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/FingerPrintDownload?format=json`;
   const options = {
     method: "POST",
     headers: {
@@ -110,9 +186,14 @@ module.exports.saveFingerPrintCapture = function (req, res, next) {
 };
 
 module.exports.subscribe = function (req, res, next) {
+  /**
+   * For Production as unmounting the component close the persistent connection
+   */
+
   // var curlTest = new Curl();
   // const terminateCurl = curlTest.close.bind(curlTest);
-  const url = `http://${process.env.access_control_terminal_ip}/ISAPI/Event/notification/alertStream`;
+
+  const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/Event/notification/alertStream`;
   curlTest.setOpt(Curl.option.URL, url);
   curlTest.setOpt(Curl.option.HTTPAUTH, CurlAuth.Digest);
   curlTest.setOpt(
@@ -122,12 +203,11 @@ module.exports.subscribe = function (req, res, next) {
   curlTest.setOpt(Curl.option.VERBOSE, true);
 
   curlTest.on("data", (chunk, curlInstance) => {
-    console.log("Receiving data with size: ", chunk.length);
     console.log("********");
+    console.log("Receiving data with size: ", chunk.length);
     console.log(chunk.toString());
     console.log("********");
     res.write(chunk.toString());
-    // res.flush();
   });
 
   // Event listener for end
@@ -148,10 +228,75 @@ module.exports.subscribe = function (req, res, next) {
   res.on("close", terminateCurl);
 };
 
+module.exports.getRecords = async function (req, res, next) {
+  const searchPosition = req.body.searchPosition;
+  const conditions = {
+    AcsEventCond: {
+      searchID: "1",
+      searchResultPosition: searchPosition,
+      maxResults: 2000,
+      major: 0,
+      minor: 0,
+      eventAttribute: "attendance",
+    },
+  };
+  const username = process.env.access_control_username;
+  const password = process.env.access_control_password;
+  const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/AcsEvent?format=json`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(conditions),
+  };
+  const client = new DigestClient(username, password, { algorithm: "MD5" });
+  client
+    .fetch(url, options)
+    .then((resp) => resp.json())
+    .then((data) => {
+      return res.json(data);
+    })
+    .catch((e) => next(e));
+};
+
+module.exports.getTotalEventsNum = async function (req, res, next) {
+  const conditions = {
+    AcsEventTotalNumCond: {
+      major: 0,
+      minor: 0,
+      eventAttribute: "attendance",
+    },
+  };
+  const username = process.env.access_control_username;
+  const password = process.env.access_control_password;
+  const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/AcsEventTotalNum?format=json`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(conditions),
+  };
+  const client = new DigestClient(username, password, { algorithm: "MD5" });
+  try {
+    const resp = await client.fetch(url, options);
+    const data = await resp.json();
+    return res.json(data.AcsEventTotalNum);
+  } catch (e) {
+    next(e);
+  }
+};
+
+/**
+ *
+ * Helpers
+ */
+
 async function getPersonID() {
   const username = process.env.access_control_username;
   const password = process.env.access_control_password;
-  const url = `http://${process.env.access_control_terminal_ip}/ISAPI/AccessControl/UserInfo/Search?format=json`;
+  const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/UserInfo/Search?format=json`;
   const options = {
     method: "POST",
     headers: {
@@ -179,7 +324,6 @@ async function getPersonID() {
   }
 }
 
-//helper function to add years on date
 function addYears(date, years) {
   const dateCopy = new Date(date);
   dateCopy.setFullYear(dateCopy.getFullYear() + years);

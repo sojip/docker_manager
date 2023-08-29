@@ -12,7 +12,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { FormLabel } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import "../../styles/AddShiftForm.css";
-import useAuthContext from "../../auth/useAuthContext";
+import { useAuthContext } from "../../auth/useAuthContext";
 import { toast } from "react-toastify";
 import { useContext } from "react";
 import { ShiftsContext } from "./Shifts";
@@ -25,7 +25,7 @@ import { Settings } from "luxon";
 Settings.defaultZone = "UTC+1";
 
 const AddShiftForm = (props) => {
-  const auth = useAuthContext();
+  const { user } = useAuthContext();
   const [datas, setdatas] = useState({ type: "", startdate: null });
   const [time, settime] = useState("");
   const [workers, setworkers] = useState([]);
@@ -42,7 +42,7 @@ const AddShiftForm = (props) => {
     const res = await fetch("/api/workers", {
       signal: signal,
       headers: {
-        Authorization: `Bearer ${auth.user.access_token}`,
+        Authorization: `Bearer ${user.access_token}`,
       },
     });
     const workers = await res.json();

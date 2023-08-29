@@ -9,8 +9,6 @@ var mongoose = require("mongoose");
 var apiRouter = require("./routes/api");
 const http = require("http");
 const socketio = require("socket.io");
-var compression = require("compression");
-var accessControlController = require("./controllers/accessControlController");
 require("dotenv").config();
 require("./auth/auth");
 
@@ -54,7 +52,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(xmlparser());
 app.use(cookieParser());
-app.use(compression());
 app.use("/api", apiRouter);
 
 /**

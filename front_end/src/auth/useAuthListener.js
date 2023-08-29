@@ -23,7 +23,7 @@ const useAuthListener = () => {
         if (data === undefined) return;
         setuser({
           id: data.user._id,
-          username: data.user.username,
+          name: data.user.username,
           profile: data.user.profile,
           access_token: data.access_token,
         });
@@ -43,6 +43,7 @@ const useAuthListener = () => {
   }, []);
   return {
     ischecking,
+    setischecking,
     user,
     setuser,
   };

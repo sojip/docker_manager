@@ -1,0 +1,32 @@
+.event {
+  border: solid 1px red;
+  display: grid;
+  grid-template-columns: min-content 2fr repeat(3, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.event img {
+  border-radius: 50%;
+  width: 50px;
+  object-fit: cover;
+}
+
+.fade-enter {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+.fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 300ms, transform 300ms;
+}
+.fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+.fade-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 300ms, transform 300ms;
+}

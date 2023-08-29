@@ -22,15 +22,15 @@ const Home = () => {
         </Link>
       </div>
       <div className="homeItem">
-        <Link to="/stats" className="homeLink">
-          <Icon path={mdiMonitorDashboard} size={1} />
-          Stats
-        </Link>
-      </div>
-      <div className="homeItem">
         <Link to="/access-events" className="homeLink">
           <Icon path={mdiSecurity} size={1} />
           Access Events
+        </Link>
+      </div>
+      <div className="homeItem">
+        <Link to="/stats" className="homeLink">
+          <Icon path={mdiMonitorDashboard} size={1} />
+          Stats
         </Link>
       </div>
     </div>

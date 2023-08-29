@@ -12,17 +12,20 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { InputAdornment, IconButton } from "@mui/material";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
+import BadgeIcon from "@mui/icons-material/Badge";
 
 const AddWorkerForm = (props) => {
-  const [isLoading, setisLoading] = useState(false);
-  const [iscapturing, setiscapturing] = useState(false);
+  const [isSubmitting, setisSubmitting] = useState(false);
+  const [iscapturingfinger, setiscapturingfinger] = useState(false);
+  const [iscapturingcard, setiscapturingcard] = useState(false);
   const [datas, setdatas] = useState({
     dateofbirth: null,
-    fingerprintcapture: "",
+    fingerprintcapturecheckIn: "",
+    fingerprintcapturecheckOut: "",
+    cardInfo: "",
   });
   const [photoSrc, setphotoSrc] = useState(DefaultPhoto);
-  let { handleClose } = props;
-  let { setworkers } = props;
+  let { handleClose, setworkers } = props;
 
   let style = {
     marginBottom: "15px",
@@ -41,10 +44,10 @@ const AddWorkerForm = (props) => {
     setphotoSrc(URL.createObjectURL(target.files[0]));
   };
 
-  const handleCaptureFingerprint = () => {
-    setiscapturing(true);
-    setdatas({ ...datas, fingerprintcapture: "" });
-    fetch("/api/capture_fingerprint")
+  const handleCaptureFingerprintCheckIn = () => {
+    setiscapturingfinger(true);
+    setdatas({ ...datas, fingerprintcapturecheckIn: "" });
+    fetch("/api/capture_fingerprint_checkin")
       .then((resp) => resp.json())
       .then((data) => {
         if (data.ResponseStatus !== undefined)
@@ -56,10 +59,57 @@ const AddWorkerForm = (props) => {
         );
         if (fingercaptureQuality < 80)
           throw new Error("Bad FingerPrint Quality, Please Try Again");
-        setdatas({ ...datas, fingerprintcapture: fingercapture.fingerData[0] });
+        setdatas({
+          ...datas,
+          fingerprintcapturecheckIn: fingercapture.fingerData[0],
+        });
       })
       .finally(() => {
-        setiscapturing(false);
+        setiscapturingfinger(false);
+      })
+      .catch((e) => toast.error(e.message));
+  };
+
+  const handleCaptureFingerprintCheckOut = () => {
+    setiscapturingfinger(true);
+    setdatas({ ...datas, fingerprintcapturecheckOut: "" });
+    fetch("/api/capture_fingerprint_checkout")
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (data.ResponseStatus !== undefined)
+          throw new Error(data.ResponseStatus.statusString[0]);
+        //tcheck fingerprint quality
+        const fingercapture = data.CaptureFingerPrint;
+        const fingercaptureQuality = Number(
+          fingercapture.fingerPrintQuality[0]
+        );
+        if (fingercaptureQuality < 80)
+          throw new Error("Bad FingerPrint Quality, Please Try Again");
+        setdatas({
+          ...datas,
+          fingerprintcapturecheckOut: fingercapture.fingerData[0],
+        });
+      })
+      .finally(() => {
+        setiscapturingfinger(false);
+      })
+      .catch((e) => toast.error(e.message));
+  };
+
+  const handleCaptureCard = () => {
+    setiscapturingcard(true);
+    setdatas({ ...datas, cardInfo: "" });
+    fetch("/api/capture_cardinfo")
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (data.ResponseStatus !== undefined)
+          throw new Error(data.ResponseStatus.statusString[0]);
+        const cardInfo = data.CardInfo.cardNo;
+        console.log(cardInfo);
+        setdatas({ ...datas, cardInfo });
+      })
+      .finally(() => {
+        setiscapturingcard(false);
       })
       .catch((e) => toast.error(e.message));
   };
@@ -71,9 +121,9 @@ const AddWorkerForm = (props) => {
       return toast.info("Please Add A Photo");
     }
     if (datas.fingerprintcapture === "") {
-      // return toast.info("Please Add A Fingerprint");
+      return toast.info("Please Add A Fingerprint");
     }
-    setisLoading(true);
+    setisSubmitting(true);
     //create mutltipart form data
     let formData = new FormData();
     formData.append("photo", photo.files[0]);
@@ -87,13 +137,14 @@ const AddWorkerForm = (props) => {
     })
       .then(async (res) => {
         if (!res.ok) throw new Error(await res.text());
-        return res.json();
+        return await res.json();
       })
       .then((worker) => {
         setworkers((workers) => [...workers, worker]);
         setdatas({
           dateofbirth: null,
           fingerprintcapture: "",
+          cardInfo: "",
         });
         setphotoSrc(DefaultPhoto);
         toast.success("Worker Added Successfully");
@@ -103,7 +154,7 @@ const AddWorkerForm = (props) => {
         toast.error(e.message);
       })
       .finally(() => {
-        setisLoading(false);
+        setisSubmitting(false);
       });
   };
 
@@ -205,26 +256,51 @@ const AddWorkerForm = (props) => {
       />
       <br />
       <TextField
-        id="fingerpirnt"
-        label="Fingerprint"
-        name="fingerprint"
+        id="accesscard"
+        label="Access Card"
+        name="card"
+        variant="outlined"
+        style={style}
+        value={datas.cardInfo}
+        InputProps={{
+          readOnly: true,
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleCaptureCard}
+                edge="end"
+              >
+                {iscapturingcard ? (
+                  <i className="fa-solid fa-spinner fa-spin-pulse"></i>
+                ) : (
+                  <BadgeIcon />
+                )}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+      <TextField
+        id="fingerprint checkin"
+        label="Fingerprint CheckIn"
+        name="fingerprint_checkin"
         variant="outlined"
         style={style}
         InputProps={{
           readOnly: true,
           startAdornment:
-            datas.fingerprintcapture === "" ? null : (
+            datas.fingerprintcapturecheckIn === "" ? null : (
               <img src={FingerPrint} id="fingerprintImg" alt="" />
             ),
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
                 aria-label="toggle password visibility"
-                onClick={handleCaptureFingerprint}
-                // onMouseDown={handleMouseDownPassword}
+                onClick={handleCaptureFingerprintCheckIn}
                 edge="end"
               >
-                {iscapturing ? (
+                {iscapturingfinger ? (
                   <i className="fa-solid fa-spinner fa-spin-pulse"></i>
                 ) : (
                   <TouchAppIcon />
@@ -234,11 +310,41 @@ const AddWorkerForm = (props) => {
           ),
         }}
       />
+      <TextField
+        id="fingerprint checkout"
+        label="Fingerprint CheckOut"
+        name="fingerprint_checkout"
+        variant="outlined"
+        style={style}
+        InputProps={{
+          readOnly: true,
+          startAdornment:
+            datas.fingerprintcapturecheckOut === "" ? null : (
+              <img src={FingerPrint} id="fingerprintImg" alt="" />
+            ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleCaptureFingerprintCheckOut}
+                edge="end"
+              >
+                {iscapturingfinger ? (
+                  <i className="fa-solid fa-spinner fa-spin-pulse"></i>
+                ) : (
+                  <TouchAppIcon />
+                )}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+
       <br />
       <input
         type="submit"
-        value={isLoading ? "saving..." : "save"}
-        disabled={isLoading ? "disabled" : null}
+        value={isSubmitting ? "saving..." : "save"}
+        disabled={isSubmitting ? "disabled" : null}
       />
       <br />
     </Box>

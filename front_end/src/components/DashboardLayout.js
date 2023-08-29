@@ -1,12 +1,12 @@
-import AppHeader from "./AppHeader";
-import AppNav from "./AppNav";
+import Header from "./Header";
+import Nav from "./Nav";
 import { Outlet } from "react-router-dom";
 
 const DashboardLayout = (props) => {
   return (
     <>
-      <AppHeader />
-      <AppNav />
+      <Header />
+      <Nav />
       <main className="main">
         <Outlet />
       </main>

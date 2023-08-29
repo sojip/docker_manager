@@ -7,7 +7,7 @@ import { mdiSecurity } from "@mdi/js";
 import { NavLink } from "react-router-dom";
 import "../styles/AppNav.css";
 
-const AppNav = () => {
+const Nav = () => {
   let activeStyle = {
     color: "var(--orange-color)",
   };
@@ -69,4 +69,4 @@ const AppNav = () => {
   );
 };
 
-export default AppNav;
+export default Nav;

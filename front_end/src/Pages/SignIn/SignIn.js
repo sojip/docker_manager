@@ -4,12 +4,13 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import useAuthContext from "../../auth/useAuthContext";
+import { useAuthContext } from "../../auth/useAuthContext";
+import { useLoadingContext } from "../../App";
 
-export default function SignIn(props) {
+export default function SignIn() {
   const [datas, setdatas] = useState({});
-  const auth = useAuthContext();
-  const { setisLoading } = props;
+  const { setuser } = useAuthContext();
+  const setisLoading = useLoadingContext();
 
   const handleChange = (e) => {
     let name = e.target.name;
@@ -32,9 +33,9 @@ export default function SignIn(props) {
         if (datas.message) {
           throw new Error(datas.message);
         }
-        auth.setuser({
+        setuser({
           id: datas.user._id,
-          username: datas.user.username,
+          name: datas.user.username,
           profile: datas.user.profile,
           access_token: datas.access_token,
         });
