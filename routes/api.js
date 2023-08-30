@@ -78,18 +78,33 @@ router.get("/capture_cardinfo", accessControlController.captureCardInfo);
 
 //online subscription
 router.get(
-  "/accesscontroller/events/subscribe",
-  accessControlController.subscribe
-);
-
-router.post(
-  "/accesscontroller/events/records",
-  accessControlController.getRecords
+  "/accesscontroller/events/subscribe/checkin",
+  accessControlController.checkInSubscription
 );
 
 router.get(
-  "/accesscontroller/events/total",
-  accessControlController.getTotalEventsNum
+  "/accesscontroller/events/subscribe/checkout",
+  accessControlController.checkOutSubscription
+);
+
+router.post(
+  "/accesscontroller/events/records/checkin",
+  accessControlController.getRecordsCheckIn
+);
+
+router.post(
+  "/accesscontroller/events/records/checkout",
+  accessControlController.getRecordsCheckOut
+);
+
+router.get(
+  "/accesscontroller/records/checkin/total",
+  accessControlController.getTotalRecordsCheckIn
+);
+
+router.get(
+  "/accesscontroller/records/checkout/total",
+  accessControlController.getTotalRecordsCheckOut
 );
 
 module.exports = router;

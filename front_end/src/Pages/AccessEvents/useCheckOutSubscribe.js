@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
 import { v4 } from "uuid";
 
-export const useSubscribe = () => {
-  const [events, setevents] = useState([]);
+export const useCheckOutSubscribe = () => {
+  const [checkOutEvents, setevents] = useState([]);
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
     (async () => {
-      const response = await fetch("/api/accesscontroller/events/subscribe", {
-        signal: signal,
-      });
+      const response = await fetch(
+        "/api/accesscontroller/events/subscribe/checkout",
+        {
+          signal: signal,
+        }
+      );
       const reader = response.body
         .pipeThrough(new window.TextDecoderStream())
         .getReader();
@@ -37,7 +40,7 @@ export const useSubscribe = () => {
     };
   }, []);
 
-  return { events };
+  return { checkOutEvents };
 };
 
 function parseChunk(value) {

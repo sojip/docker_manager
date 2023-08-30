@@ -5,7 +5,7 @@ module.exports.login = function (req, res, next) {
   passport.authenticate("login", async (err, user, info) => {
     try {
       if (err !== null) return new Error("An Error occured");
-      if (!user) return res.status().json(info);
+      if (!user) return res.json(info);
       req.login(user, { session: false }, (error) => {
         if (error) return next(error);
 
@@ -32,6 +32,7 @@ module.exports.login = function (req, res, next) {
         return res.json({ access_token, user: body });
       });
     } catch (error) {
+      // return next(error);
       return new Error("An Error Occured");
     }
   })(req, res, next);

@@ -1,28 +1,58 @@
 import { useState, useEffect } from "react";
-import { useSubscribe } from "./useSubscribe";
+// import { useCheckInSubscribe } from "./useCheckInSubscribe";
+// import { useCheckOutSubscribe } from "./useCheckOutSubscribe";
+import { useEventsSubscribe } from "./useEventsSubscribe";
+import { useRecords } from "./useRecords";
 import { TransitionGroup } from "react-transition-group";
 import { Event } from "./Event";
 import { v4 } from "uuid";
 import "./Events.css";
-// Settings.defaultZone = "UTC+1";
 
 export const Events = () => {
-  const { events } = useSubscribe();
-  const [records, setrecords] = useState([]);
-  const [uievents, setuievents] = useState([]);
-  const [searchPosition, setsearchPosition] = useState(undefined);
+  // const { checkInEvents } = useCheckInSubscribe();
+  // const { checkOutEvents } = useCheckOutSubscribe();
+  // const checkInEvents = useEventsSubscribe(
+  //   "/api/accesscontroller/events/subscribe/checkin"
+  // );
+  // const checkOutEvents = useEventsSubscribe(
+  //   "/api/accesscontroller/events/subscribe/checkout"
+  // );
 
-  /** Get Total Number of Event then set search position to get the last ten */
+  const [checkInSearchPosition, setcheckInSearchPosition] = useState(null);
+  const [checkOutSearchPosition, setcheckOutSearchPosition] = useState(null);
+  const checkInRecords = useRecords(
+    "/api/accesscontroller/events/records/checkin",
+    checkInSearchPosition
+  );
+  const checkOutRecords = useRecords(
+    "/api/accesscontroller/events/records/checkout",
+    checkOutSearchPosition
+  );
+
+  // const [records, setrecords] = useState([]);
+  // const [checkInrecords, setcheckInrecords] = useState([]);
+  // const [checkOutrecords, setcheckOutrecords] = useState([]);
+  const [uievents, setuievents] = useState([]);
+  // const [searchPosition, setsearchPosition] = useState(undefined);
+
+  /** Get Total Number of Records then set search position to get the last ten */
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
     (async () => {
-      const resp = await fetch("/api/accesscontroller/events/total", {
-        signal: signal,
-      });
-      const data = await resp.json();
-      const total = data.totalNum;
-      setsearchPosition(total - 10);
+      const responses = await Promise.all([
+        fetch("/api/accesscontroller/records/checkin/total", {
+          signal: signal,
+        }),
+        fetch("/api/accesscontroller/records/checkout/total", {
+          signal: signal,
+        }),
+      ]);
+      const data = await Promise.all(
+        responses.map((response) => response.json())
+      );
+      setcheckInSearchPosition(data[0].totalNum - 10);
+      setcheckOutSearchPosition(data[1].totalNum - 10);
     })();
     return () => {
       controller.abort();
@@ -30,37 +60,47 @@ export const Events = () => {
   }, []);
 
   /** Get the recorded events based on search position */
-  useEffect(() => {
-    if (searchPosition) {
-      (async () => {
-        const resp = await fetch("/api/accesscontroller/events/records", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ searchPosition }),
-        });
-        const data = await resp.json();
-        if (data.AcsEvent.InfoList.length > 0) {
-          const infosList = data.AcsEvent.InfoList.map((info) => {
-            return addUserDetails(info);
-          });
-          const records = await Promise.all(infosList);
-          setrecords(records.toReversed());
-        }
-      })();
-    }
-  }, [searchPosition]);
+  // useEffect(() => {
+  //   const controller = new AbortController();
+  //   const signal = controller.signal;
+  //   if (searchPosition) {
+  //     (async () => {
+  //       const resp = await fetch("/api/accesscontroller/events/records", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ searchPosition }),
+  //         signal: signal,
+  //       });
+  //       const data = await resp.json();
+  //       if (data.AcsEvent.InfoList.length > 0) {
+  //         const infosList = data.AcsEvent.InfoList.map((info) => {
+  //           return addUserDetails(info);
+  //         });
+  //         const records = await Promise.all(infosList);
+  //         setrecords(records.toReversed());
+  //       }
+  //     })();
+  //   }
+  //   return () => {
+  //     controller.abort();
+  //   };
+  // }, [searchPosition]);
 
-  /** Merge real time and recorded events in descengin order */
+  /** Merge real time and recorded events in descending order */
   useEffect(() => {
+    // setuievents(
+    //   checkInEvents
+    //     .concat(checkOutEvents, checkInRecords, checkOutRecords)
+    //     .sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime))
+    // );
     setuievents(
-      events
-        .concat(records)
+      checkInRecords
+        .concat(checkOutRecords)
         .sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime))
     );
-    console.log(uievents);
-  }, [events, records]);
+  }, [checkInRecords, checkOutRecords]);
 
   return (
     <>

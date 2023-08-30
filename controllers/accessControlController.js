@@ -5,8 +5,10 @@ require("dotenv").config();
 /**
  * For Development as unmounting the component do not close the persistent connection
  */
-var curlTest = new Curl();
-const terminateCurl = curlTest.close.bind(curlTest);
+var checkInCurl = new Curl();
+var checkOutCurl = new Curl();
+const terminateCheckInCurl = checkInCurl.close.bind(checkInCurl);
+const terminateCheckOutCurl = checkOutCurl.close.bind(checkOutCurl);
 
 module.exports.captureFingerPrintCheckIn = function (req, res, next) {
   const username = process.env.access_control_username;
@@ -250,7 +252,7 @@ module.exports.saveFingerPrintCapture = async function (req, res, next) {
   //   .catch((e) => next(e));
 };
 
-module.exports.subscribe = function (req, res, next) {
+module.exports.checkInSubscription = function (req, res, next) {
   /**
    * For Production as unmounting the component close the persistent connection
    */
@@ -259,15 +261,15 @@ module.exports.subscribe = function (req, res, next) {
   // const terminateCurl = curlTest.close.bind(curlTest);
 
   const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/Event/notification/alertStream`;
-  curlTest.setOpt(Curl.option.URL, url);
-  curlTest.setOpt(Curl.option.HTTPAUTH, CurlAuth.Digest);
-  curlTest.setOpt(
+  checkInCurl.setOpt(Curl.option.URL, url);
+  checkInCurl.setOpt(Curl.option.HTTPAUTH, CurlAuth.Digest);
+  checkInCurl.setOpt(
     Curl.option.USERPWD,
     `${process.env.access_control_username}:${process.env.access_control_password}`
   );
-  curlTest.setOpt(Curl.option.VERBOSE, true);
+  checkInCurl.setOpt(Curl.option.VERBOSE, true);
 
-  curlTest.on("data", (chunk, curlInstance) => {
+  checkInCurl.on("data", (chunk, curlInstance) => {
     console.log("********");
     console.log("Receiving data with size: ", chunk.length);
     console.log(chunk.toString());
@@ -276,24 +278,67 @@ module.exports.subscribe = function (req, res, next) {
   });
 
   // Event listener for end
-  curlTest.on("end", (statusCode, body, headers, curlInstance) => {
+  checkInCurl.on("end", (statusCode, body, headers, curlInstance) => {
     console.log("request ending");
-    terminateCurl();
+    terminateCheckInCurl();
     res.end();
   });
 
   // Error handler for cURL
-  curlTest.on("error", (error, errorCode) => {
+  checkInCurl.on("error", (error, errorCode) => {
     console.log("error on access control listener");
-    terminateCurl();
+    terminateCheckInCurl();
   });
 
   // Commits this request to the URL
-  curlTest.perform();
-  res.on("close", terminateCurl);
+  checkInCurl.perform();
+  res.on("close", terminateCheckInCurl);
 };
 
-module.exports.getRecords = async function (req, res, next) {
+module.exports.checkOutSubscription = function (req, res, next) {
+  /**
+   * For Production as unmounting the component close the persistent connection
+   */
+
+  // var curlTest = new Curl();
+  // const terminateCurl = curlTest.close.bind(curlTest);
+
+  const url = `http://${process.env.access_control_checkout_terminal_ip}/ISAPI/Event/notification/alertStream`;
+  checkOutCurl.setOpt(Curl.option.URL, url);
+  checkOutCurl.setOpt(Curl.option.HTTPAUTH, CurlAuth.Digest);
+  checkOutCurl.setOpt(
+    Curl.option.USERPWD,
+    `${process.env.access_control_username}:${process.env.access_control_password}`
+  );
+  checkOutCurl.setOpt(Curl.option.VERBOSE, true);
+
+  checkOutCurl.on("data", (chunk, curlInstance) => {
+    console.log("********");
+    console.log("Receiving data with size: ", chunk.length);
+    console.log(chunk.toString());
+    console.log("********");
+    res.write(chunk.toString());
+  });
+
+  // Event listener for end
+  checkOutCurl.on("end", (statusCode, body, headers, curlInstance) => {
+    console.log("request ending");
+    terminateCheckOutCurl();
+    res.end();
+  });
+
+  // Error handler for cURL
+  checkOutCurl.on("error", (error, errorCode) => {
+    console.log("error on access control listener");
+    terminateCheckOutCurl();
+  });
+
+  // Commits this request to the URL
+  checkOutCurl.perform();
+  res.on("close", terminateCheckOutCurl);
+};
+
+module.exports.getRecordsCheckIn = async function (req, res, next) {
   const searchPosition = req.body.searchPosition;
   const conditions = {
     AcsEventCond: {
@@ -325,7 +370,39 @@ module.exports.getRecords = async function (req, res, next) {
     .catch((e) => next(e));
 };
 
-module.exports.getTotalEventsNum = async function (req, res, next) {
+module.exports.getRecordsCheckOut = async function (req, res, next) {
+  const searchPosition = req.body.searchPosition;
+  const conditions = {
+    AcsEventCond: {
+      searchID: "1",
+      searchResultPosition: searchPosition,
+      maxResults: 2000,
+      major: 0,
+      minor: 0,
+      eventAttribute: "attendance",
+    },
+  };
+  const username = process.env.access_control_username;
+  const password = process.env.access_control_password;
+  const url = `http://${process.env.access_control_checkout_terminal_ip}/ISAPI/AccessControl/AcsEvent?format=json`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(conditions),
+  };
+  const client = new DigestClient(username, password, { algorithm: "MD5" });
+  client
+    .fetch(url, options)
+    .then((resp) => resp.json())
+    .then((data) => {
+      return res.json(data);
+    })
+    .catch((e) => next(e));
+};
+
+module.exports.getTotalRecordsCheckIn = async function (req, res, next) {
   const conditions = {
     AcsEventTotalNumCond: {
       major: 0,
@@ -336,6 +413,34 @@ module.exports.getTotalEventsNum = async function (req, res, next) {
   const username = process.env.access_control_username;
   const password = process.env.access_control_password;
   const url = `http://${process.env.access_control_checkin_terminal_ip}/ISAPI/AccessControl/AcsEventTotalNum?format=json`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(conditions),
+  };
+  const client = new DigestClient(username, password, { algorithm: "MD5" });
+  try {
+    const resp = await client.fetch(url, options);
+    const data = await resp.json();
+    return res.json(data.AcsEventTotalNum);
+  } catch (e) {
+    next(e);
+  }
+};
+
+module.exports.getTotalRecordsCheckOut = async function (req, res, next) {
+  const conditions = {
+    AcsEventTotalNumCond: {
+      major: 0,
+      minor: 0,
+      eventAttribute: "attendance",
+    },
+  };
+  const username = process.env.access_control_username;
+  const password = process.env.access_control_password;
+  const url = `http://${process.env.access_control_checkout_terminal_ip}/ISAPI/AccessControl/AcsEventTotalNum?format=json`;
   const options = {
     method: "POST",
     headers: {
