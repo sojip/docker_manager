@@ -7,8 +7,10 @@ export const useRecords = (url, searchPosition) => {
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
+
     if (searchPosition) {
       console.log(searchPosition);
+      setrecords([]);
       (async () => {
         const resp = await fetch(url, {
           method: "POST",
@@ -23,8 +25,9 @@ export const useRecords = (url, searchPosition) => {
           const infosList = data.AcsEvent.InfoList.map((info) => {
             return addUserDetails(info);
           });
-          const records = await Promise.all(infosList);
-          setrecords(records.toReversed());
+          const _records = await Promise.all(infosList);
+          // setrecords(_records.toReversed());
+          setrecords(_records);
         }
       })();
     }
@@ -41,7 +44,6 @@ export const useRecords = (url, searchPosition) => {
  */
 
 async function addUserDetails(info) {
-  // console.log(info);
   const resp = await fetch(`/api/workers/event/${info.employeeNoString}`);
   const employee = await resp.json();
   return {

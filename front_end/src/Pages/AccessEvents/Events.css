@@ -1,15 +1,34 @@
 .event {
-  border: solid 1px red;
   display: grid;
   grid-template-columns: min-content 2fr repeat(3, 1fr);
   align-items: center;
   gap: 10px;
+  background-color: white;
+  padding: 6px 10px;
+  border-top: solid 2px var(--orange-color);
+}
+
+.event:last-of-type {
+  border-bottom: solid 2px var(--orange-color);
+  margin-bottom: 25px;
+}
+
+.navigation.arrows {
+  display: flex;
+  justify-content: flex-end;
+  gap: 25px;
+  padding-bottom: 25px;
+  background-color: white;
+}
+
+.navigation.arrows > * {
+  cursor: pointer;
 }
 
 .event img {
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
 }
 
@@ -27,7 +46,7 @@
   transform: translateX(0);
 }
 .fade-exit-active {
-  opacity: 0;
+  opacity: 1;
   transform: translateX(-100%);
   transition: opacity 300ms, transform 300ms;
 }

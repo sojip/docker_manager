@@ -344,7 +344,7 @@ module.exports.getRecordsCheckIn = async function (req, res, next) {
     AcsEventCond: {
       searchID: "1",
       searchResultPosition: searchPosition,
-      maxResults: 2000,
+      maxResults: 10,
       major: 0,
       minor: 0,
       eventAttribute: "attendance",
@@ -376,7 +376,7 @@ module.exports.getRecordsCheckOut = async function (req, res, next) {
     AcsEventCond: {
       searchID: "1",
       searchResultPosition: searchPosition,
-      maxResults: 2000,
+      maxResults: 10,
       major: 0,
       minor: 0,
       eventAttribute: "attendance",

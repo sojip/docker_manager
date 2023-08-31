@@ -68,9 +68,9 @@ async function getJSON(chunk, { signal }) {
       signal: signal,
     });
     employee = await employee.json();
-    value.uid = employee._id;
-    value.photo = employee.photo;
-    value.userName = `${employee.firstname} ${employee.lastname}`;
+    value.uid = employee?._id;
+    value.photo = employee?.photo;
+    value.userName = `${employee?.firstname} ${employee?.lastname}`;
     value.id = v4();
     return value;
   }
