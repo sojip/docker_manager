@@ -26,7 +26,6 @@ export const useRecords = (url, searchPosition) => {
             return addUserDetails(info);
           });
           const _records = await Promise.all(infosList);
-          // setrecords(_records.toReversed());
           setrecords(_records);
         }
       })();
