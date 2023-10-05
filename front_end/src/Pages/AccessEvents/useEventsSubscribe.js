@@ -64,7 +64,7 @@ async function getJSON(chunk, { signal }) {
   let value = JSON.parse(parseChunk(chunk));
   let employeeNoString = value?.AccessControllerEvent?.employeeNoString;
   if (employeeNoString) {
-    let employee = await fetch(`/api/workers/event/${employeeNoString}`, {
+    let employee = await fetch(`/api/workers/personID/${employeeNoString}`, {
       signal: signal,
     });
     employee = await employee.json();

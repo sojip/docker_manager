@@ -1,4 +1,4 @@
-import "../../styles/SignIn.css";
+import "./SignIn.css";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
@@ -21,7 +21,7 @@ export default function SignIn() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setisLoading(true);
-    fetch("/api/login", {
+    fetch("/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -7,7 +7,7 @@ const useAuthListener = () => {
   useEffect(() => {
     const controller = new AbortController();
     let signal = controller.signal;
-    fetch("/api/refresh_token", {
+    fetch("/api/auth/refresh_token", {
       signal: signal,
     })
       .then((res) => {

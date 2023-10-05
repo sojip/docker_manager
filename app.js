@@ -6,11 +6,17 @@ var logger = require("morgan");
 var cors = require("cors");
 var xmlparser = require("express-xml-bodyparser");
 var mongoose = require("mongoose");
-var apiRouter = require("./routes/api");
 const http = require("http");
+var authRouter = require("./routes/authRouter");
+var dockerRouter = require("./routes/dockerRouter");
+var accessControlRouter = require("./routes/accessControlRouter");
+var shiftRouter = require("./routes/shiftRouter");
+var shiftinstanceRouter = require("./routes/shiftinstanceRouter");
+
 const socketio = require("socket.io");
+
 require("dotenv").config();
-require("./auth/auth");
+require("./auth/PassportConfig");
 
 /**
  * Mongodb connection.
@@ -52,10 +58,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(xmlparser());
 app.use(cookieParser());
-app.use("/api", apiRouter);
-
+app.use("/api/auth", authRouter);
+app.use("/api/workers", dockerRouter);
+app.use("/api/accesscontroller", accessControlRouter);
+app.use("/api/shifts", shiftRouter);
+app.use("/api/shiftinstances", shiftinstanceRouter);
 /**
- * Indicate react app folder.
+ * Indicate folders that should be served.
  */
 app.use(express.static(path.join(__dirname, "./front_end/build")));
 app.use(express.static(path.join(__dirname, "./public")));

@@ -19,12 +19,12 @@ const Workers = () => {
   let [workers, setworkers] = useState([]);
   const [searchWorkersResults, setsearchWorkersResults] = useState([]);
   const [addWorker, setaddWorker] = useState(false);
-  const [showWorker, setshowWorker] = useState(false);
+  const [showWorkerDetails, setshowWorkerDetails] = useState(false);
   const [selected_id, setselected] = useState("");
 
   const handleClose = () => {
     setaddWorker(false);
-    setshowWorker(false);
+    setshowWorkerDetails(false);
   };
 
   const handleAddWorkerClick = (e) => {
@@ -33,7 +33,7 @@ const Workers = () => {
 
   const handleWorkerCardClick = (e) => {
     setselected(e.currentTarget.id);
-    setshowWorker(true);
+    setshowWorkerDetails(true);
   };
 
   let search = (arr, str) => {
@@ -130,7 +130,7 @@ const Workers = () => {
       </Modal>
       <Modal
         backdrop="static"
-        show={showWorker}
+        show={showWorkerDetails}
         contentClassName="content-wrapper showWorker"
         fullscreen={true}
         scrollable

@@ -4,7 +4,7 @@ import { mdiAccountMultiple } from "@mdi/js";
 import { mdiCarShiftPattern } from "@mdi/js";
 import { mdiMonitorDashboard } from "@mdi/js";
 import { mdiSecurity } from "@mdi/js";
-import "../../styles/Home.css";
+import "./Home.css";
 
 const Home = () => {
   return (

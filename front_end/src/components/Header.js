@@ -42,7 +42,7 @@ const Header = () => {
   }
 
   function handleLogOut(e) {
-    fetch("/api/logout")
+    fetch("/api/auth/logout")
       .then(() => {
         auth.setuser(null);
       })

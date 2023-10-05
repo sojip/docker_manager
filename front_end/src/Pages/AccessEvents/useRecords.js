@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { v4 } from "uuid";
 
 export const useRecords = (url, searchPosition) => {
-  const [records, setrecords] = useState([]);
+  /**
+   * The starting records is undefined instead of an empty array to manage spinner state.
+   * When records is anything else than undefined it means server response is available so the spinner can be hidden.
+   */
+  const [records, setrecords] = useState(undefined);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -10,7 +14,7 @@ export const useRecords = (url, searchPosition) => {
 
     if (searchPosition) {
       console.log(searchPosition);
-      setrecords([]);
+      setrecords(undefined);
       (async () => {
         const resp = await fetch(url, {
           method: "POST",
@@ -21,7 +25,7 @@ export const useRecords = (url, searchPosition) => {
           signal: signal,
         });
         const data = await resp.json();
-        if (data.AcsEvent.InfoList.length > 0) {
+        if (data?.AcsEvent?.InfoList?.length >= 0) {
           const infosList = data.AcsEvent.InfoList.map((info) => {
             return addUserDetails(info);
           });
@@ -43,7 +47,7 @@ export const useRecords = (url, searchPosition) => {
  */
 
 async function addUserDetails(info) {
-  const resp = await fetch(`/api/workers/event/${info.employeeNoString}`);
+  const resp = await fetch(`/api/workers/personID/${info.employeeNoString}`);
   const employee = await resp.json();
   return {
     ...info,

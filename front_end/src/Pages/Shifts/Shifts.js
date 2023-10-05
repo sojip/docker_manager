@@ -12,12 +12,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import "../../styles/Shifts.css";
+import { useLoadingContext } from "../../App";
 
 export const ShiftsContext = createContext();
 export const SelectedShiftContext = createContext();
 
 const Shifts = (props) => {
-  const { setisLoading } = props;
+  const setisLoading = useLoadingContext();
   const [shifts, setshifts] = useState([]);
   const [searchShiftsResults, setsearchShiftsResults] = useState([]);
   const [selected_shift, setselectedshift] = useState({});

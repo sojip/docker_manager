@@ -45,74 +45,67 @@ const AddWorkerForm = (props) => {
     setdatas({ ...datas, photo: target.files[0] });
   };
 
-  const handleCaptureFingerprintCheckIn = () => {
-    setiscapturingfingerIn(true);
-    setdatas({ ...datas, fingerprintcapturecheckIn: "" });
-    fetch("/api/capture_fingerprint_checkin")
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.ResponseStatus !== undefined)
-          throw new Error(data.ResponseStatus.statusString[0]);
-        //tcheck fingerprint quality
-        const fingercapture = data.CaptureFingerPrint;
-        const fingercaptureQuality = Number(
-          fingercapture.fingerPrintQuality[0]
-        );
-        if (fingercaptureQuality < 80)
-          throw new Error("Bad FingerPrint Quality, Please Try Again");
+  const handleFingerCapture = async (e) => {
+    let ipaddress = e.currentTarget.dataset.ip;
+    if (ipaddress === process.env.REACT_APP_CHECKIN_TERMINAL_IP) {
+      setiscapturingfingerIn(true);
+      setdatas({ ...datas, fingerprintcapturecheckIn: "" });
+    }
+    if (ipaddress === process.env.REACT_APP_CHECKOUT_TERMINAL_IP) {
+      setiscapturingfingerOut(true);
+      setdatas({ ...datas, fingerprintcapturecheckOut: "" });
+    }
+    try {
+      const resp = await fetch(
+        `/api/accesscontroller/${ipaddress}/capturefinger`
+      );
+      const data = await resp.json();
+      if (data.ResponseStatus !== undefined)
+        throw new Error(data.ResponseStatus.statusString[0]);
+      //Tcheck fingerprint quality
+      const fingercapture = data.CaptureFingerPrint;
+      const fingercaptureQuality = Number(fingercapture.fingerPrintQuality[0]);
+      if (fingercaptureQuality < 80)
+        throw new Error("Bad FingerPrint Quality, Please Try Again");
+
+      if (ipaddress === process.env.REACT_APP_CHECKIN_TERMINAL_IP) {
         setdatas({
           ...datas,
           fingerprintcapturecheckIn: fingercapture.fingerData[0],
         });
-      })
-      .finally(() => {
         setiscapturingfingerIn(false);
-      })
-      .catch((e) => toast.error(e.message));
-  };
-
-  const handleCaptureFingerprintCheckOut = () => {
-    setiscapturingfingerOut(true);
-    setdatas({ ...datas, fingerprintcapturecheckOut: "" });
-    fetch("/api/capture_fingerprint_checkout")
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.ResponseStatus !== undefined)
-          throw new Error(data.ResponseStatus.statusString[0]);
-        //tcheck fingerprint quality
-        const fingercapture = data.CaptureFingerPrint;
-        const fingercaptureQuality = Number(
-          fingercapture.fingerPrintQuality[0]
-        );
-        if (fingercaptureQuality < 80)
-          throw new Error("Bad FingerPrint Quality, Please Try Again");
+      }
+      if (ipaddress === process.env.REACT_APP_CHECKOUT_TERMINAL_IP) {
         setdatas({
           ...datas,
           fingerprintcapturecheckOut: fingercapture.fingerData[0],
         });
-      })
-      .finally(() => {
         setiscapturingfingerOut(false);
-      })
-      .catch((e) => toast.error(e.message));
+      }
+    } catch (e) {
+      setiscapturingfingerIn(false);
+      setiscapturingfingerOut(false);
+      toast.error(e.message);
+    }
   };
 
-  const handleCaptureCard = () => {
+  const handleCaptureCard = async () => {
     setiscapturingcard(true);
     setdatas({ ...datas, cardInfo: "" });
-    fetch("/api/capture_cardinfo")
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.ResponseStatus !== undefined)
-          throw new Error(data.ResponseStatus.statusString[0]);
-        const cardInfo = data.CardInfo.cardNo;
-        console.log(cardInfo);
-        setdatas({ ...datas, cardInfo });
-      })
-      .finally(() => {
-        setiscapturingcard(false);
-      })
-      .catch((e) => toast.error(e.message));
+    try {
+      const resp = await fetch(
+        `/api/accesscontroller/${process.env.REACT_APP_CHECKIN_TERMINAL_IP}/capturecard`
+      );
+      const data = await resp.json();
+      if (data.ResponseStatus !== undefined)
+        throw new Error(data.ResponseStatus.statusString[0]);
+      const cardInfo = data.CardInfo.cardNo;
+      setdatas({ ...datas, cardInfo });
+      setiscapturingcard(false);
+    } catch (e) {
+      setiscapturingcard(false);
+      toast.error(e.message);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -299,7 +292,8 @@ const AddWorkerForm = (props) => {
             <InputAdornment position="end">
               <IconButton
                 aria-label="toggle password visibility"
-                onClick={handleCaptureFingerprintCheckIn}
+                data-ip={process.env.REACT_APP_CHECKIN_TERMINAL_IP}
+                onClick={handleFingerCapture}
                 edge="end"
               >
                 {iscapturingfingerIn ? (
@@ -328,7 +322,8 @@ const AddWorkerForm = (props) => {
             <InputAdornment position="end">
               <IconButton
                 aria-label="toggle password visibility"
-                onClick={handleCaptureFingerprintCheckOut}
+                data-ip={process.env.REACT_APP_CHECKOUT_TERMINAL_IP}
+                onClick={handleFingerCapture}
                 edge="end"
               >
                 {iscapturingfingerOut ? (
